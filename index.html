@@ -5,301 +5,33 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NexusAI - Chatbot</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
-        }
-
-        body {
-            background-color: #050507;
-            color: #f4f4fc;
-            font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            min-height: 100dvh;
-            overflow: hidden;
-        }
-
-        /* TELA DE CARREGAMENTO ROXA NEON */
-        #splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: #0d0d11;
-            z-index: 99999;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            transition: opacity 0.5s ease, visibility 0.5s ease;
-        }
-
-        .splash-logo {
-            color: #d8b4fe;
-            font-size: 28px;
-            font-weight: bold;
-            text-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
-            margin-bottom: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-        }
-
-        .splash-insta {
-            color: #a78bfa;
-            font-size: 14px;
-            font-weight: 500;
-            animation: pulse 1.5s infinite ease-in-out;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 0.6; }
-            50% { transform: scale(1.05); opacity: 1; }
-        }
-
-        /* Estrutura Responsiva - Inteligente para PC e Celular */
-        .site-wrapper {
-            width: 100%;
-            height: 100vh;
-            height: 100dvh;
-            max-width: 800px; /* Ficou um pouco mais largo para telas de PC */
-            display: flex;
-            flex-direction: column;
-            background-color: #0d0d11;
-            position: relative;
-        }
-
-        /* Ajuste visual exclusivo para telas de Computador */
-        @media (min-width: 768px) {
-            .site-wrapper {
-                height: 85vh; /* No PC, vira uma janela central elegante */
-                border-radius: 16px;
-                border: 1px solid rgba(168, 85, 247, 0.2);
-                box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
-            }
-        }
-
-        /* Topo do Site */
-        .site-header {
-            background: linear-gradient(180deg, rgba(168, 85, 247, 0.1), transparent);
-            padding: 14px;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.15);
-            text-align: center;
-            flex-shrink: 0;
-        }
-
-        .site-header h1 {
-            font-size: 20px;
-            color: #d8b4fe;
-            letter-spacing: 2px;
-            margin-bottom: 2px;
-            text-transform: uppercase;
-            text-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
-        }
-
-        .site-header span {
-            color: #a78bfa;
-            font-size: 11px;
-            font-weight: 600;
-            letter-spacing: 1px;
-        }
-
-        /* Abas de Configuração */
-        .preset-bar {
-            display: flex;
-            padding: 10px;
-            gap: 8px;
-            border-bottom: 1px solid rgba(168, 85, 247, 0.1);
-            flex-shrink: 0;
-        }
-
-        .tag-btn {
-            flex: 1;
-            background: rgba(168, 85, 247, 0.05);
-            border: 1px solid rgba(168, 85, 247, 0.2);
-            color: #a78bfa;
-            padding: 10px 6px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-        }
-
-        .tag-btn:hover {
-            background: rgba(168, 85, 247, 0.12);
-        }
-
-        .tag-btn.tag-active {
-            background: rgba(168, 85, 247, 0.25);
-            color: #fff;
-            border-color: #a855f7;
-            box-shadow: 0 0 10px rgba(168, 85, 247, 0.3);
-        }
-
-        /* Área de Mensagens */
-        #chat-container {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        /* Customização da barra de rolagem (Scrollbar) no PC */
-        #chat-container::-webkit-scrollbar {
-            width: 6px;
-        }
-        #chat-container::-webkit-scrollbar-thumb {
-            background: rgba(168, 85, 247, 0.3);
-            border-radius: 10px;
-        }
-
-        .message-system {
-            max-width: 95%;
-            margin: 8px auto;
-            padding: 10px 16px;
-            background: rgba(168, 85, 247, 0.05);
-            border: 1px solid rgba(168, 85, 247, 0.15);
-            border-radius: 20px;
-            font-size: 11px;
-            color: #a78bfa;
-            text-align: center;
-            font-weight: bold;
-            letter-spacing: 0.5px;
-        }
-
-        /* Preview de Anexo */
-        .lens-preview {
-            display: none;
-            padding: 10px 14px;
-            background: rgba(168, 85, 247, 0.07);
-            border-top: 1px solid rgba(168, 85, 247, 0.2);
-            align-items: center;
-            justify-content: space-between;
-            flex-shrink: 0;
-        }
-
-        .lens-preview span {
-            font-size: 12px;
-            color: #f4f4fc;
-        }
-
-        .lens-remove {
-            color: #ef4444;
-            cursor: pointer;
-            font-weight: bold;
-            padding: 4px 8px;
-        }
-
-        /* Barra Inferior */
-        .input-area {
-            padding: 12px;
-            border-top: 1px solid rgba(168, 85, 247, 0.15);
-            background-color: #0d0d11;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            flex-shrink: 0;
-            padding-bottom: max(12px, env(safe-area-inset-bottom));
-        }
-
-        /* No PC adiciona borda arredondada na parte de baixo do chat */
-        @media (min-width: 768px) {
-            .input-area {
-                border-bottom-left-radius: 16px;
-                border-bottom-right-radius: 16px;
-            }
-        }
-
-        .input-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-        }
-
-        .textarea-input {
-            flex: 1;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(168, 85, 247, 0.25);
-            border-radius: 12px;
-            padding: 12px;
-            color: #f4f4fc;
-            font-size: 15px;
-            resize: none;
-            height: 46px;
-            outline: none;
-            font-family: inherit;
-        }
-
-        .textarea-input:focus {
-            border-color: #a855f7;
-            background: rgba(255, 255, 255, 0.06);
-        }
-
-        .btn-action {
-            background: linear-gradient(135deg, #a855f7, #6366f1);
-            border: none;
-            width: 46px;
-            height: 46px;
-            border-radius: 12px;
-            color: #fff;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
-            flex-shrink: 0;
-            font-size: 16px;
-            transition: opacity 0.2s;
-        }
-
-        .btn-action:hover {
-            opacity: 0.9;
-        }
-
-        .btn-secondary-row {
-            display: flex;
-            gap: 8px;
-        }
-
-        .btn-small {
-            flex: 1;
-            background: rgba(168, 85, 247, 0.12);
-            color: #d8b4fe;
-            border: 1px solid rgba(168, 85, 247, 0.3);
-            padding: 10px;
-            border-radius: 8px;
-            font-size: 11px;
-            font-weight: bold;
-            cursor: pointer;
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            transition: background 0.2s;
-        }
-
-        .btn-small:hover {
-            background: rgba(168, 85, 247, 0.2);
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { background-color: #050507; color: #f4f4fc; font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; min-height: 100dvh; overflow: hidden; }
+        #splash-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #0d0d11; z-index: 99999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.5s ease, visibility 0.5s ease; }
+        .splash-logo { color: #d8b4fe; font-size: 28px; font-weight: bold; text-shadow: 0 0 15px rgba(168, 85, 247, 0.6); margin-bottom: 12px; text-transform: uppercase; letter-spacing: 2px; }
+        .splash-insta { color: #a78bfa; font-size: 14px; font-weight: 500; animation: pulse 1.5s infinite ease-in-out; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); opacity: 0.6; } 50% { transform: scale(1.05); opacity: 1; } }
+        .site-wrapper { width: 100%; height: 100vh; height: 100dvh; max-width: 800px; display: flex; flex-direction: column; background-color: #0d0d11; position: relative; }
+        @media (min-width: 768px) { .site-wrapper { height: 85vh; border-radius: 16px; border: 1px solid rgba(168, 85, 247, 0.2); box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7); } }
+        .site-header { background: linear-gradient(180deg, rgba(168, 85, 247, 0.1), transparent); padding: 14px; border-bottom: 1px solid rgba(168, 85, 247, 0.15); text-align: center; flex-shrink: 0; }
+        .site-header h1 { font-size: 20px; color: #d8b4fe; letter-spacing: 2px; margin-bottom: 2px; text-transform: uppercase; text-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+        .site-header span { color: #a78bfa; font-size: 11px; font-weight: 600; letter-spacing: 1px; }
+        .preset-bar { display: flex; padding: 10px; gap: 8px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); flex-shrink: 0; }
+        .tag-btn { flex: 1; background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); color: #a78bfa; padding: 10px 6px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; text-align: center; transition: all 0.2s; }
+        .tag-btn:hover { background: rgba(168, 85, 247, 0.12); }
+        .tag-btn.tag-active { background: rgba(168, 85, 247, 0.25); color: #fff; border-color: #a855f7; box-shadow: 0 0 10px rgba(168, 85, 247, 0.3); }
+        #chat-container { flex: 1; padding: 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+        #chat-container::-webkit-scrollbar { width: 6px; }
+        #chat-container::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.3); border-radius: 10px; }
+        .message-system { max-width: 95%; margin: 8px auto; padding: 10px 16px; background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.15); border-radius: 20px; font-size: 11px; color: #a78bfa; text-align: center; font-weight: bold; letter-spacing: 0.5px; }
     </style>
 </head>
-<body>
-
-    <!-- Tela de Carregamento Roxo Neon -->
+    <body>
     <div id="splash-screen">
         <div class="splash-logo">NexusAI</div>
         <div class="splash-insta">BY @GUIWZ.045</div>
     </div>
 
-    <!-- Estrutura Principal -->
     <div class="site-wrapper">
         <header class="site-header">
             <h1>NexusAI</h1>
@@ -312,23 +44,62 @@
             <button class="tag-btn" data-mode="detalhada">📚 Passo a Passo</button>
         </div>
 
-        <!-- Painel Central das Mensagens -->
         <main id="chat-container">
             <div class="message-system">[SISTEMA ONLINE - ENVIE UMA MENSAGEM OU PRINT]</div>
         </main>
 
-        <!-- Preview de Anexo -->
-        <div id="lens-preview" class="lens-preview">
-            <span><strong id="lens-filename">Imagem carregada</strong></span>
-            <span id="lens-remove" class="lens-remove">✕</span>
+        <div id="lens-preview" style="display: none; padding: 10px 14px; background: rgba(168, 85, 247, 0.07); border-top: 1px solid rgba(168, 85, 247, 0.2); align-items: center; justify-content: space-between; flex-shrink: 0;">
+            <span style="font-size: 12px; color: #f4f4fc;"><strong id="lens-filename">Imagem carregada</strong></span>
+            <span id="lens-remove" style="color: #ef4444; cursor: pointer; font-weight: bold; padding: 4px 8px;">✕</span>
         </div>
 
-        <!-- Barra Inferior de Digitação -->
-        <footer class="input-area">
-            <div class="input-row">
-                <textarea id="input-search" class="textarea-input" placeholder="Pergunte qualquer coisa..."></textarea>
-                <button id="btn-search" class="btn-action" title="Enviar">⚡</button>
+        <footer style="padding: 12px; border-top: 1px solid rgba(168, 85, 247, 0.15); background-color: #0d0d11; display: flex; flex-direction: column; gap: 10px; flex-shrink: 0; padding-bottom: max(12px, env(safe-area-inset-bottom));">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <textarea id="input-search" style="flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 12px; padding: 12px; color: #f4f4fc; font-size: 15px; resize: none; height: 46px; outline: none; font-family: inherit;" placeholder="Pergunte qualquer coisa..."></textarea>
+                <button id="btn-search" style="background: linear-gradient(135deg, #a855f7, #6366f1); border: none; width: 46px; height: 46px; border-radius: 12px; color: #fff; cursor: pointer; display: flex; justify-content: center; align-items: center; box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3); flex-shrink: 0; font-size: 16px;" title="Enviar">⚡</button>
             </div>
-            <div class="btn-secondary-row">
-                <button id="btn-upload" class="btn-small">📸 ANEXAR PRINT</button>
-                // 1. Controle da Tela de Carregamentowindow.addEventListener('load', function() {const splash = document.getElementById('splash-screen');if (splash) {splash.style.opacity = '0';setTimeout(() => {splash.style.display = 'none';}, 500);}});// 2. Alternar entre as Abas (Padrão, Direta, Passo a Passo)const buttons = document.querySelectorAll('.tag-btn');buttons.forEach(button => {button.addEventListener('click', () => {buttons.forEach(btn => btn.classList.remove('tag-active'));button.classList.add('tag-active');});});// 3. Sistema de Envio de Texto (Funciona com Clique e tecla Enter do PC)const searchInput = document.getElementById('input-search');const sendBtn = document.getElementById('btn-search');function enviarMensagem() {const text = searchInput.value.trim();if(text !== "") {alert("Mensagem enviada no NexusAI: " + text);searchInput.value = "";}}sendBtn.addEventListener('click', enviarMensagem);// Atalho de Teclado exclusivo para PC (Enter envia, Shift+Enter pula linha)searchInput.addEventListener('keydown', function(event) {if (event.key === 'Enter' && !event.shiftKey) {event.preventDefault(); // Impede o pulo de linha padrãoenviarMensagem();}});
+            <div style="display: flex; gap: 8px;">
+                <button id="btn-upload" style="flex: 1; background: rgba(168, 85, 247, 0.12); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.3); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; text-transform: uppercase; tracking: 0.5px;">📸 ANEXAR PRINT</button>
+                <button id="btn-clear" style="flex: 1; background: rgba(168, 85, 247, 0.12); color: #f87171; border: 1px solid rgba(248, 113, 113, 0.2); padding: 10px; border-radius: 8px; font-size: 11px; font-weight: bold; cursor: pointer; text-align: center; text-transform: uppercase; tracking: 0.5px;">🗑️ LIMPAR CHAT</button>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        window.addEventListener('load', function() {
+            const splash = document.getElementById('splash-screen');
+            if (splash) {
+                splash.style.opacity = '0';
+                setTimeout(() => { splash.style.display = 'none'; }, 500);
+            }
+        });
+
+        const buttons = document.querySelectorAll('.tag-btn');
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                buttons.forEach(btn => btn.classList.remove('tag-active'));
+                button.classList.add('tag-active');
+            });
+        });
+
+        const searchInput = document.getElementById('input-search');
+        const sendBtn = document.getElementById('btn-search');
+        
+        function enviarMensagem() {
+            const text = searchInput.value.trim();
+            if(text !== "") {
+                alert("Mensagem recebida no NexusAI: " + text);
+                searchInput.value = "";
+            }
+        }
+        sendBtn.addEventListener('click', enviarMensagem);
+        searchInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                enviarMensagem();
+            }
+        });
+    </script>
+</body>
+</html>
+
