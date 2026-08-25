@@ -288,7 +288,6 @@
             <button class="tag-btn" data-mode="direta">🎯 Direta</button>
             <button class="tag-btn" data-mode="detalhada">📝 Passo a Passo</button>
         </div>
-
         <!-- Painel Central Onde as Mensagens Aparecem -->
         <main id="chat-container" class="chat-container">
             <div class="message system">[SISTEMA ONLINE - ENVIE UMA MENSAGEM OU PRINT]</div>
@@ -305,9 +304,28 @@
             <div class="input-row">
                 <textarea id="input-search" class="textarea-input" placeholder="Pergunte qualquer coisa..."></textarea>
                 <button id="btn-search" class="btn-action" title="Enviar">⚡</button>
-            </div>
+            </div
             <div class="btn-secondary-row">
                 <button id="btn-upload" class="btn-small">📁 ANEXAR PRINT</button>
                 <button id="btn-clear" class="btn-small" style="color: #f87171; border-color: rgba(239,68,68,0.3);">🗑️ RESETAR CHAT</button>
             </div>
-            copyBtn.innerText = "📋 Copiar";copyBtn.style = "display:block; margin-top:8px; font-size:11px; background:rgba(168,85,247,0.2); color:#d8b4fe; border:1px solid rgba(168,85,247,0.4); padding:3px 6px; border-radius:4px; cursor:pointer;";copyBtn.onclick = function() {navigator.clipboard.writeText(texto).then(() => {copyBtn.innerText = "✔ Copiado";setTimeout(() => { copyBtn.innerText = "📋 Copiar"; }, 1500);});};msgDiv.appendChild(copyBtn);} else {msgDiv.innerText = texto;}chatContainer.appendChild(msgDiv);chatContainer.scrollTop = chatContainer.scrollHeight;}// Executar chamada de inteligência artificialvar enviarBusca = function() {var textoAlvo = inputSearch.value.trim();if (!textoAlvo && !imagemBase64) return;// Mostra a pergunta do usuário na tela como balão roxoadicionarBalao(textoAlvo || "🖼️ [Imagem Anexada]", "user");var sysPrompt = "Você é um assistente educacional de alta precisão. Responda em português.";if (modoPrompt === "direta") sysPrompt += " Forneça apenas a alternativa/resposta direta logo de início.";if (modoPrompt === "detalhada") sysPrompt += " Explique a resolução passo a passo.";var modeloGroq = imagemBase64 ? "llama-3.2-11b-vision-preview" : "llama-3.3-70b-versatile";var conteudoMensagem = [];if (imagemBase64) {conteudoMensagem.push({ type: "text", text: textoAlvo || "Analise a imagem e resolva a questão." });conteudoMensagem.push({ type: "image_url", image_url: { url: imagemBase64 } });} else { conteudoMensagem = textoAlvo; }historicoConversa.push({ role: "user", content: conteudoMensagem });inputSearch.value = "";imagemBase64 = null;lensPreview.style.display = "none";// Mensagem temporária de processamentovar loadingDiv = document.createElement("div");loadingDiv.classList.add("message", "ai");loadingDiv.innerText = "Pensando...";chatContainer.appendChild(loadingDiv);chatContainer.scrollTop = chatContainer.scrollHeight;fetch("groq.com", {method: "POST",headers: { "Authorization": "Bearer " + MINHA_CHAVE, "Content-Type": "application/json" },body: JSON.stringify({messages: [{ role: "system", content: sysPrompt }].concat(historicoConversa),model: modeloGroq,temperature: 0.1,max_tokens: 500})}).then(r => r.json()).then(dados => {loadingDiv.remove();if (dados.choices && dados.choices.length) {var respostaIA = dados.choices[0].message.content;historicoConversa.push({ role: "assistant", content: respostaIA });adicionarBalao(respostaIA, "ai");}}).catch(() => {loadingDiv.remove();adicionarBalao("❌ Erro de comunicação com os servidores da IA.", "ai");});};document.getElementById("btn-search").onclick = enviarBusca;inputSearch.onkeydown = function(e) { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); enviarBusca(); } };
+</section>
+</footer>
+</div>
+
+<script>
+  // Faz a tela de carregamento sumir
+  window.addEventListener('load', function() {
+    const splash = document.getElementById('splash-screen');
+    if (splash) {
+      splash.style.opacity = '0';
+      setTimeout(() => {
+        splash.style.display = 'none';
+      }, 500);
+    }
+  });
+</script>
+</body>
+</html>
+
+             
