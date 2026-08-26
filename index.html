@@ -6,30 +6,47 @@
     <title>NexusAI</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background: #050507; color: #f4f4fc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d11; z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.4s; }
-        .logo { color: #d8b4fe; font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
+        body { background: #09090b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
         
-        .wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #0d0d11; position: relative; }
-        @media (min-width: 768px) { .wrapper { width: 100%; max-width: 650px; height: 85vh; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2); } }
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.4s; }
+        .logo { color: #c084fc; font-size: 28px; font-weight: 800; text-transform: uppercase; letter-spacing: 3px; text-shadow: 0 0 15px rgba(192,132,252,0.4); }
         
-        header { padding: 12px; border-bottom: 1px solid rgba(168, 85, 247, 0.15); display: flex; justify-content: space-between; align-items: center; }
-        .header-title h2 { color: #d8b4fe; letter-spacing: 1px; font-size: 18px; }
-        .header-title span { color: #a78bfa; font-size: 11px; }
+        .wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #09090b; position: relative; }
         
-        .bar { display: flex; padding: 8px; gap: 6px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); }
-        .btn { flex: 1; background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); color: #a78bfa; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
-        .btn.active { background: rgba(168, 85, 247, 0.25); color: #fff; border-color: #a855f7; }
+        header { padding: 10px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; background: #0d0d12; }
+        .header-title h2 { color: #e9d5ff; font-size: 16px; font-weight: 700; }
+        .header-title span { color: #a855f7; font-size: 11px; font-weight: 600; }
+
+        /* Aviso de desenvolvimento */
+        .dev-warning { background: linear-gradient(90deg, rgba(168,85,247,0.15), rgba(99,102,241,0.15)); border-bottom: 1px solid rgba(168,85,247,0.2); color: #d8b4fe; font-size: 11px; text-align: center; padding: 6px; font-weight: 600; letter-spacing: 0.5px; }
         
-        #chat { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
-        .sys { font-size: 11px; color: #a78bfa; text-align: center; margin: 4px; font-weight: bold; }
+        .bar { display: flex; padding: 8px 12px; gap: 8px; background: #0d0d12; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .btn { flex: 1; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #a1a1aa; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
+        .btn.active { background: rgba(168, 85, 247, 0.2); color: #f3e8ff; border-color: #a855f7; box-shadow: 0 0 10px rgba(168,85,247,0.2); }
         
-        footer { padding: 12px; border-top: 1px solid rgba(168, 85, 247, 0.15); display: flex; flex-direction: column; gap: 8px; }
+        #chat { flex: 1; padding: 20px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; width: 100%; max-width: 900px; margin: 0 auto; }
+        .sys { font-size: 11px; color: #71717a; text-align: center; margin: 4px; font-weight: 500; }
+
+        /* Estilização moderna dos balões ocupando bem a tela */
+        .message-row { display: flex; width: 100%; margin-bottom: 4px; }
+        .message-row.user { justify-content: flex-end; }
+        .message-row.ai { justify-content: flex-start; }
+
+        .bubble { max-width: 90%; padding: 12px 16px; border-radius: 14px; font-size: 14.5px; line-height: 1.6; word-break: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .message-row.user .bubble { background: linear-gradient(135deg, #9333ea, #4f46e5); color: #fff; border-bottom-right-radius: 4px; }
+        .message-row.ai .bubble { background: #18181b; border: 1px solid rgba(255, 255, 255, 0.08); color: #f4f4f5; border-bottom-left-radius: 4px; font-weight: 400; }
         
-        .row { display: flex; gap: 6px; align-items: center; }
-        textarea { flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 10px; padding: 10px; color: #fff; resize: none; height: 44px; outline: none; }
-        #send { background: linear-gradient(135deg, #a855f7, #6366f1); border: none; width: 44px; height: 44px; border-radius: 10px; color: #fff; cursor: pointer; font-size: 16px; }
-        .sub-btn { flex: 1; background: rgba(168, 85, 247, 0.1); color: #d8b4fe; border: 1px solid rgba(168, 85, 247, 0.2); padding: 8px; border-radius: 6px; font-size: 11px; font-weight: bold; cursor: pointer; }
+        footer { padding: 12px 16px; background: #0d0d12; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 8px; }
+        
+        .row { display: flex; gap: 8px; align-items: center; max-width: 900px; width: 100%; margin: 0 auto; }
+        textarea { flex: 1; background: #18181b; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; color: #fff; resize: none; height: 48px; outline: none; font-size: 14px; }
+        textarea:focus { border-color: #a855f7; box-shadow: 0 0 0 2px rgba(168,85,247,0.2); }
+        
+        #send { background: linear-gradient(135deg, #a855f7, #6366f1); border: none; width: 48px; height: 48px; border-radius: 12px; color: #fff; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        #send:active { transform: scale(0.95); }
+        
+        .sub-btn { background: none; color: #71717a; border: none; padding: 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
+        .sub-btn:hover { color: #a1a1aa; }
     </style>
 </head>
 <body>
@@ -43,21 +60,23 @@
             </div>
         </header>
 
+        <div class="dev-warning">⚠️ Essa IA está em desenvolvimento</div>
+
         <div class="bar">
             <button class="btn active" data-m="Padrão">✨ Padrão</button>
             <button class="btn" data-m="Direto">🎯 Direto</button>
             <button class="btn" data-m="Passo a Passo">📚 Passo a Passo</button>
         </div>
 
-        <main id="chat"><div class="sys">[SISTEMA ONLINE - API PRONTA]</div></main>
+        <main id="chat"><div class="sys">[SISTEMA PRONTO]</div></main>
 
         <footer>
             <div class="row">
                 <textarea id="txt" placeholder="Pergunte qualquer coisa..."></textarea>
-                <button id="send">⚡</button>
+                <button id="send">➔</button>
             </div>
-            <div class="row">
-                <button id="clear" class="sub-btn">🗑️ LIMPAR CHAT</button>
+            <div class="row" style="justify-content: center;">
+                <button id="clear" class="sub-btn">🗑️ Limpar conversa</button>
             </div>
         </footer>
     </div>
@@ -79,16 +98,31 @@
 
         const txt = document.getElementById('txt'), send = document.getElementById('send'), chat = document.getElementById('chat');
 
+        // Função para limpar os símbolos feios de markdown ( **, ###, *, etc ) e deixar o texto limpo
+        function limparMarkdown(texto) {
+            return texto
+                .replace(/###\s*/g, '')
+                .replace(/##\s*/g, '')
+                .replace(/#\s*/g, '')
+                .replace(/\*\*/g, '')
+                .replace(/\*/g, '')
+                .replace(/[-|]/g, ' ')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+        }
+
         function balao(texto, usuario) {
+            const row = document.createElement('div');
+            row.className = 'message-row ' + (usuario ? 'user' : 'ai');
+
             const b = document.createElement('div');
-            b.style.maxWidth = '80%'; b.style.padding = '10px 14px'; b.style.borderRadius = '12px'; b.style.fontSize = '14px'; b.style.marginBottom = '4px'; b.style.wordBreak = 'break-word';
-            if (usuario) {
-                b.style.alignSelf = 'flex-end'; b.style.background = 'linear-gradient(135deg, #a855f7, #6366f1)'; b.style.color = '#fff';
-            } else {
-                b.style.alignSelf = 'flex-start'; b.style.background = 'rgba(255,255,255,0.05)'; b.style.border = '1px solid rgba(168,85,247,0.2)'; b.style.color = '#f4f4fc';
-            }
-            b.innerText = texto;
-            chat.appendChild(b); chat.scrollTop = chat.scrollHeight; return b;
+            b.className = 'bubble';
+            b.innerText = usuario ? texto : limparMarkdown(texto);
+
+            row.appendChild(b);
+            chat.appendChild(row);
+            chat.scrollTop = chat.scrollHeight; 
+            return b;
         }
 
         async function enviar() {
@@ -98,14 +132,13 @@
             balao(val, true); 
             txt.value = "";
 
-            const bIA = balao("NexusAI está pensando...", false);
+            const bIA = balao("Pensando...", false);
 
             try {
-                let systemPrompt = "Você é o NexusAI, um assistente de tecnologia inteligente criado por @GUIWZ.045.";
-                if (modo === "Direto") systemPrompt += " Seja extremamente direto, curto e sem enrolação nas respostas.";
-                if (modo === "Passo a Passo") systemPrompt += " Estruture sempre suas respostas em tópicos e passos lógicos claros.";
+                let systemPrompt = "Você é o NexusAI, um assistente inteligente criado por @GUIWZ.045. Responda de forma limpa, direta, sem usar marcações de código markdown como asteriscos duplos ou hashtags.";
+                if (modo === "Direto") systemPrompt += " Seja extremamente direto, curto e objetivo.";
+                if (modo === "Passo a Passo") systemPrompt += " Explique de forma organizada em tópicos limpos.";
 
-                // Montagem protegida da chave para dificultar bloqueio automático por bots do GitHub
                 const p1 = "gsk_YoGlAqyP";
                 const p2 = "fjgdOinVn7NEWG";
                 const p3 = "dyb3FYjSHSCaVyfJX2d9aQ3n3UK0VV";
@@ -118,7 +151,7 @@
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "openai/gpt-oss-20b",
+                        model: "llama-3.3-70b-versatile",
                         messages: [
                             { role: "system", content: systemPrompt },
                             { role: "user", content: val }
@@ -130,15 +163,15 @@
                 const data = await response.json();
 
                 if (data.choices && data.choices.length > 0) {
-                    bIA.innerText = data.choices[0].message.content;
+                    bIA.innerText = limparMarkdown(data.choices[0].message.content);
                 } else if (data.error) {
-                    bIA.innerText = "Erro na API da Groq: " + (data.error.message || "Verifique o modelo.");
+                    bIA.innerText = "Erro: " + (data.error.message || "Tente novamente.");
                 } else {
-                    bIA.innerText = "Erro desconhecido ao processar a resposta.";
+                    bIA.innerText = "Erro ao processar resposta.";
                 }
 
             } catch (error) {
-                bIA.innerText = "Falha de conexão com a API. Verifique sua internet.";
+                bIA.innerText = "Falha de conexão com a API.";
                 console.error(error);
             }
 
@@ -147,7 +180,7 @@
 
         send.addEventListener('click', enviar);
         txt.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } });
-        document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '<div class="sys">[CHAT LIMPO]</div>'; });
+        document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '<div class="sys">[CONVERSA LIMPA]</div>'; });
     </script>
 </body>
 </html>
