@@ -77,6 +77,8 @@
         .logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; background: linear-gradient(45deg, #fff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sub { font-size: 0.75rem; color: #a78bfa; }
 
+        .lang-select { background: #160d26; border: 1px solid #3b2361; color: #a78bfa; padding: 6px 10px; border-radius: 10px; font-size: 0.8rem; font-family: 'Outfit', sans-serif; cursor: pointer; outline: none; }
+
         .sidebar-overlay { 
             display: none; 
             position: fixed; 
@@ -87,28 +89,26 @@
             background: rgba(0,0,0,0.7); 
             z-index: 100; 
             backdrop-filter: blur(4px);
-            pointer-events: none;
             opacity: 0;
             transition: opacity 0.3s ease;
         }
         .sidebar-overlay.active { 
             display: block; 
             opacity: 1;
-            pointer-events: auto;
         }
 
-        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 15px; overflow-y: auto; }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 12px; overflow-y: auto; }
         .sidebar.open { left: 0; }
-        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 15px; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 12px; }
         .sidebar-title { font-weight: bold; font-size: 1.1rem; color: #a78bfa; }
         .close-sidebar { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
-        .sidebar-menu-item { display: flex; align-items: center; gap: 12px; background: #1a102f; border: 1px solid #3b2361; color: #fff; padding: 12px 15px; border-radius: 12px; text-decoration: none; font-size: 0.95rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        .sidebar-menu-item { display: flex; align-items: center; gap: 12px; background: #1a102f; border: 1px solid #3b2361; color: #fff; padding: 10px 14px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
         .sidebar-menu-item:hover { background: #251642; transform: translateX(4px); }
         
         .stats-box { background: #0a0514; border: 1px solid #2d1b4e; border-radius: 12px; padding: 12px; font-size: 0.8rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 6px; }
         .stats-title { font-weight: bold; color: #a78bfa; margin-bottom: 4px; }
         
-        .insta-icon-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #fff; }
+        .insta-icon-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; }
 
         .modes { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(15, 8, 28, 0.6); border-bottom: 1px solid #1a102f; flex-shrink: 0; }
         .modes::-webkit-scrollbar { display: none; }
@@ -147,10 +147,11 @@
         
         .message img { max-width: 100%; border-radius: 12px; margin-top: 12px; border: 1px solid #3b2361; display: block; }
 
-        .ai-message-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(45, 27, 78, 0.5); font-size: 0.75rem; color: #9ca3af; }
+        .message-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.75rem; color: #cbd5e1; }
         .ai-speed-badge { background: rgba(124, 58, 237, 0.15); color: #c4b5fd; padding: 2px 8px; border-radius: 6px; font-weight: 500; border: 1px solid rgba(124, 58, 237, 0.3); }
-        .voice-btn { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; transition: background 0.2s; }
-        .voice-btn:hover { background: rgba(167, 139, 250, 0.1); color: #fff; }
+        .voice-btn { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; transition: background 0.2s; }
+        .user .voice-btn { color: #fff; }
+        .voice-btn:hover { background: rgba(255, 255, 255, 0.15); }
 
         .code-box-wrapper { background: #0a0512; border: 1px solid #2d1b4e; border-radius: 10px; margin: 10px 0; overflow: hidden; }
         .code-header { background: #130a24; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #a78bfa; border-bottom: 1px solid #2d1b4e; }
@@ -170,7 +171,11 @@
         .input-area input[type="text"]:focus { border-color: #7c3aed; box-shadow: 0 0 10px rgba(124, 58, 237, 0.2); }
         .send-btn { background: #7c3aed; border: none; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); transition: transform 0.1s, background 0.2s; flex-shrink: 0; }
         .send-btn:hover { background: #6d28d9; }
-        .send-btn:active { transform: scale(0.95); }
+
+        /* Modal Termos */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #130a24; border: 1px solid #3b2361; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; border-radius: 18px; padding: 24px; color: #e2e8f0; font-size: 0.9rem; line-height: 1.6; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 12px; margin-bottom: 16px; font-weight: bold; font-size: 1.1rem; color: #a78bfa; }
     </style>
 </head>
 <body>
@@ -191,12 +196,15 @@
             <a class="sidebar-menu-item" onclick="exportChat()">
                 <span>📥 Exportar Conversa</span>
             </a>
+            <a class="sidebar-menu-item" onclick="openTerms()">
+                <span>📜 Termos & Privacidade</span>
+            </a>
 
             <div class="stats-box">
-                <span class="stats-title">📊 Métricas do Sistema</span>
+                <span class="stats-title">📊 Métricas da Sessão</span>
                 <span>Mensagens enviadas: <b id="statMsgs">0</b></span>
-                <span>Tempo médio de resposta: <b id="statSpeed">0.0s</b></span>
-                <span>Tokens aproximados: <b id="statTokens">0</b></span>
+                <span>Tempo médio: <b id="statSpeed">0.0s</b></span>
+                <span>Tokens estim.: <b id="statTokens">0</b></span>
             </div>
 
             <a href="https://instagram.com" target="_blank" class="sidebar-menu-item" style="margin-top: auto;">
@@ -213,6 +221,12 @@
                     <div class="sub">@GUIWY_045</div>
                 </div>
             </div>
+            <select class="lang-select" id="langSelect">
+                <option value="pt-BR">🇵🇹 PT-BR</option>
+                <option value="en-US">🇺🇸 English</option>
+                <option value="es-ES">🇪🇸 Español</option>
+                <option value="fr-FR">🇫🇷 Français</option>
+            </select>
         </header>
 
         <div class="modes">
@@ -225,11 +239,11 @@
         <div class="quick-actions">
             <button class="quick-btn" onclick="insertQuickPrompt('Resuma o seguinte texto de forma simples: ')">📝 Resumir Texto</button>
             <button class="quick-btn" onclick="insertQuickPrompt('Corrija e otimize este código: ')">⚡ Otimizar Código</button>
-            <button class="quick-btn" onclick="insertQuickPrompt('Traduza o seguinte texto para o Inglês: ')">🌐 Traduzir</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Traduza o seguinte texto: ')">🌐 Traduzir</button>
         </div>
 
         <div class="chat-container" id="chatContainer">
-            <div class="message ai">✨ <b>NEXUSAI PRO v3.0</b><br><br>Bem-vindo! Configure sua API Key no menu (☰). Agora com leitor de arquivos TXT, análise de dados e estatísticas em tempo real.</div>
+            <div class="message ai">✨ <b>NEXUSAI PRO v3.5</b><br><br>Bem-vindo! Configure sua chave API no menu (☰). Sistema pronto para respostas rápidas, voz e análise de documentos.</div>
         </div>
 
         <div class="file-preview-bar" id="filePreviewBar">
@@ -247,10 +261,23 @@
             
             <div class="input-actions">
                 <button class="action-icon-btn" onclick="document.getElementById('imageInput').click()" title="Anexar Imagem">🖼️</button>
-                <button class="action-icon-btn" onclick="document.getElementById('txtInput').click()" title="Anexar Documento de Texto">📄</button>
+                <button class="action-icon-btn" onclick="document.getElementById('txtInput').click()" title="Anexar Arquivo de Texto">📄</button>
             </div>
             <input type="text" id="userInput" placeholder="Digite sua mensagem para a NexusAI..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button class="send-btn" onclick="sendMessage()">➔</button>
+        </div>
+    </div>
+
+    <!-- Modal de Termos -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Termos de Uso e Privacidade</span>
+                <button class="close-sidebar" onclick="closeTerms()">✕</button>
+            </div>
+            <p><b>1. Armazenamento de Dados:</b> Sua Chave API e histórico de conversas são armazenados exclusivamente no seu próprio navegador (LocalStorage). Nenhum dado pessoal é salvo em nossos servidores.</p>
+            <p><b>2. Uso da API Groq:</b> O serviço utiliza a infraestrutura oficial da Groq Cloud. Certifique-se de manter sua chave de acesso em segurança.</p>
+            <p><b>3. Responsabilidade do Conteúdo:</b> As respostas geradas pela IA são computadas em tempo real. O desenvolvedor (@GUIWY_045) não se responsabiliza pelo conteúdo gerado pelo modelo.</p>
         </div>
     </div>
 
@@ -259,9 +286,9 @@
         let currentImageBase64 = null;
         let currentTxtContent = null;
         let currentFileName = null;
-        let aiResponsesStorage = [];
+        let speakStorage = {};
 
-        // Sistema de métricas
+        // Métricas
         let totalMessages = 0;
         let totalTime = 0;
         let estimatedTokens = 0;
@@ -283,18 +310,21 @@
             overlay.classList.toggle('active', isOpen);
         }
 
+        function openTerms() { document.getElementById('termsModal').style.display = 'flex'; toggleSidebar(); }
+        function closeTerms() { document.getElementById('termsModal').style.display = 'none'; }
+
         function setMode(mode, btn) {
             currentMode = mode;
             document.querySelectorAll('.modes .mode-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            aiResponsesStorage = [];
             document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI [Modo: ${mode}]</b><br><br>Sessão alterada para o modo <b>${mode}</b>.</div>`;
         }
 
         function clearChat() {
-            aiResponsesStorage = [];
-            document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI</b><br><br>Nova conversa iniciada.</div>`;
+            if (confirm("Deseja realmente limpar todo o histórico da tela?")) {
+                document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI</b><br><br>Nova conversa iniciada.</div>`;
+            }
         }
 
         function insertQuickPrompt(promptText) {
@@ -346,7 +376,7 @@
                 currentFileName = file.name;
                 document.getElementById('fileIcon').innerText = '📄';
                 document.getElementById('fileName').innerText = file.name;
-                document.getElementById('fileSub').innerText = 'Documento lido com sucesso';
+                document.getElementById('fileSub').innerText = 'Documento Anexado';
                 document.getElementById('filePreviewBar').style.display = 'flex';
             };
             reader.readAsText(file);
@@ -372,22 +402,23 @@
             toggleSidebar();
         }
 
-        function speakStoredText(index) {
-            const textToSpeak = aiResponsesStorage[index];
+        function speakText(msgId) {
+            const textToSpeak = speakStorage[msgId];
+            const selectedLang = document.getElementById('langSelect').value;
+
             if (textToSpeak && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
                 const utterance = new SpeechSynthesisUtterance(textToSpeak);
-                utterance.lang = 'pt-BR';
+                utterance.lang = selectedLang;
                 window.speechSynthesis.speak(utterance);
             } else {
-                alert('Leitura de voz indisponível.');
+                alert('Síntese de voz indisponível no navegador.');
             }
         }
 
         function copyCode(btn) {
             const codeEl = btn.parentElement.nextElementSibling;
-            const textToCopy = codeEl.innerText;
-            navigator.clipboard.writeText(textToCopy).then(() => {
+            navigator.clipboard.writeText(codeEl.innerText).then(() => {
                 btn.innerText = 'Copiado! ✓';
                 setTimeout(() => { btn.innerText = 'Copiar'; }, 2000);
             });
@@ -428,7 +459,9 @@
         async function sendMessage() {
             const input = document.getElementById('userInput');
             const container = document.getElementById('chatContainer');
+            const selectedLang = document.getElementById('langSelect').value;
             const text = input.value.trim();
+
             if (!text && !currentImageBase64 && !currentTxtContent) return;
 
             let userApiKey = "";
@@ -443,20 +476,28 @@
                 return;
             }
 
+            const userMsgId = 'msg-' + Date.now();
+            speakStorage[userMsgId] = text || "Anexo de arquivo enviado.";
+
             let fullUserPrompt = text;
             let userHtml = `<div class="message user">`;
             
             if (currentImageBase64) {
-                userHtml += `<img src="${currentImageBase64}" alt="Uploaded image"><br>`;
+                userHtml += `<img src="${currentImageBase64}" alt="Imagem enviada"><br>`;
             }
             if (currentTxtContent) {
                 userHtml += `📄 <b>[Arquivo: ${escapeHtml(currentFileName)}]</b><br>`;
                 fullUserPrompt += `\n\n[Conteúdo do arquivo ${currentFileName}]:\n${currentTxtContent}`;
             }
 
-            userHtml += `${escapeHtml(text || "Analise o anexo.")}</div>`;
-            container.innerHTML += userHtml;
+            userHtml += `${escapeHtml(text || "Analise o anexo enviado.")}
+                <div class="message-footer">
+                    <span>Você</span>
+                    <button class="voice-btn" onclick="speakText('${userMsgId}')">🔊 Ouvir</button>
+                </div>
+            </div>`;
 
+            container.innerHTML += userHtml;
             input.value = '';
             removeAttachedFile();
             container.scrollTop = container.scrollHeight;
@@ -468,16 +509,15 @@
             const startTime = performance.now();
 
             try {
-                let systemInstruction = "Você é a NexusAI PRO (@GUIWY_045), uma inteligência artificial avançada e completa.";
-                if (currentMode === 'Direto') systemInstruction += " Seja extremamente direto, objetivo e sem enrolação.";
-                if (currentMode === 'Passo a Passo') systemInstruction += " Responda detalhadamente em etapas sequenciais organizadas.";
-                if (currentMode === 'Programador') systemInstruction += " Atue como engenheiro de software senior. Forneça códigos limpos, performáticos e bem documentados.";
+                let systemInstruction = `Você é a NexusAI PRO (@GUIWY_045). Responda preferencialmente no idioma associado ao código [${selectedLang}].`;
+                if (currentMode === 'Direto') systemInstruction += " Seja extremamente direto e objetivo.";
+                if (currentMode === 'Passo a Passo') systemInstruction += " Responda detalhadamente em etapas organizadas.";
+                if (currentMode === 'Programador') systemInstruction += " Atue como engenheiro de software senior com códigos limpos.";
 
+                // Chamada DIRETINHA para a Groq API (sem intermediários quebrados)
                 const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-                const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(apiUrl);
 
-                // Modelo Groq Llama 3.3 70B Versatile atualizado
-                const res = await fetch(proxyUrl, {
+                const res = await fetch(apiUrl, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -487,7 +527,7 @@
                         model: 'llama-3.3-70b-versatile',
                         messages: [
                             { role: 'system', content: systemInstruction },
-                            { role: 'user', content: fullUserPrompt || "Analise o anexo enviado." }
+                            { role: 'user', content: fullUserPrompt || "Analise o anexo." }
                         ],
                         temperature: 0.7
                     })
@@ -499,30 +539,27 @@
 
                 const endTime = performance.now();
                 const responseTimeVal = (endTime - startTime) / 1000;
-                const responseTime = responseTimeVal.toFixed(2);
 
                 if (data.error) {
                     container.innerHTML += `<div class="message ai">⚠️ <b>Erro da API:</b> ${escapeHtml(data.error.message)}</div>`;
                 } else if (data.choices && data.choices.length > 0) {
                     const aiContent = data.choices[0].message.content;
-                    const storageIndex = aiResponsesStorage.push(aiContent) - 1;
-                    const formattedContent = formatAIResponse(aiContent);
+                    const aiMsgId = 'ai-' + Date.now();
+                    speakStorage[aiMsgId] = aiContent;
 
+                    const formattedContent = formatAIResponse(aiContent);
                     updateMetrics(responseTimeVal, fullUserPrompt.length + aiContent.length);
 
                     container.innerHTML += `
                         <div class="message ai">
                             ${formattedContent}
-                            <div class="ai-message-footer">
-                                <span class="ai-speed-badge">⚡ ${responseTime}s</span>
-                                <button class="voice-btn" onclick="speakStoredText(${storageIndex})">🔊 Ouvir</button>
+                            <div class="message-footer">
+                                <span class="ai-speed-badge">⚡ ${responseTimeVal.toFixed(2)}s</span>
+                                <button class="voice-btn" onclick="speakText('${aiMsgId}')">🔊 Ouvir</button>
                             </div>
                         </div>
                     `;
-                } else {
-                    container.innerHTML += `<div class="message ai">⚠️ Resposta inesperada da API Groq.</div>`;
                 }
-
             } catch (err) {
                 const loadingEl = document.getElementById(loadingId);
                 if (loadingEl) loadingEl.remove();
