@@ -180,7 +180,7 @@
             </div>
         </header>
 
-        <!-- Ao clicar em qualquer uma das 3 opções, limpa o chat e inicia nova sessão -->
+        <!-- Cada clique aqui limpa o chat e inicia uma nova sessão -->
         <div class="modes">
             <button class="mode-btn active" onclick="setMode('Padrão', this)">✨ Padrão</button>
             <button class="mode-btn" onclick="setMode('Direto', this)">🎯 Direto</button>
@@ -188,7 +188,7 @@
         </div>
 
         <div class="chat-container" id="chatContainer">
-            <div class="message ai">✨ <b>NEXUSAI v2.0</b><br><br>Olá! Tudo pronto por aqui. Escolha um modo acima, clique em <b>☰</b> para configurar sua chave ou comece a digitar abaixo.</div>
+            <div class="message ai">✨ <b>NEXUSAI v2.0</b><br><br>Olá! Clique em <b>☰</b> no canto superior esquerdo para configurar sua Chave API do Groq, escolha um modo acima ou comece a conversar!</div>
         </div>
 
         <div class="image-preview-bar" id="imagePreviewBar">
@@ -202,7 +202,7 @@
             <div class="input-actions">
                 <button class="action-icon-btn" onclick="document.getElementById('imageInput').click()" title="Anexar Imagem">📎</button>
             </div>
-            <input type="text" id="userInput" placeholder="Pergunte algo ou peça para criar imagem..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <input type="text" id="userInput" placeholder="Digite sua mensagem para a NexusAI..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button class="send-btn" onclick="sendMessage()">➔</button>
         </div>
     </div>
@@ -210,8 +210,7 @@
     <script>
         let currentMode = 'Padrão';
         let currentImageBase64 = null;
-        let currentSessionId = 'session_' + Date.now();
-        let aiResponsesStorage = []; // Array seguro para armazenar respostas (evita erros de aspas/quebras de linha)
+        let aiResponsesStorage = [];
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -225,13 +224,11 @@
             document.querySelectorAll('.modes .mode-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            currentSessionId = 'session_' + Date.now();
             aiResponsesStorage = [];
             document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI [Modo: ${mode}]</b><br><br>Nova sessão iniciada no modo <b>${mode}</b>. Como posso ajudar?</div>`;
         }
 
         function clearChat() {
-            currentSessionId = 'session_' + Date.now();
             aiResponsesStorage = [];
             document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI</b><br><br>Nova conversa iniciada. Como posso ajudar?</div>`;
         }
@@ -242,7 +239,7 @@
                 const saved = localStorage.getItem('nexus_groq_key');
                 if (saved) currentKey = atob(saved);
             } catch(e){}
-            const newKey = prompt("Insira/Atualize sua Chave API:", currentKey);
+            const newKey = prompt("Insira sua Chave API do Groq (console.groq.com):", currentKey);
             if (newKey !== null) {
                 if (newKey.trim() === "") {
                     localStorage.removeItem('nexus_groq_key');
@@ -319,6 +316,18 @@
             const text = input.value.trim();
             if (!text && !currentImageBase64) return;
 
+            let userApiKey = "";
+            try {
+                const savedKeyEnc = localStorage.getItem('nexus_groq_key');
+                if (savedKeyEnc) userApiKey = atob(savedKeyEnc);
+            } catch(e) {}
+
+            if (!userApiKey) {
+                alert("⚠️ Por favor, abra o menu (☰) no canto superior esquerdo e clique em 'Configurar Chave API' para inserir sua chave do Groq.");
+                toggleSidebar();
+                return;
+            }
+
             let userHtml = `<div class="message user">`;
             if (currentImageBase64) {
                 userHtml += `<img src="${currentImageBase64}" alt="Uploaded image"><br>`;
@@ -338,38 +347,28 @@
             const startTime = performance.now();
 
             try {
-                let userApiKey = "";
-                try {
-                    const savedKeyEnc = localStorage.getItem('nexus_groq_key');
-                    if (savedKeyEnc) userApiKey = atob(savedKeyEnc);
-                } catch(e) {}
+                let systemInstruction = "Você é a NexusAI (@GUIWY_045), uma inteligência artificial avançada, prestativa e inteligente.";
+                if (currentMode === 'Direto') systemInstruction += " Seja extremamente direto, conciso e objetivo.";
+                if (currentMode === 'Passo a Passo') systemInstruction += " Responda detalhadamente dividindo a resposta em passos organizados.";
 
-                const res = await fetch('/api/chat', {
+                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        message: text || "Analise esta imagem.", 
-                        mode: currentMode, 
-                        userApiKey: userApiKey,
-                        imageBase64: imgToSend,
-                        sessionId: currentSessionId
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${userApiKey}`
+                    },
+                    body: JSON.stringify({
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [
+                            { role: 'system', content: systemInstruction },
+                            { role: 'user', content: text || "Analise esta imagem." }
+                        ],
+                        temperature: 0.7
                     })
                 });
+
                 const data = await res.json();
                 document.getElementById(loadingId).remove();
-                
-                const endTime = performance.now();
-                const duration = ((endTime - startTime) / 1000).toFixed(2);
 
-                const rawResponse = data.response || 'Erro desconhecido';
-                
-                // Armazena com segurança no array
-                aiResponsesStorage.push(rawResponse);
-                const msgIndex = aiResponsesStorage.length - 1;
-
-                let formattedContent = formatAIResponse(rawResponse);
-
-                let aiHtml = `<div class="message ai">${formattedContent}`;
-                
-                aiHtml += `<div class="ai-message-footer">
-                    <span class="ai
+                if (data.error) {
+                    thr
