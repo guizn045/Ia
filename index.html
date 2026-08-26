@@ -5,238 +5,90 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NexusAI</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { background: #09090b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 9999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s ease; }
-        .splash-content { display: flex; flex-direction: column; align-items: center; gap: 14px; animation: pulseGlow 2.5s infinite ease-in-out; }
-        .splash-logo { width: 85px; height: 85px; background: linear-gradient(135deg, #a855f7, #6366f1); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 0 40px rgba(168,85,247,0.7); }
-        .splash-title { color: #f4f4f5; font-size: 28px; font-weight: 800; letter-spacing: 2px; }
-        .splash-sub { color: #d8b4fe; font-size: 15px; font-weight: 700; letter-spacing: 1.5px; background: rgba(168, 85, 247, 0.2); padding: 8px 18px; border-radius: 20px; border: 1px solid rgba(168, 85, 247, 0.4); box-shadow: 0 0 15px rgba(168, 85, 247, 0.3); }
-        
-        @keyframes pulseGlow {
-            0% { transform: scale(0.95); opacity: 0.85; }
-            50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.85; }
-        }
-        
-        .wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #09090b; position: relative; overflow: hidden; }
-        
-        header { flex-shrink: 0; padding: 12px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; background: #0d0d12; z-index: 10; }
-        .header-title h2 { color: #e9d5ff; font-size: 17px; font-weight: 700; }
-        .header-title span { color: #a855f7; font-size: 11px; font-weight: 600; }
-
-        .insta-btn { display: inline-flex; align-items: center; gap: 6px; background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); color: #ffffff; padding: 8px 14px; border-radius: 20px; font-size: 12px; font-weight: 700; text-decoration: none; box-shadow: 0 0 15px rgba(220, 39, 67, 0.5); border: 1px solid rgba(255, 255, 255, 0.3); transition: 0.2s ease; flex-shrink: 0; }
-        .insta-btn:active { transform: scale(0.92); }
-        .insta-btn svg { width: 16px; height: 16px; fill: #fff; }
-
-        .dev-warning { flex-shrink: 0; background: linear-gradient(90deg, rgba(168,85,247,0.15), rgba(99,102,241,0.15)); border-bottom: 1px solid rgba(168,85,247,0.2); color: #d8b4fe; font-size: 11px; text-align: center; padding: 6px; font-weight: 600; letter-spacing: 0.5px; z-index: 10; }
-        
-        .bar { flex-shrink: 0; display: flex; padding: 8px 12px; gap: 8px; background: #0d0d12; border-bottom: 1px solid rgba(255, 255, 255, 0.05); z-index: 10; }
-        .btn { flex: 1; background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.08); color: #a1a1aa; padding: 8px; border-radius: 8px; font-size: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; }
-        .btn.active { background: rgba(168, 85, 247, 0.2); color: #f3e8ff; border-color: #a855f7; box-shadow: 0 0 10px rgba(168,85,247,0.2); }
-        
-        #chat { flex: 1; padding: 20px 16px; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; scroll-behavior: smooth; width: 100%; max-width: 900px; margin: 0 auto; position: relative; }
-        .sys { font-size: 11px; color: #71717a; text-align: center; margin: 4px; font-weight: 500; }
-
-        .message-row { display: flex; width: 100%; margin-bottom: 4px; }
-        .message-row.user { justify-content: flex-end; }
-        .message-row.ai { justify-content: flex-start; }
-
-        .bubble { max-width: 90%; padding: 12px 16px; border-radius: 14px; font-size: 14.5px; line-height: 1.6; word-break: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .message-row.user .bubble { background: linear-gradient(135deg, #9333ea, #4f46e5); color: #fff; border-bottom-right-radius: 4px; }
-        
-        .message-row.ai .bubble { background: #18181b; border: 1px solid rgba(168, 85, 247, 0.2); color: #f4f4f5; border-bottom-left-radius: 4px; font-weight: 400; }
-        .ai-header { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #c084fc; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
-        
-        footer { flex-shrink: 0; padding: 12px 16px; background: #0d0d12; border-top: 1px solid rgba(255, 255, 255, 0.08); display: flex; flex-direction: column; gap: 8px; z-index: 10; }
-        
-        .row { display: flex; gap: 8px; align-items: center; max-width: 900px; width: 100%; margin: 0 auto; }
-        textarea { flex: 1; background: #18181b; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 12px; color: #fff; resize: none; height: 48px; outline: none; font-size: 14px; }
-        textarea:focus { border-color: #a855f7; box-shadow: 0 0 0 2px rgba(168,85,247,0.2); }
-        
-        #send { background: linear-gradient(135deg, #a855f7, #6366f1); border: none; width: 48px; height: 48px; border-radius: 12px; color: #fff; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        #send:active { transform: scale(0.95); }
-        
-        .sub-btn { background: none; color: #71717a; border: none; padding: 4px; font-size: 11px; font-weight: 600; cursor: pointer; text-align: center; }
-        .sub-btn:hover { color: #a1a1aa; }
+        body { background: #0b0614; color: #fff; font-family: sans-serif; margin: 0; display: flex; flex-direction: column; height: 100vh; }
+        header { display: flex; justify-content: space-between; align-items: center; padding: 15px; border-bottom: 1px solid #221535; }
+        .logo { font-weight: bold; font-size: 1.2rem; }
+        .sub { font-size: 0.8rem; color: #a78bfa; }
+        .insta-btn { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: white; padding: 6px 12px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: bold; }
+        .modes { display: flex; gap: 8px; padding: 10px 15px; overflow-x: auto; }
+        .mode-btn { background: #1a102f; border: 1px solid #3b2361; color: #fff; padding: 6px 14px; border-radius: 15px; cursor: pointer; font-size: 0.85rem; }
+        .mode-btn.active { background: #7c3aed; border-color: #8b5cf6; }
+        .chat-container { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; }
+        .message { max-width: 80%; padding: 10px 14px; border-radius: 12px; font-size: 0.95rem; line-height: 1.4; word-break: break-word; }
+        .message.user { background: #7c3aed; align-self: flex-end; border-bottom-right-radius: 2px; }
+        .message.ai { background: #1a102f; border: 1px solid #2d1b4e; align-self: flex-start; border-bottom-left-radius: 2px; }
+        .input-area { display: flex; padding: 10px 15px; background: #0b0614; border-top: 1px solid #221535; gap: 8px; }
+        .input-area input { flex: 1; background: #140b24; border: 1px solid #2d1b4e; color: #fff; padding: 10px 15px; border-radius: 20px; outline: none; font-size: 0.95rem; }
+        .input-area button { background: #7c3aed; border: none; color: white; width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; }
+        .dev-warning { background: #2e1a0b; color: #fbbf24; text-align: center; font-size: 0.75rem; padding: 5px; border-bottom: 1px solid #452a0d; }
     </style>
 </head>
 <body>
-    <div id="splash">
-        <div class="splash-content">
-            <div class="splash-logo">✨</div>
-            <div class="splash-title">NexusAI</div>
-            <div class="splash-sub">@GUIWY_045</div>
+    <div class="dev-warning">⚠️ Essa IA está em desenvolvimento</div>
+    <header>
+        <div>
+            <div class="logo">NexusAI</div>
+            <div class="sub">@GUIWY_045</div>
         </div>
+        <a href="https://instagram.com" class="insta-btn" target="_blank">Instagram</a>
+    </header>
+
+    <div class="modes">
+        <button class="mode-btn active" onclick="setMode('Padrão', this)">✨ Padrão</button>
+        <button class="mode-btn" onclick="setMode('Direto', this)">🎯 Direto</button>
+        <button class="mode-btn" onclick="setMode('Passo a Passo', this)">📚 Passo a Passo</button>
     </div>
-    
-    <div class="wrapper">
-        <header>
-            <div class="header-title">
-                <h2>NexusAI</h2>
-                <span>@GUIWY_045</span>
-            </div>
-            <a href="https://www.instagram.com/guiwy_045?igsi=cmE0Nnl4ZnV3dDk5" target="_blank" class="insta-btn">
-                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
-                Instagram
-            </a>
-        </header>
 
-        <div class="dev-warning">⚠️ Essa IA está em desenvolvimento</div>
+    <div class="chat-container" id="chatContainer">
+        <div class="message ai">✨ NEXUSAI<br>Olá! Como posso ajudar você hoje?</div>
+    </div>
 
-        <div class="bar">
-            <button class="btn active" data-m="Padrão">✨ Padrão</button>
-            <button class="btn" data-m="Direto">🎯 Direto</button>
-            <button class="btn" data-m="Passo a Passo">📚 Passo a Passo</button>
-        </div>
-
-        <main id="chat"></main>
-
-        <footer>
-            <div class="row">
-                <textarea id="txt" placeholder="Pergunte qualquer coisa..."></textarea>
-                <button id="send">➔</button>
-            </div>
-            <div class="row" style="justify-content: center;">
-                <button id="clear" class="sub-btn">🗑️ Limpar conversa atual</button>
-            </div>
-        </footer>
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Pergunte qualquer coisa..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">➔</button>
     </div>
 
     <script>
-        window.addEventListener('load', () => {
-            setTimeout(() => {
-                const sp = document.getElementById('splash');
-                if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.style.display = 'none', 800); }
-            }, 2500);
-        });
-        
-        let modo = "Padrão";
-        
-        const historico = {
-            "Padrão": [],
-            "Direto": [],
-            "Passo a Passo": []
-        };
-
-        const chat = document.getElementById('chat');
-
-        function renderizarChat() {
-            chat.innerHTML = "";
-            const msgs = historico[modo];
-            
-            if (msgs.length === 0) {
-                chat.innerHTML = `<div class="sys">[SISTEMA PRONTO - MODO ${modo.toUpperCase()}]</div>`;
-                return;
-            }
-
-            msgs.forEach(m => {
-                const row = document.createElement('div');
-                row.className = 'message-row ' + (m.usuario ? 'user' : 'ai');
-
-                const b = document.createElement('div');
-                b.className = 'bubble';
-
-                if (!m.usuario) {
-                    const header = document.createElement('div');
-                    header.className = 'ai-header';
-                    header.innerHTML = '✨ NexusAI';
-                    b.appendChild(header);
-                }
-
-                const content = document.createElement('div');
-                content.innerText = m.texto;
-                b.appendChild(content);
-
-                row.appendChild(b);
-                chat.appendChild(row);
-            });
+        let currentMode = 'Padrão';
+        function setMode(mode, btn) {
+            currentMode = mode;
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
         }
 
-        const btns = document.querySelectorAll('.btn');
-        btns.forEach(b => b.addEventListener('click', () => {
-            btns.forEach(x => x.classList.remove('active')); 
-            b.classList.add('active');
-            modo = b.getAttribute('data-m');
-            renderizarChat();
-        }));
-
-        const txt = document.getElementById('txt'), send = document.getElementById('send');
-
-        function limparMarkdown(texto) {
-            return texto
-                .replace(/###\s*/g, '')
-                .replace(/##\s*/g, '')
-                .replace(/#\s*/g, '')
-                .replace(/\*\*/g, '')
-                .replace(/\*/g, '')
-                .replace(/[-|]/g, ' ')
-                .replace(/\{2,\}/g, ' ')
-                .trim();
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') sendMessage();
         }
 
-        async function enviar() {
-            const val = txt.value.trim(); 
-            if (!val) return;
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const container = document.getElementById('chatContainer');
+            const text = input.value.trim();
+            if (!text) return;
 
-            historico[modo].push({ texto: val, usuario: true });
-            renderizarChat();
-            txt.value = "";
+            container.innerHTML += `<div class="message user">${text}</div>`;
+            input.value = '';
+            container.scrollTop = container.scrollHeight;
 
-            historico[modo].push({ texto: "Pensando...", usuario: false });
-            renderizarChat();
+            const loadingId = 'loading-' + Date.now();
+            container.innerHTML += `<div class="message ai" id="${loadingId}">Pensando...</div>`;
+            container.scrollTop = container.scrollHeight;
 
             try {
-                // Chama o servidor interno da Vercel (/api/chat) de forma 100% segura
-                const response = await fetch("/api/chat", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        message: val,
-                        mode: modo
-                    })
+                const res = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ message: text, mode: currentMode })
                 });
-
-                const data = await response.json();
-                let respostaFinal = "";
-
-                if (data.response) {
-                    respostaFinal = limparMarkdown(data.response);
-                } else {
-                    respostaFinal = data.error || "Erro de conexão.";
-                }
-
-                historico[modo][historico[modo].length - 1].texto = respostaFinal;
-                renderizarChat();
-
-                const updatedAiRows = chat.querySelectorAll('.message-row.ai');
-                const currentAiRow = updatedAiRows[updatedAiRows.length - 1];
-                if (currentAiRow) {
-                    chat.scrollTo({
-                        top: currentAiRow.offsetTop - 20,
-                        behavior: 'smooth'
-                    });
-                }
-
-            } catch (error) {
-                historico[modo][historico[modo].length - 1].texto = "Falha na conexão.";
-                renderizarChat();
-                console.error(error);
+                const data = await res.json();
+                document.getElementById(loadingId).remove();
+                container.innerHTML += `<div class="message ai">${data.response || data.error || 'Erro desconhecido'}</div>`;
+            } catch (err) {
+                document.getElementById(loadingId).remove();
+                container.innerHTML += `<div class="message ai">Falha na conexão.</div>`;
             }
+            container.scrollTop = container.scrollHeight;
         }
-
-        send.addEventListener('click', enviar);
-        txt.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } });
-        
-        document.getElementById('clear').addEventListener('click', () => { 
-            historico[modo] = [];
-            renderizarChat(); 
-        });
-
-        renderizarChat();
     </script>
 </body>
 </html>
