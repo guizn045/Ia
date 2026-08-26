@@ -22,28 +22,25 @@
             position: relative;
         }
 
-        body::before {
+        body::before, body::after {
             content: '';
             position: absolute;
             width: 450px;
             height: 450px;
+            z-index: 0;
+            pointer-events: none; /* Garante que os fundos luminosos não bloqueiem cliques */
+        }
+
+        body::before {
             background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
             top: -100px;
             left: -100px;
-            z-index: 0;
-            pointer-events: none;
         }
 
         body::after {
-            content: '';
-            position: absolute;
-            width: 450px;
-            height: 450px;
             background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
             bottom: -100px;
             right: -100px;
-            z-index: 0;
-            pointer-events: none;
         }
 
         .app-wrapper {
@@ -69,7 +66,17 @@
             }
         }
         
-        header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #221535; background: rgba(11, 6, 20, 0.8); z-index: 5; flex-shrink: 0; }
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 14px 20px; 
+            border-bottom: 1px solid #221535; 
+            background: rgba(11, 6, 20, 0.8); 
+            z-index: 10; 
+            flex-shrink: 0; 
+        }
+        
         .header-left { display: flex; align-items: center; gap: 14px; }
         .menu-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: color 0.2s; }
         .menu-btn:hover { color: #a78bfa; }
@@ -91,8 +98,10 @@
             justify-content: center;
             gap: 6px;
             flex-shrink: 0;
+            z-index: 10;
         }
 
+        /* Overlay corrigido para não bloquear cliques quando inativo */
         .sidebar-overlay { 
             display: none; 
             position: fixed; 
@@ -105,10 +114,13 @@
             backdrop-filter: blur(4px);
             opacity: 0;
             transition: opacity 0.3s ease;
+            pointer-events: none;
         }
+        
         .sidebar-overlay.active { 
             display: block; 
             opacity: 1;
+            pointer-events: auto;
         }
 
         .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 12px; overflow-y: auto; }
@@ -124,41 +136,23 @@
         
         .insta-icon-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; }
 
-        .modes { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(15, 8, 28, 0.6); border-bottom: 1px solid #1a102f; flex-shrink: 0; }
+        .modes { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(15, 8, 28, 0.6); border-bottom: 1px solid #1a102f; flex-shrink: 0; z-index: 5; }
         .modes::-webkit-scrollbar { display: none; }
         .mode-btn { background: #160d26; border: 1px solid #2d1b4e; color: #cbd5e1; padding: 7px 16px; border-radius: 16px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
         .mode-btn:hover { background: #221535; border-color: #7c3aed; }
         .mode-btn.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; font-weight: 600; box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
 
-        .quick-actions { display: flex; gap: 8px; padding: 8px 20px; background: rgba(11, 6, 20, 0.4); overflow-x: auto; border-bottom: 1px solid #1a102f; flex-shrink: 0; }
+        .quick-actions { display: flex; gap: 8px; padding: 8px 20px; background: rgba(11, 6, 20, 0.4); overflow-x: auto; border-bottom: 1px solid #1a102f; flex-shrink: 0; z-index: 5; }
         .quick-btn { background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3); color: #d8b4fe; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
         .quick-btn:hover { background: #7c3aed; color: #fff; }
 
-        .chat-container { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
+        .chat-container { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; z-index: 2; }
         .chat-container::-webkit-scrollbar { width: 6px; }
         .chat-container::-webkit-scrollbar-thumb { background: #2d1b4e; border-radius: 10px; }
         
         .message { max-width: 85%; padding: 16px 20px; border-radius: 18px; font-size: 0.97rem; line-height: 1.6; word-break: break-word; position: relative; }
-        
-        .message.user { 
-            background: #7c3aed; 
-            color: #ffffff; 
-            align-self: flex-end; 
-            border-bottom-right-radius: 4px; 
-            box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3);
-            font-weight: 500;
-        }
-        
-        .message.ai { 
-            background: #160d26; 
-            border: 1px solid #2d1b4e; 
-            color: #f3f4f6; 
-            align-self: flex-start; 
-            border-bottom-left-radius: 4px; 
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            font-weight: 400;
-        }
-        
+        .message.user { background: #7c3aed; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); font-weight: 500; }
+        .message.ai { background: #160d26; border: 1px solid #2d1b4e; color: #f3f4f6; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); font-weight: 400; }
         .message img { max-width: 100%; border-radius: 12px; margin-top: 12px; border: 1px solid #3b2361; display: block; }
 
         .message-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.75rem; color: #cbd5e1; }
@@ -173,11 +167,11 @@
         .copy-code-btn:hover { background: #7c3aed; color: #fff; }
         .code-content { padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; margin: 0; white-space: pre; }
 
-        .file-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; }
+        .file-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; z-index: 5; }
         .file-preview-thumb { width: 40px; height: 40px; background: #7c3aed; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; }
         .remove-file-btn { background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .input-area { display: flex; padding: 14px 20px; background: rgba(11, 6, 20, 0.9); border-top: 1px solid #221535; gap: 10px; align-items: center; flex-shrink: 0; }
+        .input-area { display: flex; padding: 14px 20px; background: rgba(11, 6, 20, 0.9); border-top: 1px solid #221535; gap: 10px; align-items: center; flex-shrink: 0; z-index: 10; }
         .input-actions { display: flex; gap: 6px; }
         .action-icon-btn { background: #160d26; border: 1px solid #2d1b4e; color: #a78bfa; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
         .action-icon-btn:hover { background: #221535; transform: scale(1.05); }
@@ -301,8 +295,8 @@
             </div>
             <div id="termsBody">
                 <p><b>1. Estado do Projeto:</b> A NexusAI é um sistema em desenvolvimento ativo por @GUIWY_045. Versões dedicadas para Android e iOS estão sendo preparadas.</p>
-                <p><b>2. Armazenamento de Dados:</b> Sua Chave API e histórico de conversas são armazenados exclusivamente no seu próprio navegador (LocalStorage). Nenhum dado pessoal é salvo externamente.</p>
-                <p><b>3. Uso da API Groq:</b> O serviço utiliza a infraestrutura oficial da Groq Cloud com o modelo Llama 3 70B.</p>
+                <p><b>2. Armazenamento de Dados:</b> Sua Chave API e histórico são armazenados no seu próprio navegador.</p>
+                <p><b>3. Uso da API Groq:</b> O serviço utiliza o modelo de alta performance Llama 3 70B.</p>
             </div>
         </div>
     </div>
@@ -329,4 +323,4 @@
                 btnQuickOptimize: '⚡ Otimizar Código',
                 btnQuickTranslate: '🌐 Traduzir',
                 placeholder: 'Digite sua mensagem para a NexusAI...',
-                welcome: '✨ <b>NEXUSAI PRO v3.8</b><br><br>Bem-vindo! Configure sua chave API no menu (☰). <br><br>💡 <i>Esta inteligência artificial está em constante desenvolvimento e em breve estará dispo
+                welcome: '✨ <b>NEXUSAI PRO v3.8</b><br><br>Bem-vindo! Configure sua chave API no menu (☰). <br><br>💡 <i>Esta inteligência artificial está em constante desenvolvimento e em breve estará disponível nativamente pa
