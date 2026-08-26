@@ -10,7 +10,6 @@
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d11; z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.4s; }
         .logo { color: #d8b4fe; font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
         
-        /* Layout Híbrido: Tela cheia no mobile, painel elegante no PC */
         .wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #0d0d11; position: relative; }
         @media (min-width: 768px) { .wrapper { width: 100%; max-width: 650px; height: 85vh; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2); } }
         
@@ -194,7 +193,6 @@
 
             const apiKey = localStorage.getItem('nexus_groq_key');
 
-            // Fallback para o modo local caso o usuário não tenha configurado uma chave ainda
             if (!apiKey) {
                 const bIA = balao("NexusAI está digitando...", false);
                 setTimeout(() => {
@@ -207,7 +205,6 @@
             const bIA = balao("NexusAI está pensando...", false);
 
             try {
-                // Prepara system prompt de acordo com o botão superior ativo
                 let systemPrompt = "Você é o NexusAI, um assistente de tecnologia inteligente criado por @GUIWZ.045.";
                 if (modo === "Direto") systemPrompt += " Seja extremamente direto, curto e sem enrolação nas respostas.";
                 if (modo === "Passo a Passo") systemPrompt += " Estruture sempre suas respostas em tópicos e passos lógicos claros.";
@@ -216,11 +213,11 @@
                     { role: "system", content: systemPrompt }
                 ];
 
-                // Montagem da requisição suportando texto ou Vision (caso tenha imagem)
-                let modelName = "llama-3.3-70b-versatile";
+                // Atualizado para usar os modelos atuais recomendados da Groq
+                let modelName = "llama-3.1-8b-instant";
                 
                 if (currentImg) {
-                    modelName = "llama-3.2-11b-vision-preview";
+                    modelName = "qwen/qwen3.6-27b"; // Modelo com suporte a visão na Groq
                     messages.push({
                         role: "user",
                         content: [
@@ -268,5 +265,4 @@
         document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '<div class="sys">[CHAT LIMPO]</div>'; });
     </script>
 </body>
-    </html>
-    
+</html>
