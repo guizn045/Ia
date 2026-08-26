@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusAI - Advanced</title>
+    <title>NexusAI - Ultra Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
@@ -25,9 +25,9 @@
         body::before {
             content: '';
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(124, 58, 237, 0.15) 0%, transparent 70%);
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
             top: -100px;
             left: -100px;
             z-index: 0;
@@ -37,9 +37,9 @@
         body::after {
             content: '';
             position: absolute;
-            width: 400px;
-            height: 400px;
-            background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
+            width: 450px;
+            height: 450px;
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
             bottom: -100px;
             right: -100px;
             z-index: 0;
@@ -62,8 +62,8 @@
 
         @media (min-width: 768px) {
             .app-wrapper {
-                width: 950px;
-                height: 92vh;
+                width: 1000px;
+                height: 94vh;
                 border-radius: 24px;
                 box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(124, 58, 237, 0.15);
             }
@@ -77,7 +77,6 @@
         .logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; background: linear-gradient(45deg, #fff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sub { font-size: 0.75rem; color: #a78bfa; }
 
-        /* Correção de bloqueio da tela no Overlay */
         .sidebar-overlay { 
             display: none; 
             position: fixed; 
@@ -98,13 +97,17 @@
             pointer-events: auto;
         }
 
-        .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 15px; }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 15px; overflow-y: auto; }
         .sidebar.open { left: 0; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 15px; }
         .sidebar-title { font-weight: bold; font-size: 1.1rem; color: #a78bfa; }
         .close-sidebar { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
         .sidebar-menu-item { display: flex; align-items: center; gap: 12px; background: #1a102f; border: 1px solid #3b2361; color: #fff; padding: 12px 15px; border-radius: 12px; text-decoration: none; font-size: 0.95rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
         .sidebar-menu-item:hover { background: #251642; transform: translateX(4px); }
+        
+        .stats-box { background: #0a0514; border: 1px solid #2d1b4e; border-radius: 12px; padding: 12px; font-size: 0.8rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 6px; }
+        .stats-title { font-weight: bold; color: #a78bfa; margin-bottom: 4px; }
+        
         .insta-icon-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #fff; }
 
         .modes { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(15, 8, 28, 0.6); border-bottom: 1px solid #1a102f; flex-shrink: 0; }
@@ -112,6 +115,10 @@
         .mode-btn { background: #160d26; border: 1px solid #2d1b4e; color: #cbd5e1; padding: 7px 16px; border-radius: 16px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
         .mode-btn:hover { background: #221535; border-color: #7c3aed; }
         .mode-btn.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; font-weight: 600; box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
+
+        .quick-actions { display: flex; gap: 8px; padding: 8px 20px; background: rgba(11, 6, 20, 0.4); overflow-x: auto; border-bottom: 1px solid #1a102f; flex-shrink: 0; }
+        .quick-btn { background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3); color: #d8b4fe; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
+        .quick-btn:hover { background: #7c3aed; color: #fff; }
 
         .chat-container { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
         .chat-container::-webkit-scrollbar { width: 6px; }
@@ -151,17 +158,17 @@
         .copy-code-btn:hover { background: #7c3aed; color: #fff; }
         .code-content { padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; margin: 0; white-space: pre; }
 
-        .image-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; }
-        .image-preview-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #7c3aed; }
-        .remove-image-btn { background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .file-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; }
+        .file-preview-thumb { width: 40px; height: 40px; background: #7c3aed; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; }
+        .remove-file-btn { background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        .input-area { display: flex; padding: 14px 20px; background: rgba(11, 6, 20, 0.9); border-top: 1px solid #221535; gap: 12px; align-items: center; flex-shrink: 0; }
+        .input-area { display: flex; padding: 14px 20px; background: rgba(11, 6, 20, 0.9); border-top: 1px solid #221535; gap: 10px; align-items: center; flex-shrink: 0; }
         .input-actions { display: flex; gap: 6px; }
-        .action-icon-btn { background: #160d26; border: 1px solid #2d1b4e; color: #a78bfa; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
+        .action-icon-btn { background: #160d26; border: 1px solid #2d1b4e; color: #a78bfa; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
         .action-icon-btn:hover { background: #221535; transform: scale(1.05); }
         .input-area input[type="text"] { flex: 1; background: #140b24; border: 1px solid #2d1b4e; color: #fff; padding: 12px 18px; border-radius: 24px; outline: none; font-size: 0.95rem; font-family: 'Outfit', sans-serif; transition: border-color 0.2s; }
         .input-area input[type="text"]:focus { border-color: #7c3aed; box-shadow: 0 0 10px rgba(124, 58, 237, 0.2); }
-        .send-btn { background: #7c3aed; border: none; color: white; width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); transition: transform 0.1s, background 0.2s; flex-shrink: 0; }
+        .send-btn { background: #7c3aed; border: none; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); transition: transform 0.1s, background 0.2s; flex-shrink: 0; }
         .send-btn:hover { background: #6d28d9; }
         .send-btn:active { transform: scale(0.95); }
     </style>
@@ -171,16 +178,28 @@
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <span class="sidebar-title">NexusAI Menu</span>
+                <span class="sidebar-title">NexusAI Core</span>
                 <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
             </div>
+            
             <a class="sidebar-menu-item" onclick="toggleSidebar(); clearChat();">
                 <span>💬 Nova Conversa</span>
             </a>
             <a class="sidebar-menu-item" onclick="configureApiKey()">
                 <span>🔑 Configurar Chave API</span>
             </a>
-            <a href="https://instagram.com" target="_blank" class="sidebar-menu-item">
+            <a class="sidebar-menu-item" onclick="exportChat()">
+                <span>📥 Exportar Conversa</span>
+            </a>
+
+            <div class="stats-box">
+                <span class="stats-title">📊 Métricas do Sistema</span>
+                <span>Mensagens enviadas: <b id="statMsgs">0</b></span>
+                <span>Tempo médio de resposta: <b id="statSpeed">0.0s</b></span>
+                <span>Tokens aproximados: <b id="statTokens">0</b></span>
+            </div>
+
+            <a href="https://instagram.com" target="_blank" class="sidebar-menu-item" style="margin-top: auto;">
                 <div class="insta-icon-badge">📷</div>
                 <span>Instagram @GUIWY_045</span>
             </a>
@@ -190,7 +209,7 @@
             <div class="header-left">
                 <button class="menu-btn" onclick="toggleSidebar()">☰</button>
                 <div class="logo-area">
-                    <div class="logo">NexusAI</div>
+                    <div class="logo">NexusAI Pro</div>
                     <div class="sub">@GUIWY_045</div>
                 </div>
             </div>
@@ -200,22 +219,35 @@
             <button class="mode-btn active" onclick="setMode('Padrão', this)">✨ Padrão</button>
             <button class="mode-btn" onclick="setMode('Direto', this)">🎯 Direto</button>
             <button class="mode-btn" onclick="setMode('Passo a Passo', this)">📚 Passo a Passo</button>
+            <button class="mode-btn" onclick="setMode('Programador', this)">💻 Dev/Code</button>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" onclick="insertQuickPrompt('Resuma o seguinte texto de forma simples: ')">📝 Resumir Texto</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Corrija e otimize este código: ')">⚡ Otimizar Código</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Traduza o seguinte texto para o Inglês: ')">🌐 Traduzir</button>
         </div>
 
         <div class="chat-container" id="chatContainer">
-            <div class="message ai">✨ <b>NEXUSAI v2.0</b><br><br>Olá! Clique em <b>☰</b> no canto superior esquerdo para configurar sua Chave API do Groq, escolha um modo acima ou comece a conversar!</div>
+            <div class="message ai">✨ <b>NEXUSAI PRO v3.0</b><br><br>Bem-vindo! Configure sua API Key no menu (☰). Agora com leitor de arquivos TXT, análise de dados e estatísticas em tempo real.</div>
         </div>
 
-        <div class="image-preview-bar" id="imagePreviewBar">
-            <img id="imagePreviewThumb" class="image-preview-thumb" src="" alt="Preview">
-            <span style="font-size: 0.85rem; color: #a78bfa; flex: 1;">Imagem anexada</span>
-            <button class="remove-image-btn" onclick="removeAttachedImage()">✕</button>
+        <div class="file-preview-bar" id="filePreviewBar">
+            <div class="file-preview-thumb" id="fileIcon">📄</div>
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <span style="font-size: 0.85rem; color: #fff; font-weight: bold;" id="fileName">arquivo.txt</span>
+                <span style="font-size: 0.75rem; color: #a78bfa;" id="fileSub">Anexo pronto</span>
+            </div>
+            <button class="remove-file-btn" onclick="removeAttachedFile()">✕</button>
         </div>
 
         <div class="input-area">
             <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+            <input type="file" id="txtInput" accept=".txt,.json,.js,.html,.css,.py" style="display: none;" onchange="handleTxtSelect(event)">
+            
             <div class="input-actions">
-                <button class="action-icon-btn" onclick="document.getElementById('imageInput').click()" title="Anexar Imagem">📎</button>
+                <button class="action-icon-btn" onclick="document.getElementById('imageInput').click()" title="Anexar Imagem">🖼️</button>
+                <button class="action-icon-btn" onclick="document.getElementById('txtInput').click()" title="Anexar Documento de Texto">📄</button>
             </div>
             <input type="text" id="userInput" placeholder="Digite sua mensagem para a NexusAI..." onkeypress="if(event.key==='Enter') sendMessage()">
             <button class="send-btn" onclick="sendMessage()">➔</button>
@@ -225,7 +257,24 @@
     <script>
         let currentMode = 'Padrão';
         let currentImageBase64 = null;
+        let currentTxtContent = null;
+        let currentFileName = null;
         let aiResponsesStorage = [];
+
+        // Sistema de métricas
+        let totalMessages = 0;
+        let totalTime = 0;
+        let estimatedTokens = 0;
+
+        function updateMetrics(lastTimeSpan, textLength) {
+            totalMessages++;
+            totalTime += lastTimeSpan;
+            estimatedTokens += Math.ceil(textLength / 4);
+
+            document.getElementById('statMsgs').innerText = totalMessages;
+            document.getElementById('statSpeed').innerText = (totalTime / totalMessages).toFixed(2) + 's';
+            document.getElementById('statTokens').innerText = estimatedTokens;
+        }
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -240,12 +289,18 @@
             btn.classList.add('active');
             
             aiResponsesStorage = [];
-            document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI [Modo: ${mode}]</b><br><br>Nova sessão iniciada no modo <b>${mode}</b>. Como posso ajudar?</div>`;
+            document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI [Modo: ${mode}]</b><br><br>Sessão alterada para o modo <b>${mode}</b>.</div>`;
         }
 
         function clearChat() {
             aiResponsesStorage = [];
-            document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI</b><br><br>Nova conversa iniciada. Como posso ajudar?</div>`;
+            document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI</b><br><br>Nova conversa iniciada.</div>`;
+        }
+
+        function insertQuickPrompt(promptText) {
+            const input = document.getElementById('userInput');
+            input.value = promptText;
+            input.focus();
         }
 
         function configureApiKey() {
@@ -273,16 +328,48 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 currentImageBase64 = e.target.result;
-                document.getElementById('imagePreviewThumb').src = currentImageBase64;
-                document.getElementById('imagePreviewBar').style.display = 'flex';
+                currentFileName = file.name;
+                document.getElementById('fileIcon').innerText = '🖼️';
+                document.getElementById('fileName').innerText = file.name;
+                document.getElementById('fileSub').innerText = 'Imagem Anexada';
+                document.getElementById('filePreviewBar').style.display = 'flex';
             };
             reader.readAsDataURL(file);
         }
 
-        function removeAttachedImage() {
+        function handleTxtSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                currentTxtContent = e.target.result;
+                currentFileName = file.name;
+                document.getElementById('fileIcon').innerText = '📄';
+                document.getElementById('fileName').innerText = file.name;
+                document.getElementById('fileSub').innerText = 'Documento lido com sucesso';
+                document.getElementById('filePreviewBar').style.display = 'flex';
+            };
+            reader.readAsText(file);
+        }
+
+        function removeAttachedFile() {
             currentImageBase64 = null;
-            document.getElementById('imagePreviewBar').style.display = 'none';
+            currentTxtContent = null;
+            currentFileName = null;
+            document.getElementById('filePreviewBar').style.display = 'none';
             document.getElementById('imageInput').value = '';
+            document.getElementById('txtInput').value = '';
+        }
+
+        function exportChat() {
+            const container = document.getElementById('chatContainer');
+            const text = container.innerText;
+            const blob = new Blob([text], { type: 'text/plain' });
+            const anchor = document.createElement('a');
+            anchor.download = `nexus_chat_${Date.now()}.txt`;
+            anchor.href = window.URL.createObjectURL(blob);
+            anchor.click();
+            toggleSidebar();
         }
 
         function speakStoredText(index) {
@@ -314,17 +401,13 @@
 
         function formatAIResponse(text) {
             const codeBlocks = [];
-            
-            // Extrai blocos de código para preservar caracteres
             let placeholderText = text.replace(/```([a-z]*)\n([\s\S]*?)```/gi, function(match, lang, code) {
                 codeBlocks.push({ lang: lang || 'código', code: code.trim() });
                 return `___CODE_BLOCK_${codeBlocks.length - 1}___`;
             });
 
-            // Sanitiza HTML
             let formatted = escapeHtml(placeholderText);
 
-            // Substitui marcas de código de volta pelo layout formatado
             codeBlocks.forEach((block, index) => {
                 const codeHtml = `<div class="code-box-wrapper">
                     <div class="code-header">
@@ -336,7 +419,6 @@
                 formatted = formatted.replace(`___CODE_BLOCK_${index}___`, codeHtml);
             });
 
-            // Formatação básica de negrito e quebras de linha
             formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
             formatted = formatted.replace(/\n/g, '<br>');
 
@@ -347,7 +429,7 @@
             const input = document.getElementById('userInput');
             const container = document.getElementById('chatContainer');
             const text = input.value.trim();
-            if (!text && !currentImageBase64) return;
+            if (!text && !currentImageBase64 && !currentTxtContent) return;
 
             let userApiKey = "";
             try {
@@ -356,36 +438,45 @@
             } catch(e) {}
 
             if (!userApiKey) {
-                alert("⚠️ Por favor, abra o menu (☰) no canto superior esquerdo e clique em 'Configurar Chave API' para inserir sua chave do Groq.");
+                alert("⚠️ Por favor, abra o menu (☰) e configure sua Chave API do Groq.");
                 toggleSidebar();
                 return;
             }
 
+            let fullUserPrompt = text;
             let userHtml = `<div class="message user">`;
+            
             if (currentImageBase64) {
                 userHtml += `<img src="${currentImageBase64}" alt="Uploaded image"><br>`;
             }
-            userHtml += `${escapeHtml(text || "Analise esta imagem.")}</div>`;
+            if (currentTxtContent) {
+                userHtml += `📄 <b>[Arquivo: ${escapeHtml(currentFileName)}]</b><br>`;
+                fullUserPrompt += `\n\n[Conteúdo do arquivo ${currentFileName}]:\n${currentTxtContent}`;
+            }
+
+            userHtml += `${escapeHtml(text || "Analise o anexo.")}</div>`;
             container.innerHTML += userHtml;
 
             input.value = '';
-            removeAttachedImage();
+            removeAttachedFile();
             container.scrollTop = container.scrollHeight;
 
             const loadingId = 'loading-' + Date.now();
-            container.innerHTML += `<div class="message ai" id="${loadingId}">Pensando...</div>`;
+            container.innerHTML += `<div class="message ai" id="${loadingId}">NexusAI processando...</div>`;
             container.scrollTop = container.scrollHeight;
 
             const startTime = performance.now();
 
             try {
-                let systemInstruction = "Você é a NexusAI (@GUIWY_045), uma inteligência artificial avançada, prestativa e inteligente.";
-                if (currentMode === 'Direto') systemInstruction += " Seja extremamente direto, conciso e objetivo.";
-                if (currentMode === 'Passo a Passo') systemInstruction += " Responda detalhadamente dividindo a resposta em passos organizados.";
+                let systemInstruction = "Você é a NexusAI PRO (@GUIWY_045), uma inteligência artificial avançada e completa.";
+                if (currentMode === 'Direto') systemInstruction += " Seja extremamente direto, objetivo e sem enrolação.";
+                if (currentMode === 'Passo a Passo') systemInstruction += " Responda detalhadamente em etapas sequenciais organizadas.";
+                if (currentMode === 'Programador') systemInstruction += " Atue como engenheiro de software senior. Forneça códigos limpos, performáticos e bem documentados.";
 
                 const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
                 const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(apiUrl);
 
+                // Modelo Groq Llama 3.3 70B Versatile atualizado
                 const res = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: { 
@@ -396,7 +487,7 @@
                         model: 'llama-3.3-70b-versatile',
                         messages: [
                             { role: 'system', content: systemInstruction },
-                            { role: 'user', content: text || "Analise esta imagem." }
+                            { role: 'user', content: fullUserPrompt || "Analise o anexo enviado." }
                         ],
                         temperature: 0.7
                     })
@@ -407,7 +498,8 @@
                 if (loadingEl) loadingEl.remove();
 
                 const endTime = performance.now();
-                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+                const responseTimeVal = (endTime - startTime) / 1000;
+                const responseTime = responseTimeVal.toFixed(2);
 
                 if (data.error) {
                     container.innerHTML += `<div class="message ai">⚠️ <b>Erro da API:</b> ${escapeHtml(data.error.message)}</div>`;
@@ -415,6 +507,8 @@
                     const aiContent = data.choices[0].message.content;
                     const storageIndex = aiResponsesStorage.push(aiContent) - 1;
                     const formattedContent = formatAIResponse(aiContent);
+
+                    updateMetrics(responseTimeVal, fullUserPrompt.length + aiContent.length);
 
                     container.innerHTML += `
                         <div class="message ai">
@@ -426,13 +520,13 @@
                         </div>
                     `;
                 } else {
-                    container.innerHTML += `<div class="message ai">⚠️ Resposta inesperada da API.</div>`;
+                    container.innerHTML += `<div class="message ai">⚠️ Resposta inesperada da API Groq.</div>`;
                 }
 
             } catch (err) {
                 const loadingEl = document.getElementById(loadingId);
                 if (loadingEl) loadingEl.remove();
-                container.innerHTML += `<div class="message ai">⚠️ Erro ao conectar com a API: ${escapeHtml(err.message)}</div>`;
+                container.innerHTML += `<div class="message ai">⚠️ Erro de conexão com a API: ${escapeHtml(err.message)}</div>`;
             }
 
             container.scrollTop = container.scrollHeight;
