@@ -180,7 +180,6 @@
             </div>
         </header>
 
-        <!-- Cada clique aqui limpa o chat e inicia uma nova sessão -->
         <div class="modes">
             <button class="mode-btn active" onclick="setMode('Padrão', this)">✨ Padrão</button>
             <button class="mode-btn" onclick="setMode('Direto', this)">🎯 Direto</button>
@@ -351,7 +350,10 @@
                 if (currentMode === 'Direto') systemInstruction += " Seja extremamente direto, conciso e objetivo.";
                 if (currentMode === 'Passo a Passo') systemInstruction += " Responda detalhadamente dividindo a resposta em passos organizados.";
 
-                const res = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+                const apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
+                const proxyUrl = 'https://corsproxy.io/?url=' + encodeURIComponent(apiUrl);
+
+                const res = await fetch(proxyUrl, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -368,7 +370,4 @@
                 });
 
                 const data = await res.json();
-                document.getElementById(loadingId).remove();
-
-                if (data.error) {
-                    thr
+                document.getElementById(loadingId).remove
