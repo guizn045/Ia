@@ -77,7 +77,27 @@
         .logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; background: linear-gradient(45deg, #fff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sub { font-size: 0.75rem; color: #a78bfa; }
 
-        .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; backdrop-filter: blur(4px); }
+        /* Correção de bloqueio da tela no Overlay */
+        .sidebar-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100%; 
+            height: 100%; 
+            background: rgba(0,0,0,0.7); 
+            z-index: 100; 
+            backdrop-filter: blur(4px);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .sidebar-overlay.active { 
+            display: block; 
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 15px; }
         .sidebar.open { left: 0; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 15px; }
@@ -97,7 +117,7 @@
         .chat-container::-webkit-scrollbar { width: 6px; }
         .chat-container::-webkit-scrollbar-thumb { background: #2d1b4e; border-radius: 10px; }
         
-        .message { max-width: 85%; padding: 16px 20px; border-radius: 18px; font-size: 0.97rem; line-height: 1.6; word-break: break-word; white-space: pre-wrap; position: relative; }
+        .message { max-width: 85%; padding: 16px 20px; border-radius: 18px; font-size: 0.97rem; line-height: 1.6; word-break: break-word; position: relative; }
         
         .message.user { 
             background: #7c3aed; 
@@ -125,15 +145,11 @@
         .voice-btn { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; transition: background 0.2s; }
         .voice-btn:hover { background: rgba(167, 139, 250, 0.1); color: #fff; }
 
-        .suggestion-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .chip { background: #1f1235; border: 1px solid #3b2361; color: #d8b4fe; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
-        .chip:hover { background: #7c3aed; color: #fff; border-color: #8b5cf6; }
-
         .code-box-wrapper { background: #0a0512; border: 1px solid #2d1b4e; border-radius: 10px; margin: 10px 0; overflow: hidden; }
         .code-header { background: #130a24; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #a78bfa; border-bottom: 1px solid #2d1b4e; }
         .copy-code-btn { background: #221535; border: 1px solid #3b2361; color: #d8b4fe; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: background 0.2s; }
         .copy-code-btn:hover { background: #7c3aed; color: #fff; }
-        .code-content { padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; margin: 0; }
+        .code-content { padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; margin: 0; white-space: pre; }
 
         .image-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; }
         .image-preview-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #7c3aed; }
@@ -158,10 +174,10 @@
                 <span class="sidebar-title">NexusAI Menu</span>
                 <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
             </div>
-            <a href="#" class="sidebar-menu-item" onclick="toggleSidebar(); clearChat();">
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); clearChat();">
                 <span>💬 Nova Conversa</span>
             </a>
-            <a href="#" class="sidebar-menu-item" onclick="configureApiKey()">
+            <a class="sidebar-menu-item" onclick="configureApiKey()">
                 <span>🔑 Configurar Chave API</span>
             </a>
             <a href="https://instagram.com" target="_blank" class="sidebar-menu-item">
@@ -215,7 +231,7 @@
             const sidebar = document.getElementById('sidebar');
             const overlay = document.getElementById('sidebarOverlay');
             const isOpen = sidebar.classList.toggle('open');
-            overlay.style.display = isOpen ? 'block' : 'none';
+            overlay.classList.toggle('active', isOpen);
         }
 
         function setMode(mode, btn) {
@@ -290,23 +306,41 @@
             });
         }
 
-        function sendQuickPrompt(promptText) {
-            document.getElementById('userInput').value = promptText;
-            sendMessage();
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
         }
 
         function formatAIResponse(text) {
-            let safeText = escapeHtml(text);
-            safeText = safeText.replace(/```([a-z]*)\n([\s\S]*?)```/g, function(match, lang, code) {
-                return `<div class="code-box-wrapper">
+            const codeBlocks = [];
+            
+            // Extrai blocos de código para preservar caracteres
+            let placeholderText = text.replace(/```([a-z]*)\n([\s\S]*?)```/gi, function(match, lang, code) {
+                codeBlocks.push({ lang: lang || 'código', code: code.trim() });
+                return `___CODE_BLOCK_${codeBlocks.length - 1}___`;
+            });
+
+            // Sanitiza HTML
+            let formatted = escapeHtml(placeholderText);
+
+            // Substitui marcas de código de volta pelo layout formatado
+            codeBlocks.forEach((block, index) => {
+                const codeHtml = `<div class="code-box-wrapper">
                     <div class="code-header">
-                        <span>${lang || 'código'}</span>
+                        <span>${escapeHtml(block.lang)}</span>
                         <button class="copy-code-btn" onclick="copyCode(this)">Copiar</button>
                     </div>
-                    <pre class="code-content"><code>${code.trim()}</code></pre>
+                    <pre class="code-content"><code>${escapeHtml(block.code)}</code></pre>
                 </div>`;
+                formatted = formatted.replace(`___CODE_BLOCK_${index}___`, codeHtml);
             });
-            return safeText;
+
+            // Formatação básica de negrito e quebras de linha
+            formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+            formatted = formatted.replace(/\n/g, '<br>');
+
+            return formatted;
         }
 
         async function sendMessage() {
@@ -334,7 +368,6 @@
             userHtml += `${escapeHtml(text || "Analise esta imagem.")}</div>`;
             container.innerHTML += userHtml;
 
-            const imgToSend = currentImageBase64;
             input.value = '';
             removeAttachedImage();
             container.scrollTop = container.scrollHeight;
@@ -370,4 +403,40 @@
                 });
 
                 const data = await res.json();
-                document.getElementById(loadingId).remove
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+
+                const endTime = performance.now();
+                const responseTime = ((endTime - startTime) / 1000).toFixed(2);
+
+                if (data.error) {
+                    container.innerHTML += `<div class="message ai">⚠️ <b>Erro da API:</b> ${escapeHtml(data.error.message)}</div>`;
+                } else if (data.choices && data.choices.length > 0) {
+                    const aiContent = data.choices[0].message.content;
+                    const storageIndex = aiResponsesStorage.push(aiContent) - 1;
+                    const formattedContent = formatAIResponse(aiContent);
+
+                    container.innerHTML += `
+                        <div class="message ai">
+                            ${formattedContent}
+                            <div class="ai-message-footer">
+                                <span class="ai-speed-badge">⚡ ${responseTime}s</span>
+                                <button class="voice-btn" onclick="speakStoredText(${storageIndex})">🔊 Ouvir</button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML += `<div class="message ai">⚠️ Resposta inesperada da API.</div>`;
+                }
+
+            } catch (err) {
+                const loadingEl = document.getElementById(loadingId);
+                if (loadingEl) loadingEl.remove();
+                container.innerHTML += `<div class="message ai">⚠️ Erro ao conectar com a API: ${escapeHtml(err.message)}</div>`;
+            }
+
+            container.scrollTop = container.scrollHeight;
+        }
+    </script>
+</body>
+</html>
