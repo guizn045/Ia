@@ -8,16 +8,16 @@
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background: #09090b; color: #f4f4f5; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
         
-        /* Animação de entrada (Splash Screen) */
-        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.6s ease, visibility 0.6s ease; }
-        .splash-content { display: flex; flex-direction: column; align-items: center; gap: 12px; animation: pulseGlow 2s infinite ease-in-out; }
-        .splash-logo { width: 70px; height: 70px; background: linear-gradient(135deg, #a855f7, #6366f1); border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 0 30px rgba(168,85,247,0.5); }
-        .splash-title { color: #f4f4f5; font-size: 24px; font-weight: 800; letter-spacing: 2px; }
-        .splash-sub { color: #a855f7; font-size: 12px; font-weight: 600; letter-spacing: 1px; }
+        /* Splash Screen com tempo maior na tela e destaque pro @ */
+        #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #09090b; z-index: 999; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease, visibility 0.8s ease; }
+        .splash-content { display: flex; flex-direction: column; align-items: center; gap: 14px; animation: pulseGlow 2.5s infinite ease-in-out; }
+        .splash-logo { width: 80px; height: 80px; background: linear-gradient(135deg, #a855f7, #6366f1); border-radius: 22px; display: flex; align-items: center; justify-content: center; font-size: 36px; box-shadow: 0 0 35px rgba(168,85,247,0.6); }
+        .splash-title { color: #f4f4f5; font-size: 26px; font-weight: 800; letter-spacing: 2px; }
+        .splash-sub { color: #c084fc; font-size: 14px; font-weight: 700; letter-spacing: 1.5px; background: rgba(168, 85, 247, 0.15); padding: 6px 14px; border-radius: 20px; border: 1px solid rgba(168, 85, 247, 0.3); }
         @keyframes pulseGlow {
-            0% { transform: scale(0.95); opacity: 0.8; }
+            0% { transform: scale(0.95); opacity: 0.85; }
             50% { transform: scale(1.05); opacity: 1; }
-            100% { transform: scale(0.95); opacity: 0.8; }
+            100% { transform: scale(0.95); opacity: 0.85; }
         }
         
         .wrapper { width: 100vw; height: 100vh; display: flex; flex-direction: column; background: #09090b; position: relative; }
@@ -25,6 +25,10 @@
         header { padding: 10px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.08); display: flex; justify-content: space-between; align-items: center; background: #0d0d12; }
         .header-title h2 { color: #e9d5ff; font-size: 16px; font-weight: 700; }
         .header-title span { color: #a855f7; font-size: 11px; font-weight: 600; }
+
+        /* Botão do Instagram no cabeçalho */
+        .insta-btn { display: flex; align-items: center; gap: 6px; background: linear-gradient(135deg, #f58529, #dd2a7b, #8134af); color: #fff; padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-decoration: none; box-shadow: 0 2px 8px rgba(221, 42, 123, 0.3); transition: 0.2s; }
+        .insta-btn:active { transform: scale(0.95); }
 
         .dev-warning { background: linear-gradient(90deg, rgba(168,85,247,0.15), rgba(99,102,241,0.15)); border-bottom: 1px solid rgba(168,85,247,0.2); color: #d8b4fe; font-size: 11px; text-align: center; padding: 6px; font-weight: 600; letter-spacing: 0.5px; }
         
@@ -42,7 +46,6 @@
         .bubble { max-width: 90%; padding: 12px 16px; border-radius: 14px; font-size: 14.5px; line-height: 1.6; word-break: break-word; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
         .message-row.user .bubble { background: linear-gradient(135deg, #9333ea, #4f46e5); color: #fff; border-bottom-right-radius: 4px; }
         
-        /* Detalhes extras no balão da IA */
         .message-row.ai .bubble { background: #18181b; border: 1px solid rgba(168, 85, 247, 0.2); color: #f4f4f5; border-bottom-left-radius: 4px; font-weight: 400; }
         .ai-header { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #c084fc; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
         
@@ -60,7 +63,7 @@
     </style>
 </head>
 <body>
-    <!-- Splash Screen Animada -->
+    <!-- Splash Screen Animada com maior tempo e destaque ao @ -->
     <div id="splash">
         <div class="splash-content">
             <div class="splash-logo">✨</div>
@@ -75,6 +78,9 @@
                 <h2>NexusAI</h2>
                 <span>@GUIWY_045</span>
             </div>
+            <a href="https://www.instagram.com/guiwy_045?igsi=cmE0Nnl4ZnV3dDk5" target="_blank" class="insta-btn">
+                📷 Instagram
+            </a>
         </header>
 
         <div class="dev-warning">⚠️ Essa IA está em desenvolvimento</div>
@@ -99,17 +105,16 @@
     </div>
 
     <script>
-        // Fecha o splash screen com animação suave
+        // Animação inicial estendida para 2.5 segundos
         window.addEventListener('load', () => {
             setTimeout(() => {
                 const sp = document.getElementById('splash');
-                if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.style.display = 'none', 600); }
-            }, 800);
+                if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.style.display = 'none', 800); }
+            }, 2500);
         });
         
         let modo = "Padrão";
         
-        // Histórico independente para cada aba/opção
         const historico = {
             "Padrão": [],
             "Direto": [],
@@ -155,7 +160,7 @@
             btns.forEach(x => x.classList.remove('active')); 
             b.classList.add('active');
             modo = b.getAttribute('data-m');
-            renderizarChat(); // Troca instantaneamente para o histórico da aba selecionada
+            renderizarChat();
         }));
 
         const txt = document.getElementById('txt'), send = document.getElementById('send');
@@ -176,17 +181,12 @@
             const val = txt.value.trim(); 
             if (!val) return;
 
-            // Adiciona a mensagem do usuário no histórico do modo atual
             historico[modo].push({ texto: val, usuario: true });
             renderizarChat();
             txt.value = "";
 
-            // Adiciona placeholder de pensamento da IA
             historico[modo].push({ texto: "Pensando...", usuario: false });
             renderizarChat();
-
-            const rowsAi = chat.querySelectorAll('.message-row.ai');
-            const lastAiRow = rowsAi[rowsAi.length - 1];
 
             try {
                 let systemPrompt = "Você é o NexusAI, um assistente inteligente criado por @GUIWY_045. Responda de forma limpa, direta, sem usar marcações de código markdown complexas.";
@@ -198,14 +198,15 @@
                 const p3 = "dyb3FYjSHSCaVyfJX2d9aQ3n3UK0VV";
                 const apiKey = p1 + p2 + p3;
 
-                const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                // Tentativa com modelo primário robusto
+                let response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
                     method: "POST",
                     headers: {
                         "Authorization": `Bearer ${apiKey}`,
                         "Content-Type": "application/json"
                     },
                     body: JSON.stringify({
-                        model: "llama-3.1-8b-instant",
+                        model: "llama-3.3-70b-versatile",
                         messages: [
                             { role: "system", content: systemPrompt },
                             { role: "user", content: val }
@@ -214,9 +215,29 @@
                     })
                 });
 
-                const data = await response.json();
-                let respostaFinal = "";
+                let data = await response.json();
 
+                // Fallback automático caso o primário falhe
+                if (data.error) {
+                    response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                        method: "POST",
+                        headers: {
+                            "Authorization": `Bearer ${apiKey}`,
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            model: "llama-3.1-8b-instant",
+                            messages: [
+                                { role: "system", content: systemPrompt },
+                                { role: "user", content: val }
+                            ],
+                            temperature: 0.7
+                        })
+                    });
+                    data = await response.json();
+                }
+
+                let respostaFinal = "";
                 if (data.choices && data.choices.length > 0) {
                     respostaFinal = limparMarkdown(data.choices[0].message.content);
                 } else if (data.error) {
@@ -225,11 +246,9 @@
                     respostaFinal = "Erro ao processar resposta.";
                 }
 
-                // Atualiza o histórico com a resposta real
                 historico[modo][historico[modo].length - 1].texto = respostaFinal;
                 renderizarChat();
 
-                // Mantém o início da resposta visível no topo (estilo IA normal)
                 const updatedAiRows = chat.querySelectorAll('.message-row.ai');
                 const currentAiRow = updatedAiRows[updatedAiRows.length - 1];
                 if (currentAiRow) {
@@ -251,7 +270,6 @@
             renderizarChat(); 
         });
 
-        // Inicializa o chat vazio no carregamento
         renderizarChat();
     </script>
 </body>
