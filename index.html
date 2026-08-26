@@ -8,7 +8,6 @@
     <style>
         * { box-sizing: border-box; }
         
-        /* Layout responsivo com Ambient Glow de fundo */
         body { 
             background: #05020a; 
             color: #f3f4f6; 
@@ -23,7 +22,6 @@
             position: relative;
         }
 
-        /* Ambient Glow (Luzes futuristas de fundo) */
         body::before {
             content: '';
             position: absolute;
@@ -71,7 +69,6 @@
             }
         }
         
-        /* Header */
         header { display: flex; justify-content: space-between; align-items: center; padding: 14px 20px; border-bottom: 1px solid #221535; background: rgba(11, 6, 20, 0.8); z-index: 5; flex-shrink: 0; }
         .header-left { display: flex; align-items: center; gap: 14px; }
         .menu-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: color 0.2s; }
@@ -80,7 +77,6 @@
         .logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; background: linear-gradient(45deg, #fff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
         .sub { font-size: 0.75rem; color: #a78bfa; }
 
-        /* Sidebar Drawer */
         .sidebar-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 100; backdrop-filter: blur(4px); }
         .sidebar { position: fixed; top: 0; left: -280px; width: 280px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 101; display: flex; flex-direction: column; padding: 20px; gap: 15px; }
         .sidebar.open { left: 0; }
@@ -91,21 +87,18 @@
         .sidebar-menu-item:hover { background: #251642; transform: translateX(4px); }
         .insta-icon-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 26px; height: 26px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; color: #fff; }
 
-        /* Modes bar */
         .modes { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(15, 8, 28, 0.6); border-bottom: 1px solid #1a102f; flex-shrink: 0; }
         .modes::-webkit-scrollbar { display: none; }
         .mode-btn { background: #160d26; border: 1px solid #2d1b4e; color: #cbd5e1; padding: 7px 16px; border-radius: 16px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
         .mode-btn:hover { background: #221535; border-color: #7c3aed; }
         .mode-btn.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; font-weight: 600; box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
 
-        /* Chat container */
         .chat-container { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; }
         .chat-container::-webkit-scrollbar { width: 6px; }
         .chat-container::-webkit-scrollbar-thumb { background: #2d1b4e; border-radius: 10px; }
         
         .message { max-width: 85%; padding: 16px 20px; border-radius: 18px; font-size: 0.97rem; line-height: 1.6; word-break: break-word; white-space: pre-wrap; position: relative; }
         
-        /* Estilo da Pergunta (Usuário) */
         .message.user { 
             background: #7c3aed; 
             color: #ffffff; 
@@ -115,7 +108,6 @@
             font-weight: 500;
         }
         
-        /* Estilo da Resposta (IA) */
         .message.ai { 
             background: #160d26; 
             border: 1px solid #2d1b4e; 
@@ -128,30 +120,25 @@
         
         .message img { max-width: 100%; border-radius: 12px; margin-top: 12px; border: 1px solid #3b2361; display: block; }
 
-        /* Rodapé interno da Mensagem da IA (Velocímetro e Voz) */
         .ai-message-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(45, 27, 78, 0.5); font-size: 0.75rem; color: #9ca3af; }
         .ai-speed-badge { background: rgba(124, 58, 237, 0.15); color: #c4b5fd; padding: 2px 8px; border-radius: 6px; font-weight: 500; border: 1px solid rgba(124, 58, 237, 0.3); }
         .voice-btn { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 1rem; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; transition: background 0.2s; }
         .voice-btn:hover { background: rgba(167, 139, 250, 0.1); color: #fff; }
 
-        /* Chips de Sugestões Contextuais */
         .suggestion-chips { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
         .chip { background: #1f1235; border: 1px solid #3b2361; color: #d8b4fe; padding: 6px 12px; border-radius: 12px; font-size: 0.8rem; cursor: pointer; transition: all 0.2s; }
         .chip:hover { background: #7c3aed; color: #fff; border-color: #8b5cf6; }
 
-        /* Blocos de Código Estilizados com Botão Copiar */
         .code-box-wrapper { background: #0a0512; border: 1px solid #2d1b4e; border-radius: 10px; margin: 10px 0; overflow: hidden; }
         .code-header { background: #130a24; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #a78bfa; border-bottom: 1px solid #2d1b4e; }
         .copy-code-btn { background: #221535; border: 1px solid #3b2361; color: #d8b4fe; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: background 0.2s; }
         .copy-code-btn:hover { background: #7c3aed; color: #fff; }
         .code-content { padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; margin: 0; }
 
-        /* Image Preview Bar */
         .image-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; }
         .image-preview-thumb { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid #7c3aed; }
         .remove-image-btn { background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
 
-        /* Input Area */
         .input-area { display: flex; padding: 14px 20px; background: rgba(11, 6, 20, 0.9); border-top: 1px solid #221535; gap: 12px; align-items: center; flex-shrink: 0; }
         .input-actions { display: flex; gap: 6px; }
         .action-icon-btn { background: #160d26; border: 1px solid #2d1b4e; color: #a78bfa; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
@@ -165,7 +152,6 @@
 </head>
 <body>
     <div class="app-wrapper">
-        <!-- Sidebar Drawer -->
         <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
         <div class="sidebar" id="sidebar">
             <div class="sidebar-header">
@@ -194,7 +180,7 @@
             </div>
         </header>
 
-        <!-- Modos: Agora cada clique limpa o chat e inicia uma nova sessão -->
+        <!-- Ao clicar em qualquer uma das 3 opções, limpa o chat e inicia nova sessão -->
         <div class="modes">
             <button class="mode-btn active" onclick="setMode('Padrão', this)">✨ Padrão</button>
             <button class="mode-btn" onclick="setMode('Direto', this)">🎯 Direto</button>
@@ -205,7 +191,6 @@
             <div class="message ai">✨ <b>NEXUSAI v2.0</b><br><br>Olá! Tudo pronto por aqui. Escolha um modo acima, clique em <b>☰</b> para configurar sua chave ou comece a digitar abaixo.</div>
         </div>
 
-        <!-- Image Preview Bar -->
         <div class="image-preview-bar" id="imagePreviewBar">
             <img id="imagePreviewThumb" class="image-preview-thumb" src="" alt="Preview">
             <span style="font-size: 0.85rem; color: #a78bfa; flex: 1;">Imagem anexada</span>
@@ -226,6 +211,7 @@
         let currentMode = 'Padrão';
         let currentImageBase64 = null;
         let currentSessionId = 'session_' + Date.now();
+        let aiResponsesStorage = []; // Array seguro para armazenar respostas (evita erros de aspas/quebras de linha)
 
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -234,19 +220,19 @@
             overlay.style.display = isOpen ? 'block' : 'none';
         }
 
-        /* Ao clicar em qualquer modo lá em cima, limpa o chat e cria uma nova sessão */
         function setMode(mode, btn) {
             currentMode = mode;
             document.querySelectorAll('.modes .mode-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
             
-            // Inicia nova conversa e limpa o chat para este modo
             currentSessionId = 'session_' + Date.now();
+            aiResponsesStorage = [];
             document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI [Modo: ${mode}]</b><br><br>Nova sessão iniciada no modo <b>${mode}</b>. Como posso ajudar?</div>`;
         }
 
         function clearChat() {
             currentSessionId = 'session_' + Date.now();
+            aiResponsesStorage = [];
             document.getElementById('chatContainer').innerHTML = `<div class="message ai">✨ <b>NEXUSAI</b><br><br>Nova conversa iniciada. Como posso ajudar?</div>`;
         }
 
@@ -287,19 +273,18 @@
             document.getElementById('imageInput').value = '';
         }
 
-        /* Recurso de Leitura em Voz Alta (TTS) */
-        function speakText(text) {
-            if ('speechSynthesis' in window) {
+        function speakStoredText(index) {
+            const textToSpeak = aiResponsesStorage[index];
+            if (textToSpeak && 'speechSynthesis' in window) {
                 window.speechSynthesis.cancel();
-                const utterance = new SpeechSynthesisUtterance(text);
+                const utterance = new SpeechSynthesisUtterance(textToSpeak);
                 utterance.lang = 'pt-BR';
                 window.speechSynthesis.speak(utterance);
             } else {
-                alert('Seu navegador não suporta leitura de voz.');
+                alert('Leitura de voz indisponível.');
             }
         }
 
-        /* Função para copiar blocos de código */
         function copyCode(btn) {
             const codeEl = btn.parentElement.nextElementSibling;
             const textToCopy = codeEl.innerText;
@@ -309,17 +294,13 @@
             });
         }
 
-        /* Enviar mensagem rápida através dos Chips de Sugestão */
         function sendQuickPrompt(promptText) {
             document.getElementById('userInput').value = promptText;
             sendMessage();
         }
 
-        /* Processador seguro de textos e blocos de código */
         function formatAIResponse(text) {
             let safeText = escapeHtml(text);
-            
-            // Substitui blocos de código markdown ``` por blocos estilizados
             safeText = safeText.replace(/```([a-z]*)\n([\s\S]*?)```/g, function(match, lang, code) {
                 return `<div class="code-box-wrapper">
                     <div class="code-header">
@@ -329,7 +310,6 @@
                     <pre class="code-content"><code>${code.trim()}</code></pre>
                 </div>`;
             });
-
             return safeText;
         }
 
@@ -355,7 +335,7 @@
             container.innerHTML += `<div class="message ai" id="${loadingId}">Pensando...</div>`;
             container.scrollTop = container.scrollHeight;
 
-            const startTime = performance.now(); // Inicia cronômetro do Groq
+            const startTime = performance.now();
 
             try {
                 let userApiKey = "";
@@ -372,4 +352,24 @@
                         mode: currentMode, 
                         userApiKey: userApiKey,
                         imageBase64: imgToSend,
-                        sessionId: currentSess
+                        sessionId: currentSessionId
+                    })
+                });
+                const data = await res.json();
+                document.getElementById(loadingId).remove();
+                
+                const endTime = performance.now();
+                const duration = ((endTime - startTime) / 1000).toFixed(2);
+
+                const rawResponse = data.response || 'Erro desconhecido';
+                
+                // Armazena com segurança no array
+                aiResponsesStorage.push(rawResponse);
+                const msgIndex = aiResponsesStorage.length - 1;
+
+                let formattedContent = formatAIResponse(rawResponse);
+
+                let aiHtml = `<div class="message ai">${formattedContent}`;
+                
+                aiHtml += `<div class="ai-message-footer">
+                    <span class="ai
