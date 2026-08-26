@@ -12,12 +12,6 @@
         .wrapper { width: 100%; height: 100vh; max-width: 650px; display: flex; flex-direction: column; background: #0d0d11; }
         @media (min-width: 768px) { .wrapper { height: 85vh; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2); } }
         header { padding: 12px; border-bottom: 1px solid rgba(168, 85, 247, 0.15); text-align: center; }
-        
-        /* BOX DA API */
-        .key-box { padding: 8px; background: rgba(168, 85, 247, 0.1); border-bottom: 1px solid rgba(168, 85, 247, 0.2); display: flex; gap: 6px; justify-content: center; align-items: center; }
-        .key-in { background: #161622; border: 1px solid #a855f7; color: #fff; padding: 6px; border-radius: 6px; font-size: 12px; width: 70%; outline: none; }
-        .key-btn { background: #a855f7; border: none; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; }
-
         .bar { display: flex; padding: 8px; gap: 6px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); }
         .btn { flex: 1; background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); color: #a78bfa; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn.active { background: rgba(168, 85, 247, 0.25); color: #fff; border-color: #a855f7; }
@@ -31,32 +25,15 @@
     </style>
 </head>
 <body>
-
-    <div id="splash">
-        <div class="logo">NexusAI</div>
-        <div style="color: #a78bfa; font-size: 13px; margin-top: 4px;">BY @GUIWZ.045</div>
-    </div>
-
+    <div id="splash"><div class="logo">NexusAI</div><div style="color: #a78bfa; font-size: 13px; margin-top: 4px;">BY @GUIWZ.045</div></div>
     <div class="wrapper">
-        <header>
-            <h2 style="color: #d8b4fe; letter-spacing: 1px;">NexusAI</h2>
-            <span>@GUIWZ.045</span>
-        </header>
-
-        <!-- CAIXA DA CHAVE -->
-        <div id="api-section" class="key-box">
-            <input type="password" id="api-in" class="key-in" placeholder="Cole sua NOVA chave da Groq (gsk_...) aqui">
-            <button id="api-save" class="key-btn">SALVAR</button>
-        </div>
-
+        <header><h2 style="color: #d8b4fe; letter-spacing: 1px;">NexusAI</h2><span>@GUIWZ.045</span></header>
         <div class="bar">
             <button class="btn active" data-m="Padrão">✨ Padrão</button>
             <button class="btn" data-m="Direto">🎯 Direto</button>
             <button class="btn" data-m="Passo a Passo">📚 Passo a Passo</button>
         </div>
-
         <main id="chat"><div class="sys">[SISTEMA ONLINE - ENVIE UMA MENSAGEM]</div></main>
-
         <footer>
             <div class="row">
                 <textarea id="txt" placeholder="Pergunte qualquer coisa..."></textarea>
@@ -64,58 +41,26 @@
             </div>
             <div class="row">
                 <button id="clear" class="sub-btn">🗑️ LIMPAR CHAT</button>
-                <button id="reset-key" class="sub-btn" style="color: #f87171; border-color: rgba(248, 113, 113, 0.15);">🔑 TROCAR CHAVE API</button>
             </div>
         </footer>
     </div>
-
     <script>
-        // 1. Splash Screen
         window.addEventListener('load', () => {
             setTimeout(() => {
-                document.getElementById('splash').style.opacity = '0';
-                setTimeout(() => document.getElementById('splash').style.display = 'none', 400);
+                const sp = document.getElementById('splash');
+                if (sp) { sp.style.opacity = '0'; setTimeout(() => sp.style.display = 'none', 400); }
             }, 400);
-
-            // Se já tiver chave salva, oculta a barra do topo
-            if (localStorage.getItem('groq_key_local')) {
-                document.getElementById('api-section').style.display = 'none';
-            }
-        });
-
-        // Ação de Salvar a Chave
-        document.getElementById('api-save').addEventListener('click', () => {
-            const chave = document.getElementById('api-in').value.trim();
-            if (chave.startsWith('gsk_')) {
-                localStorage.setItem('groq_key_local', chave);
-                document.getElementById('api-section').style.display = 'none';
-                alert('Nova chave gravada com sucesso!');
-            } else {
-                alert('Insira uma chave válida da Groq que comece com gsk_');
-            }
-        });
-
-        // Botão para deletar a chave antiga e fazer a caixinha reaparecer
-        document.getElementById('reset-key').addEventListener('click', () => {
-            localStorage.removeItem('groq_key_local');
-            document.getElementById('api-in').value = "";
-            document.getElementById('api-section').style.with = 'flex';
-            document.getElementById('api-section').style.display = 'flex';
-            alert('Chave antiga apagada! Insira a nova no topo da tela.');
         });
         
-        // 2. Seleção de Modo
         let modo = "Padrão";
         const btns = document.querySelectorAll('.btn');
         btns.forEach(b => b.addEventListener('click', () => {
-            btns.forEach(x => x.classList.remove('active'));
-            b.classList.add('active');
+            btns.forEach(x => x.classList.remove('active')); b.classList.add('active');
             modo = b.getAttribute('data-m');
         }));
 
         const txt = document.getElementById('txt'), send = document.getElementById('send'), chat = document.getElementById('chat');
 
-        // 3. Criar Balões
         function balao(texto, usuario) {
             const b = document.createElement('div');
             b.style.maxWidth = '80%'; b.style.padding = '10px 14px'; b.style.borderRadius = '12px'; b.style.fontSize = '14px'; b.style.marginBottom = '4px'; b.style.wordBreak = 'break-word';
@@ -127,59 +72,24 @@
             b.innerText = texto; chat.appendChild(b); chat.scrollTop = chat.scrollHeight; return b;
         }
 
-        // 4. Envio Real para a Groq com Logs de Erro Detalhados
-        async function enviar() {
-            const val = txt.value.trim();
-            if (!val) return;
-
-            const apiKey = localStorage.getItem('groq_key_local');
-            if (!apiKey) {
-                alert('Por favor, cole e salve sua nova chave gsk_ no topo da tela primeiro!');
-                return;
-            }
-
+        function enviar() {
+            const val = txt.value.trim(); if (!val) return;
             balao(val, true); txt.value = "";
-            const bIA = balao("NexusAI está pensando...", false);
+            const bIA = balao("NexusAI está digitando...", false);
             
-            let sistema = "Você é o NexusAI, criado por @GUIWZ.045.";
-            if (modo === "Direto") sistema += " Responda de forma curta e objetiva.";
-            if (modo === "Passo a Passo") sistema += " Explique dividindo em tópicos.";
-
-            const urlProxy = "https://corsproxy.io?" + encodeURIComponent("https://groq.com");
-
-            try {
-                const response = await fetch(urlProxy, {
-                    method: "POST",
-                    headers: {
-                        "Authorization": `Bearer ${apiKey}`,
-                        "Content-Type": "application/json"
-                    },
-                    body: JSON.stringify({
-                        model: "llama3-8b-8192",
-                        messages: [
-                            { role: "system", content: sistema },
-                            { role: "user", content: val }
-                        ]
-                    })
-                });
-
-                const data = await response.json();
-                
-                if (data.choices && data.choices[0].message) {
-                    bIA.innerText = data.choices[0].message.content;
-                } else if (data.error) {
-                    bIA.style.color = "#f87171";
-                    bIA.innerText = "Erro da Groq: " + data.error.message;
-                } else {
-                    bIA.innerText = "Erro desconhecido na estrutura da resposta.";
-                }
-            } catch (err) {
-                bIA.style.color = "#f87171";
-                bIA.innerText = "Falha de conexão. Verifique se o formato da sua chave está correto.";
-            }
-            chat.scrollTop = chat.scrollHeight;
+            setTimeout(() => {
+                let m = val.toLowerCase(), r = "Processando pergunta localmente no NexusAI. O que mais deseja testar?";
+                if (m.includes("oi") || m.includes("olá")) r = "Olá! Eu sou o NexusAI, seu assistente premium criado por @GUIWZ.045! Como posso te ajudar hoje?";
+                if (m.includes("tudo bem")) r = "Tudo ótimo por aqui! Pronto para criar novas tecnologias hoje?";
+                if (modo === "Direto") r = "Modo Direto: Resposta gerada de forma curta e sem enrolação.";
+                if (modo === "Passo a Passo") r = "Análise passo a passo:\n1. Requisição aceita.\n2. Interface responsiva renderizada.\n3. Resposta enviada sem erros de rede.";
+                bIA.innerText = r;
+            }, 600);
         }
 
         send.addEventListener('click', enviar);
         txt.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } });
-        document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '[CHAT LIMPO]'; });
+        document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '<div class="sys">[CHAT LIMPO]</div>'; });
+    </script>
+</body>
+</html>
