@@ -7,29 +7,22 @@
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { background: #050507; color: #f4f4fc; font-family: sans-serif; display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; }
-        
-        /* CARREGAMENTO */
         #splash { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0d0d11; z-index: 99; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: 0.4s; }
         .logo { color: #d8b4fe; font-size: 26px; font-weight: bold; text-transform: uppercase; letter-spacing: 2px; text-shadow: 0 0 10px rgba(168,85,247,0.5); }
-        
-        /* ESTRUTURA */
         .wrapper { width: 100%; height: 100vh; max-width: 650px; display: flex; flex-direction: column; background: #0d0d11; }
         @media (min-width: 768px) { .wrapper { height: 85vh; border-radius: 12px; border: 1px solid rgba(168, 85, 247, 0.2); } }
-        
         header { padding: 12px; border-bottom: 1px solid rgba(168, 85, 247, 0.15); text-align: center; }
         
-        /* CAMPO DA API */
-        .key-box { padding: 6px; background: rgba(168, 85, 247, 0.1); border-bottom: 1px solid rgba(168, 85, 247, 0.2); display: flex; gap: 6px; justify-content: center; }
+        /* BOX DA API */
+        .key-box { padding: 8px; background: rgba(168, 85, 247, 0.1); border-bottom: 1px solid rgba(168, 85, 247, 0.2); display: flex; gap: 6px; justify-content: center; align-items: center; }
         .key-in { background: #161622; border: 1px solid #a855f7; color: #fff; padding: 6px; border-radius: 6px; font-size: 12px; width: 70%; outline: none; }
         .key-btn { background: #a855f7; border: none; color: #fff; padding: 6px 12px; border-radius: 6px; font-size: 12px; cursor: pointer; font-weight: bold; }
 
         .bar { display: flex; padding: 8px; gap: 6px; border-bottom: 1px solid rgba(168, 85, 247, 0.1); }
         .btn { flex: 1; background: rgba(168, 85, 247, 0.05); border: 1px solid rgba(168, 85, 247, 0.2); color: #a78bfa; padding: 8px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; }
         .btn.active { background: rgba(168, 85, 247, 0.25); color: #fff; border-color: #a855f7; }
-        
         #chat { flex: 1; padding: 14px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
         .sys { font-size: 11px; color: #a78bfa; text-align: center; margin: 4px; font-weight: bold; }
-        
         footer { padding: 12px; border-top: 1px solid rgba(168, 85, 247, 0.15); display: flex; flex-direction: column; gap: 8px; }
         .row { display: flex; gap: 6px; }
         textarea { flex: 1; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(168, 85, 247, 0.25); border-radius: 10px; padding: 10px; color: #fff; resize: none; height: 44px; outline: none; }
@@ -50,9 +43,9 @@
             <span>@GUIWZ.045</span>
         </header>
 
-        <!-- LUGAR SEGURO PARA POR A API KEY NO NAVEGADOR -->
+        <!-- CAIXA DA CHAVE -->
         <div id="api-section" class="key-box">
-            <input type="password" id="api-in" class="key-in" placeholder="Cole sua chave da Groq (gsk_...) aqui">
+            <input type="password" id="api-in" class="key-in" placeholder="Cole sua NOVA chave da Groq (gsk_...) aqui">
             <button id="api-save" class="key-btn">SALVAR</button>
         </div>
 
@@ -62,7 +55,7 @@
             <button class="btn" data-m="Passo a Passo">📚 Passo a Passo</button>
         </div>
 
-        <main id="chat"><div class="sys">[SISTEMA ONLINE - INSIRA A CHAVE PARA COMEÇAR]</div></main>
+        <main id="chat"><div class="sys">[SISTEMA ONLINE - ENVIE UMA MENSAGEM]</div></main>
 
         <footer>
             <div class="row">
@@ -70,8 +63,8 @@
                 <button id="send">⚡</button>
             </div>
             <div class="row">
-                <button id="upload" class="sub-btn">📸 ANEXAR PRINT</button>
-                <button id="clear" class="sub-btn" style="color: #f87171; border-color: rgba(248, 113, 113, 0.15);">🗑️ LIMPAR CHAT</button>
+                <button id="clear" class="sub-btn">🗑️ LIMPAR CHAT</button>
+                <button id="reset-key" class="sub-btn" style="color: #f87171; border-color: rgba(248, 113, 113, 0.15);">🔑 TROCAR CHAVE API</button>
             </div>
         </footer>
     </div>
@@ -84,22 +77,31 @@
                 setTimeout(() => document.getElementById('splash').style.display = 'none', 400);
             }, 400);
 
-            // Se já tiver uma chave salva no navegador do celular, esconde a barra
+            // Se já tiver chave salva, oculta a barra do topo
             if (localStorage.getItem('groq_key_local')) {
                 document.getElementById('api-section').style.display = 'none';
             }
         });
 
-        // Salvar a chave localmente no dispositivo
+        // Ação de Salvar a Chave
         document.getElementById('api-save').addEventListener('click', () => {
             const chave = document.getElementById('api-in').value.trim();
             if (chave.startsWith('gsk_')) {
                 localStorage.setItem('groq_key_local', chave);
                 document.getElementById('api-section').style.display = 'none';
-                alert('Chave salva com sucesso no seu dispositivo!');
+                alert('Nova chave gravada com sucesso!');
             } else {
                 alert('Insira uma chave válida da Groq que comece com gsk_');
             }
+        });
+
+        // Botão para deletar a chave antiga e fazer a caixinha reaparecer
+        document.getElementById('reset-key').addEventListener('click', () => {
+            localStorage.removeItem('groq_key_local');
+            document.getElementById('api-in').value = "";
+            document.getElementById('api-section').style.with = 'flex';
+            document.getElementById('api-section').style.display = 'flex';
+            alert('Chave antiga apagada! Insira a nova no topo da tela.');
         });
         
         // 2. Seleção de Modo
@@ -125,14 +127,14 @@
             b.innerText = texto; chat.appendChild(b); chat.scrollTop = chat.scrollHeight; return b;
         }
 
-        // 4. Lógica de Envio Real para a Groq (Com proteção de Proxy)
+        // 4. Envio Real para a Groq com Logs de Erro Detalhados
         async function enviar() {
             const val = txt.value.trim();
             if (!val) return;
 
             const apiKey = localStorage.getItem('groq_key_local');
             if (!apiKey) {
-                alert('Por favor, cole e salve sua chave gsk_ no topo primeiro!');
+                alert('Por favor, cole e salve sua nova chave gsk_ no topo da tela primeiro!');
                 return;
             }
 
@@ -141,9 +143,8 @@
             
             let sistema = "Você é o NexusAI, criado por @GUIWZ.045.";
             if (modo === "Direto") sistema += " Responda de forma curta e objetiva.";
-            if (modo === "Passo a Passo") sistema += " Explique dividindo em tópicos ou passo a passo.";
+            if (modo === "Passo a Passo") sistema += " Explique dividindo em tópicos.";
 
-            // URL com proxy gratuito para que o GitHub Pages não bloqueie a conexão
             const urlProxy = "https://corsproxy.io?" + encodeURIComponent("https://groq.com");
 
             try {
@@ -163,21 +164,22 @@
                 });
 
                 const data = await response.json();
+                
                 if (data.choices && data.choices[0].message) {
                     bIA.innerText = data.choices[0].message.content;
+                } else if (data.error) {
+                    bIA.style.color = "#f87171";
+                    bIA.innerText = "Erro da Groq: " + data.error.message;
                 } else {
-                    bIA.innerText = "Erro: A chave inserida pode estar inativa ou incorreta.";
+                    bIA.innerText = "Erro desconhecido na estrutura da resposta.";
                 }
             } catch (err) {
-                bIA.innerText = "Erro de rede ao conectar com a Groq. Verifique a chave.";
+                bIA.style.color = "#f87171";
+                bIA.innerText = "Falha de conexão. Verifique se o formato da sua chave está correto.";
             }
             chat.scrollTop = chat.scrollHeight;
         }
 
         send.addEventListener('click', enviar);
         txt.addEventListener('keydown', (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); enviar(); } });
-        document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '<div class="sys">[CHAT LIMPO]</div>'; });
-        document.getElementById('upload').addEventListener('click', () => { alert("Leitura de arquivos desativada temporariamente."); });
-    </script>
-</body>
-</html>
+        document.getElementById('clear').addEventListener('click', () => { chat.innerHTML = '[CHAT LIMPO]'; });
