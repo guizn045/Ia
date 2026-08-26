@@ -291,7 +291,7 @@
             </div>
             <div class="modal-body">
                 <p>Obtenha sua chave gratuita em <b>console.groq.com</b></p>
-                <input type="password" id="apiKeyInput" placeholder="gsk_...">
+                <input type="password" id="apiKeyInput" placeholder="gsk_..." onkeypress="if(event.key==='Enter') saveApiKey()">
                 <button class="modal-btn" onclick="saveApiKey()">Salvar Chave</button>
             </div>
         </div>
@@ -319,6 +319,7 @@
         let currentFileName = null;
         let speakStorage = {};
         let inMemoryApiKey = "";
+        let chatHistory = [];
 
         let totalMessages = 0;
         let totalTime = 0;
@@ -335,6 +336,4 @@
 
         function openApiKeyModal() {
             document.getElementById('apiKeyInput').value = getApiKey();
-            document.getElementById('apiModal').style.display = 'flex';
-            const sidebar = document.getElementById('sidebar');
-            i
+            document.getElementById('apiModal').style.display = 'flex
