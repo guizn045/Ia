@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusAI - Fixed Edition</title>
+    <title>NexusAI - Fully Fixed Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * { box-sizing: border-box; }
@@ -48,7 +48,6 @@
             height: 100vh;
             height: 100dvh;
             background: rgba(11, 6, 20, 0.95);
-            backdrop-filter: blur(20px);
             display: flex;
             flex-direction: column;
             overflow: hidden;
@@ -101,7 +100,7 @@
             z-index: 10;
         }
 
-        /* CORREÇÃO DEFINITIVA DO CLIQUE: Overlay desativado completamente por padrão */
+        /* CORREÇÃO TOTAL DO OVERLAY DE BLOQUEIO */
         .sidebar-overlay { 
             display: none; 
             position: fixed; 
@@ -109,16 +108,17 @@
             left: 0; 
             width: 100vw; 
             height: 100vh; 
-            background: rgba(0,0,0,0.7); 
-            z-index: 50; 
-            backdrop-filter: blur(4px);
+            background: rgba(0, 0, 0, 0.75); 
+            z-index: 40; 
+            pointer-events: none;
         }
         
         .sidebar-overlay.active { 
             display: block !important; 
+            pointer-events: auto !important;
         }
 
-        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 60; display: flex; flex-direction: column; padding: 20px; gap: 12px; overflow-y: auto; }
+        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 50; display: flex; flex-direction: column; padding: 20px; gap: 12px; overflow-y: auto; }
         .sidebar.open { left: 0; }
         .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 12px; }
         .sidebar-title { font-weight: bold; font-size: 1.1rem; color: #a78bfa; }
@@ -195,30 +195,30 @@
             </div>
             
             <a class="sidebar-menu-item" onclick="toggleSidebar(); clearChat();">
-                <span id="menuNewChat">💬 Nova Conversa</span>
+                <span>💬 Nova Conversa</span>
             </a>
             <a class="sidebar-menu-item" onclick="openApiKeyModal()">
-                <span id="menuApiKey">🔑 Configurar Chave API</span>
+                <span>🔑 Configurar Chave API</span>
             </a>
             <a class="sidebar-menu-item" onclick="exportChat()">
-                <span id="menuExport">📥 Exportar Conversa</span>
+                <span>📥 Exportar Conversa</span>
             </a>
             <a class="sidebar-menu-item" onclick="openTerms()">
-                <span id="menuTerms">📜 Termos & Privacidade</span>
+                <span>📜 Termos & Privacidade</span>
             </a>
 
             <div class="stats-box">
-                <span class="stats-title" id="statAppTitle">📲 Status do App</span>
+                <span class="stats-title">📲 Status do App</span>
                 <span>Engine: <b>Llama-3.3-70B</b></span>
-                <span>Status: <b style="color: #4ade80;" id="statStatus">Em Desenvolvimento</b></span>
+                <span>Status: <b style="color: #4ade80;">Em Desenvolvimento</b></span>
                 <span>Plataformas: <b>Web, Android & iOS</b></span>
             </div>
 
             <div class="stats-box">
-                <span class="stats-title" id="statSessionTitle">📊 Métricas da Sessão</span>
-                <span><span id="lblMsgs">Mensagens enviadas</span>: <b id="statMsgs">0</b></span>
-                <span><span id="lblSpeed">Tempo médio</span>: <b id="statSpeed">0.0s</b></span>
-                <span><span id="lblTokens">Tokens estim.</span>: <b id="statTokens">0</b></span>
+                <span class="stats-title">📊 Métricas da Sessão</span>
+                <span>Mensagens enviadas: <b id="statMsgs">0</b></span>
+                <span>Tempo médio: <b id="statSpeed">0.0s</b></span>
+                <span>Tokens estim.: <b id="statTokens">0</b></span>
             </div>
 
             <a href="https://instagram.com" target="_blank" class="sidebar-menu-item" style="margin-top: auto;">
@@ -244,16 +244,16 @@
         </header>
 
         <div class="modes">
-            <button class="mode-btn active" id="btnModeDefault" onclick="setMode('Padrão', this)">✨ Padrão</button>
-            <button class="mode-btn" id="btnModeDirect" onclick="setMode('Direto', this)">🎯 Direto</button>
-            <button class="mode-btn" id="btnModeStep" onclick="setMode('Passo a Passo', this)">📚 Passo a Passo</button>
-            <button class="mode-btn" id="btnModeDev" onclick="setMode('Programador', this)">💻 Dev/Code</button>
+            <button class="mode-btn active" onclick="setMode('Padrão', this)">✨ Padrão</button>
+            <button class="mode-btn" onclick="setMode('Direto', this)">🎯 Direto</button>
+            <button class="mode-btn" onclick="setMode('Passo a Passo', this)">📚 Passo a Passo</button>
+            <button class="mode-btn" onclick="setMode('Programador', this)">💻 Dev/Code</button>
         </div>
 
         <div class="quick-actions">
-            <button class="quick-btn" id="btnQuickSummarize" onclick="insertQuickPrompt('Resuma o seguinte texto de forma simples: ')">📝 Resumir Texto</button>
-            <button class="quick-btn" id="btnQuickOptimize" onclick="insertQuickPrompt('Corrija e otimize este código: ')">⚡ Otimizar Código</button>
-            <button class="quick-btn" id="btnQuickTranslate" onclick="insertQuickPrompt('Traduza o seguinte texto: ')">🌐 Traduzir</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Resuma o seguinte texto de forma simples: ')">📝 Resumir Texto</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Corrija e otimize este código: ')">⚡ Otimizar Código</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Traduza o seguinte texto: ')">🌐 Traduzir</button>
         </div>
 
         <div class="chat-container" id="chatContainer">
@@ -301,10 +301,10 @@
     <div class="modal" id="termsModal">
         <div class="modal-content">
             <div class="modal-header">
-                <span id="termsTitle">Termos de Uso e Privacidade</span>
+                <span>Termos de Uso e Privacidade</span>
                 <button class="close-sidebar" onclick="closeTerms()">✕</button>
             </div>
-            <div id="termsBody">
+            <div>
                 <p><b>1. Estado do Projeto:</b> A NexusAI é um sistema em desenvolvimento ativo por @GUIWY_045. Versões dedicadas para Android e iOS estão sendo preparadas.</p>
                 <p><b>2. Armazenamento de Dados:</b> Sua Chave API e histórico são armazenados no seu próprio navegador.</p>
                 <p><b>3. Uso da API Groq:</b> O serviço utiliza o modelo de alta performance Llama 3.3 70B Versatile.</p>
@@ -327,4 +327,14 @@
         function getApiKey() {
             if (inMemoryApiKey) return inMemoryApiKey;
             try {
-                if (typeof window 
+                const saved = localStorage.getItem('nexus_groq_key');
+                if (saved) return atob(saved);
+            } catch(e) {}
+            return "";
+        }
+
+        function openApiKeyModal() {
+            document.getElementById('apiKeyInput').value = getApiKey();
+            document.getElementById('apiModal').style.display = 'flex';
+            const sidebar = document.getElementById('sidebar');
+            i
