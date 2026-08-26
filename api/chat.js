@@ -1,0 +1,66 @@
+export default async function handler(req, res) {
+    if (req.method !== 'POST') {
+        return res.status(405).json({ error: 'Method not allowed' });
+    }
+
+    const { message, mode } = req.body;
+
+    if (!message) {
+        return res.status(400).json({ error: 'Mensagem obrigatória' });
+    }
+
+    // Pega a chave secreta salva de forma segura na Vercel
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey) {
+        return res.status(500).json({ error: 'Chave da API não configurada no servidor.' });
+    }
+
+    let systemPrompt = "Você é o NexusAI, um assistente inteligente criado por @GUIWY_045. Responda de forma limpa, direta, sem usar marcações de código markdown complexas.";
+    if (mode === "Direto") systemPrompt += " Seja extremamente direto, curto e objetivo.";
+    if (mode === "Passo a Passo") systemPrompt += " Explique de forma organizada em tópicos limpos.";
+
+    const modelos = [
+        "llama-3.3-70b-versatile",
+        "llama-3.1-8b-instant",
+        "mixtral-8x7b-32768",
+        "gemma2-9b-it"
+    ];
+
+    let respostaFinal = "";
+
+    for (const modelName of modelos) {
+        try {
+            const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${apiKey}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: modelName,
+                    messages: [
+                        { role: "system", content: systemPrompt },
+                        { role: "user", content: message }
+                    ],
+                    temperature: 0.7
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.choices && data.choices[0] && data.choices[0].message) {
+                respostaFinal = data.choices[0].message.content;
+                break;
+            }
+        } catch (e) {
+            console.warn(`Tentando próximo modelo...`);
+        }
+    }
+
+    if (!respostaFinal) {
+        return res.status(500).json({ error: "Erro ao comunicar com a Groq." });
+    }
+
+    return res.status(200).json({ response: respostaFinal });
+    }
+
