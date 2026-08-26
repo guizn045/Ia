@@ -100,7 +100,6 @@
             z-index: 10;
         }
 
-        /* CORREÇÃO TOTAL DO OVERLAY DE BLOQUEIO */
         .sidebar-overlay { 
             display: none; 
             position: fixed; 
@@ -317,7 +316,6 @@
         let currentImageBase64 = null;
         let currentTxtContent = null;
         let currentFileName = null;
-        let speakStorage = {};
         let inMemoryApiKey = "";
         let chatHistory = [];
 
@@ -325,18 +323,19 @@
         let totalTime = 0;
         let estimatedTokens = 0;
 
+        // ---------- API KEY ----------
         function getApiKey() {
             if (inMemoryApiKey) return inMemoryApiKey;
             try {
                 const saved = localStorage.getItem('nexus_groq_key');
                 if (saved) return atob(saved);
-            } catch(e) {}
+            } catch (e) {}
             return "";
         }
 
         function openApiKeyModal() {
             document.getElementById('apiKeyInput').value = getApiKey();
-            document.getElementById('apiModal').style.display = 'flex
+            document.getElementById('apiModal').style.display = 'flex';
+        }
 
-            <script src="https://cdn.jsdelivr.net/npm/eruda"></script>
-<script>eruda.init();</script>
+        function closeApiKe
