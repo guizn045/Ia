@@ -2,6 +2,7 @@
 // Rota de backend (Vercel Serverless Function) que fala com a Groq usando
 // a chave guardada só no servidor (variável de ambiente GROQ_API_KEY).
 // O navegador do usuário nunca vê essa chave — ele só chama esse endpoint.
+import { DAILY_TOKEN_LIMIT, resolveSubjectKey, getUsedTokens, addUsedTokens, getTodayKeyAndReset } from './_usageLimit.js';
 
 // Modelos permitidos (mesma lista que já existe no front-end).
 // Isso evita que alguém use seu endpoint pra chamar modelo caro/fora do previsto.
@@ -31,6 +32,20 @@ export default async function handler(req, res) {
         return res.status(400).json({ error: 'Campo "messages" inválido.' });
     }
 
+    // ---------- LIMITE DE USO DIÁRIO POR PESSOA ----------
+    // subjectKey é o usuário logado (confirmado pelo token, não dá pra
+    // falsificar) ou, pra convidado, o IP da requisição.
+    const subjectKey = await resolveSubjectKey(req);
+    const { resetAt } = getTodayKeyAndReset();
+    const usedSoFar = await getUsedTokens(subjectKey);
+
+    if (usedSoFar >= DAILY_TOKEN_LIMIT) {
+        return res.status(429).json({
+            error: 'Você já usou todo o seu limite de tokens de hoje. Volta depois que resetar.',
+            usage: { used: usedSoFar, limit: DAILY_TOKEN_LIMIT, remaining: 0, resetAt: resetAt }
+        });
+    }
+
     const groqBody = {
         model: model,
         messages: messages,
@@ -51,11 +66,33 @@ export default async function handler(req, res) {
             body: JSON.stringify(groqBody)
         });
 
-        const data = await groqResponse.text();
+        const rawText = await groqResponse.text();
+
+        // Soma os tokens gastos nessa chamada ao total do dia da pessoa e devolve
+        // a informação de uso atualizada junto da resposta (evita uma segunda
+        // chamada só pra isso). Se algo aqui falhar, devolve a resposta normal
+        // mesmo assim — isso nunca deve travar o chat.
+        try {
+            const parsed = JSON.parse(rawText);
+            const tokensUsed = parsed && parsed.usage && parsed.usage.total_tokens;
+            if (typeof tokensUsed === 'number') {
+                await addUsedTokens(subjectKey, tokensUsed);
+                const newUsed = usedSoFar + tokensUsed;
+                parsed.nexus_usage = {
+                    used: newUsed,
+                    limit: DAILY_TOKEN_LIMIT,
+                    remaining: Math.max(0, DAILY_TOKEN_LIMIT - newUsed),
+                    resetAt: resetAt
+                };
+                res.status(groqResponse.status);
+                res.setHeader('Content-Type', 'application/json');
+                return res.send(JSON.stringify(parsed));
+            }
+        } catch (e) {}
 
         res.status(groqResponse.status);
         res.setHeader('Content-Type', 'application/json');
-        return res.send(data);
+        return res.send(rawText);
     } catch (err) {
         return res.status(502).json({ error: 'Erro ao falar com a Groq: ' + err.message });
     }

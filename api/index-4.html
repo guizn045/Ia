@@ -1,0 +1,2864 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusAI - Fully Fixed Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; }
+        
+        body { 
+            background: #05020a; 
+            color: #f3f4f6; 
+            font-family: 'Outfit', sans-serif; 
+            margin: 0; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100vh; 
+            height: 100dvh; 
+            overflow: hidden; 
+            position: relative;
+        }
+
+        body::before, body::after {
+            content: '';
+            position: absolute;
+            width: 450px;
+            height: 450px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::before {
+            background: radial-gradient(circle, rgba(124, 58, 237, 0.18) 0%, transparent 70%);
+            top: -100px;
+            left: -100px;
+        }
+
+        body::after {
+            background: radial-gradient(circle, rgba(59, 130, 246, 0.12) 0%, transparent 70%);
+            bottom: -100px;
+            right: -100px;
+        }
+
+        .app-wrapper {
+            width: 100%;
+            height: 100vh;
+            height: 100dvh;
+            background: rgba(11, 6, 20, 0.95);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+            border: 1px solid rgba(45, 27, 78, 0.5);
+        }
+
+        @media (min-width: 768px) {
+            .app-wrapper {
+                width: 1000px;
+                height: 94vh;
+                border-radius: 24px;
+                box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8), 0 0 40px rgba(124, 58, 237, 0.15);
+            }
+        }
+        
+        header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            padding: 14px 20px; 
+            border-bottom: 1px solid #221535; 
+            background: rgba(11, 6, 20, 0.8); 
+            z-index: 10; 
+            flex-shrink: 0; 
+        }
+        
+        .header-left { display: flex; align-items: center; gap: 14px; }
+        .menu-btn { background: none; border: none; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; transition: color 0.2s; }
+        .menu-btn:hover { color: #a78bfa; }
+        .logo-area { display: flex; flex-direction: column; }
+        .logo { font-weight: 700; font-size: 1.2rem; letter-spacing: 0.5px; background: linear-gradient(45deg, #fff, #a78bfa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .sub { font-size: 0.75rem; color: #a78bfa; }
+
+        .lang-select { background: #160d26; border: 1px solid #3b2361; color: #a78bfa; padding: 6px 10px; border-radius: 10px; font-size: 0.8rem; font-family: 'Outfit', sans-serif; cursor: pointer; outline: none; }
+
+        /* Em telas estreitas, encolhe/oculta itens do cabeçalho pra garantir
+           que o botão de ⋮ (mais opções) nunca fique cortado fora da tela. */
+        @media (max-width: 420px) {
+            header { padding: 12px 10px; }
+            .header-left { gap: 8px; }
+            .logo { font-size: 1.02rem; }
+            .sub { display: none; }
+            .mood-orb-label { display: none; }
+            .mood-orb-wrap { margin-left: 4px; }
+            .lang-select { padding: 5px 6px; font-size: 0.7rem; }
+        }
+
+        .mobile-banner {
+            background: linear-gradient(90deg, #7c3aed, #3b82f6);
+            color: #fff;
+            padding: 6px 12px;
+            font-size: 0.78rem;
+            text-align: center;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .sidebar-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; 
+            left: 0; 
+            width: 100vw; 
+            height: 100vh; 
+            background: rgba(0, 0, 0, 0.75); 
+            z-index: 40; 
+            pointer-events: none;
+        }
+        
+        .sidebar-overlay.active { 
+            display: block !important; 
+            pointer-events: auto !important;
+        }
+
+        .sidebar { position: fixed; top: 0; left: -300px; width: 300px; height: 100%; background: #130a24; border-right: 1px solid #2d1b4e; transition: left 0.3s ease; z-index: 50; display: flex; flex-direction: column; padding: 20px; gap: 12px; overflow-y: auto; }
+        .sidebar.open { left: 0; }
+        .sidebar-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 12px; }
+        .sidebar-title { font-weight: bold; font-size: 1.1rem; color: #a78bfa; }
+        .close-sidebar { background: none; border: none; color: #fff; font-size: 1.2rem; cursor: pointer; }
+        .sidebar-menu-item { display: flex; align-items: center; gap: 12px; background: #1a102f; border: 1px solid #3b2361; color: #fff; padding: 10px 14px; border-radius: 12px; text-decoration: none; font-size: 0.9rem; cursor: pointer; transition: background 0.2s, transform 0.1s; }
+        .sidebar-menu-item:hover { background: #251642; transform: translateX(4px); }
+        
+        .stats-box { background: #0a0514; border: 1px solid #2d1b4e; border-radius: 12px; padding: 12px; font-size: 0.8rem; color: #cbd5e1; display: flex; flex-direction: column; gap: 6px; }
+        .stats-title { font-weight: bold; color: #a78bfa; margin-bottom: 4px; }
+        .insta-icon-badge { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); width: 24px; height: 24px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; color: #fff; }
+
+        .modes { display: flex; gap: 10px; padding: 12px 20px; overflow-x: auto; background: rgba(15, 8, 28, 0.6); border-bottom: 1px solid #1a102f; flex-shrink: 0; z-index: 5; }
+        .modes::-webkit-scrollbar { display: none; }
+        .mode-btn { background: #160d26; border: 1px solid #2d1b4e; color: #cbd5e1; padding: 7px 16px; border-radius: 16px; cursor: pointer; font-size: 0.85rem; white-space: nowrap; transition: all 0.2s; flex-shrink: 0; font-family: 'Outfit', sans-serif; }
+        .mode-btn:hover { background: #221535; border-color: #7c3aed; }
+        .mode-btn.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; font-weight: 600; box-shadow: 0 0 15px rgba(124, 58, 237, 0.4); }
+
+        .quick-actions { display: flex; gap: 8px; padding: 8px 20px; background: rgba(11, 6, 20, 0.4); overflow-x: auto; border-bottom: 1px solid #1a102f; flex-shrink: 0; z-index: 5; }
+        .quick-btn { background: rgba(124, 58, 237, 0.1); border: 1px solid rgba(124, 58, 237, 0.3); color: #d8b4fe; padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; cursor: pointer; white-space: nowrap; }
+        .quick-btn:hover { background: #7c3aed; color: #fff; }
+
+        .chat-container { flex: 1; min-height: 0; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 18px; scroll-behavior: smooth; z-index: 2; }
+        .chat-container::-webkit-scrollbar { width: 6px; }
+        .chat-container::-webkit-scrollbar-thumb { background: #2d1b4e; border-radius: 10px; }
+        
+        .message { max-width: 85%; padding: 16px 20px; border-radius: 18px; font-size: 0.97rem; line-height: 1.6; word-break: break-word; position: relative; }
+        .message.user { background: #7c3aed; color: #ffffff; align-self: flex-end; border-bottom-right-radius: 4px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.3); font-weight: 500; }
+        .message.ai { background: #160d26; border: 1px solid #2d1b4e; color: #f3f4f6; align-self: flex-start; border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.4); font-weight: 400; }
+        .message img { max-width: 100%; border-radius: 12px; margin-top: 12px; border: 1px solid #3b2361; display: block; }
+
+        .message-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.75rem; color: #cbd5e1; }
+        .ai-speed-badge { background: rgba(124, 58, 237, 0.15); color: #c4b5fd; padding: 2px 8px; border-radius: 6px; font-weight: 500; border: 1px solid rgba(124, 58, 237, 0.3); }
+        .voice-btn { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; transition: background 0.2s; }
+        .user .voice-btn { color: #fff; }
+        .voice-btn:hover { background: rgba(255, 255, 255, 0.15); }
+
+        .code-box-wrapper { background: #0a0512; border: 1px solid #2d1b4e; border-radius: 10px; margin: 10px 0; overflow: hidden; }
+        .code-header { background: #130a24; padding: 6px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 0.75rem; color: #a78bfa; border-bottom: 1px solid #2d1b4e; }
+        .copy-code-btn { background: #221535; border: 1px solid #3b2361; color: #d8b4fe; padding: 3px 8px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; transition: background 0.2s; }
+        .copy-code-btn:hover { background: #7c3aed; color: #fff; }
+        .code-content { padding: 12px; font-family: monospace; font-size: 0.85rem; color: #e2e8f0; overflow-x: auto; margin: 0; white-space: pre; }
+
+        .file-preview-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; z-index: 5; }
+        .file-preview-thumb { width: 40px; height: 40px; background: #7c3aed; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: #fff; }
+        .remove-file-btn { background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+        .input-area { display: flex; padding: 14px 20px; background: rgba(11, 6, 20, 0.9); border-top: 1px solid #221535; gap: 10px; align-items: center; flex-shrink: 0; z-index: 10; }
+        .input-actions { display: flex; gap: 6px; }
+        .action-icon-btn { background: #160d26; border: 1px solid #2d1b4e; color: #a78bfa; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; transition: background 0.2s, transform 0.1s; flex-shrink: 0; }
+        .action-icon-btn:hover { background: #221535; transform: scale(1.05); }
+        .input-area input[type="text"] { flex: 1; background: #140b24; border: 1px solid #2d1b4e; color: #fff; padding: 12px 18px; border-radius: 24px; outline: none; font-size: 0.95rem; font-family: 'Outfit', sans-serif; transition: border-color 0.2s; }
+        .input-area input[type="text"]:focus { border-color: #7c3aed; box-shadow: 0 0 10px rgba(124, 58, 237, 0.2); }
+        .send-btn { background: #7c3aed; border: none; color: white; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); transition: transform 0.1s, background 0.2s; flex-shrink: 0; }
+        .send-btn:hover { background: #6d28d9; }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background: #130a24; border: 1px solid #3b2361; max-width: 500px; width: 100%; max-height: 80vh; overflow-y: auto; border-radius: 18px; padding: 24px; color: #e2e8f0; font-size: 0.9rem; line-height: 1.6; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #2d1b4e; padding-bottom: 12px; margin-bottom: 16px; font-weight: bold; font-size: 1.1rem; color: #a78bfa; }
+        .modal-body input { width: 100%; background: #0a0514; border: 1px solid #3b2361; color: #fff; padding: 10px 14px; border-radius: 10px; margin: 10px 0; outline: none; font-family: 'Outfit', sans-serif; }
+        .modal-btn { background: #7c3aed; border: none; color: white; padding: 10px 18px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; margin-top: 10px; }
+
+        /* ---------- ORBE DE HUMOR ---------- */
+        .mood-orb-wrap { display: flex; flex-direction: column; align-items: center; gap: 2px; margin-left: 10px; }
+        .mood-orb { width: 22px; height: 22px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a78bfa, #7c3aed 60%, #4c1d95 100%); box-shadow: 0 0 12px rgba(124, 58, 237, 0.7); transition: background 0.6s ease, box-shadow 0.6s ease, transform 0.3s ease; }
+        .mood-orb.pulse { animation: orbPulse 0.6s ease; }
+        .mood-orb.mood-positivo { background: radial-gradient(circle at 35% 30%, #86efac, #22c55e 60%, #14532d 100%); box-shadow: 0 0 14px rgba(34, 197, 94, 0.8); }
+        .mood-orb.mood-negativo { background: radial-gradient(circle at 35% 30%, #fca5a5, #ef4444 60%, #7f1d1d 100%); box-shadow: 0 0 14px rgba(239, 68, 68, 0.8); }
+        .mood-orb.mood-animado { background: radial-gradient(circle at 35% 30%, #fde68a, #f59e0b 60%, #78350f 100%); box-shadow: 0 0 14px rgba(245, 158, 11, 0.8); }
+        .mood-orb.mood-neutro { background: radial-gradient(circle at 35% 30%, #a78bfa, #7c3aed 60%, #4c1d95 100%); box-shadow: 0 0 12px rgba(124, 58, 237, 0.7); }
+        .mood-orb-label { font-size: 0.6rem; color: #a78bfa; text-transform: uppercase; letter-spacing: 0.5px; }
+        @keyframes orbPulse { 0% { transform: scale(1); } 40% { transform: scale(1.35); } 100% { transform: scale(1); } }
+
+        /* ---------- SPINNER (Melhorar Imagem Ultra HD) ---------- */
+        .ultra-spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(167, 139, 250, 0.3); border-top-color: #a78bfa; border-radius: 50%; animation: ultraSpin 0.7s linear infinite; vertical-align: middle; margin-right: 6px; }
+        @keyframes ultraSpin { to { transform: rotate(360deg); } }
+        .modal-btn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+        /* ---------- ASSISTENTE DE VOZ ---------- */
+        .voice-modal-content { max-width: 420px; }
+        .voice-modal-body { display: flex; flex-direction: column; align-items: center; gap: 18px; padding-top: 10px; padding-bottom: 10px; }
+        .voice-orb-wrap { width: 140px; height: 140px; display: flex; align-items: center; justify-content: center; }
+        .voice-orb { width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a78bfa, #7c3aed 60%, #4c1d95 100%); box-shadow: 0 0 30px rgba(124, 58, 237, 0.6); transition: box-shadow 0.3s ease, transform 0.3s ease; }
+        .voice-orb.listening { animation: voiceListenPulse 1.4s ease-in-out infinite; }
+        .voice-orb.thinking { animation: voiceThinkSpin 1.1s linear infinite; background: radial-gradient(circle at 35% 30%, #93c5fd, #3b82f6 60%, #1e3a8a 100%); box-shadow: 0 0 30px rgba(59, 130, 246, 0.6); }
+        .voice-orb.speaking { animation: voiceSpeakPulse 0.5s ease-in-out infinite; background: radial-gradient(circle at 35% 30%, #86efac, #22c55e 60%, #14532d 100%); box-shadow: 0 0 30px rgba(34, 197, 94, 0.6); }
+        @keyframes voiceListenPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.12); box-shadow: 0 0 45px rgba(124, 58, 237, 0.9); } }
+        @keyframes voiceSpeakPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+        @keyframes voiceThinkSpin { 0% { transform: rotate(0deg) scale(1); } 50% { transform: rotate(180deg) scale(0.94); } 100% { transform: rotate(360deg) scale(1); } }
+        .voice-status { font-size: 0.9rem; color: #c4b5fd; text-align: center; min-height: 1.2em; }
+        .voice-transcript { font-size: 0.85rem; color: #f3f4f6; text-align: center; min-height: 2.4em; opacity: 0.85; padding: 0 6px; }
+        .voice-controls { display: flex; align-items: center; gap: 22px; margin-top: 4px; }
+        .voice-mic-btn { width: 62px; height: 62px; border-radius: 50%; border: none; background: #7c3aed; color: #fff; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.4); transition: background 0.2s, transform 0.15s; }
+        .voice-mic-btn:hover { transform: scale(1.05); }
+        .voice-mic-btn.active { background: #ef4444; box-shadow: 0 0 20px rgba(239, 68, 68, 0.6); }
+        .voice-end-btn { width: 50px; height: 50px; border-radius: 50%; border: none; background: #2d1b4e; color: #fff; font-size: 1.2rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transform: rotate(135deg); transition: background 0.2s; }
+        .voice-end-btn:hover { background: #ef4444; }
+        .voice-hint { font-size: 0.72rem; color: #fca5a5; text-align: center; }
+
+        /* ---------- RESPOSTA DESTACADA (estilo "resposta direta" do Google) ---------- */
+        .rc-highlight-box { background: linear-gradient(135deg, rgba(124, 58, 237, 0.22), rgba(59, 130, 246, 0.14)); border: 1px solid rgba(139, 92, 246, 0.55); border-radius: 14px; padding: 14px 16px; margin-bottom: 12px; box-shadow: 0 4px 15px rgba(124, 58, 237, 0.15); }
+        .rc-highlight-label { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.6px; color: #c4b5fd; font-weight: 700; margin-bottom: 5px; display: block; }
+        .rc-highlight-text { font-size: 1.08rem; font-weight: 600; color: #ffffff; line-height: 1.4; }
+
+        /* ---------- INDICADOR "DIGITANDO..." ---------- */
+        .typing-row { display: flex; align-items: center; gap: 8px; }
+        .typing-dots { display: flex; gap: 4px; }
+        .typing-dots span { width: 6px; height: 6px; border-radius: 50%; background: #a78bfa; animation: typingBounce 1.2s infinite ease-in-out; }
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+        @keyframes typingBounce { 0%, 80%, 100% { transform: translateY(0); opacity: 0.5; } 40% { transform: translateY(-4px); opacity: 1; } }
+        .typing-label { font-size: 0.8rem; color: #a78bfa; }
+
+        /* ---------- TOAST DE AVISO (usado na explicação de notificações) ---------- */
+        .nexus-toast { position: fixed; left: 50%; bottom: 24px; transform: translateX(-50%) translateY(20px); max-width: 90%; width: 380px; background: #160d26; border: 1px solid #3b2361; border-radius: 14px; padding: 14px 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 100; opacity: 0; transition: opacity 0.3s ease, transform 0.3s ease; pointer-events: none; }
+        .nexus-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+        .nexus-toast-title { font-size: 0.85rem; font-weight: 700; color: #c4b5fd; margin-bottom: 4px; display: flex; align-items: center; gap: 6px; }
+        .nexus-toast-body { font-size: 0.8rem; color: #f3f4f6; line-height: 1.4; }
+        .nexus-toast-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: #a78bfa; font-size: 1rem; cursor: pointer; }
+
+        /* ---------- COMPARAR MODELOS ---------- */
+        .compare-wrapper { display: flex; flex-direction: column; gap: 10px; max-width: 100%; align-self: stretch; }
+        .compare-columns { display: flex; gap: 10px; flex-wrap: wrap; }
+        .compare-card { flex: 1; min-width: 220px; background: #160d26; border: 1px solid #2d1b4e; border-radius: 14px; padding: 14px; }
+        .compare-card.voted { border-color: #22c55e; box-shadow: 0 0 12px rgba(34, 197, 94, 0.35); }
+        .compare-model-name { font-size: 0.75rem; color: #a78bfa; font-weight: 600; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .compare-vote-btn { background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.4); color: #d8b4fe; padding: 6px 12px; border-radius: 8px; font-size: 0.8rem; cursor: pointer; margin-top: 10px; width: 100%; }
+        .compare-vote-btn:hover { background: #7c3aed; color: #fff; }
+        .compare-vote-btn:disabled { opacity: 0.5; cursor: default; }
+
+        /* ---------- VARIANTES / ÁRVORE DE CONVERSA ---------- */
+        .variant-nav { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+        .variant-nav-btn { background: rgba(124, 58, 237, 0.15); border: 1px solid rgba(124, 58, 237, 0.4); color: #d8b4fe; width: 24px; height: 24px; border-radius: 6px; cursor: pointer; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; }
+        .variant-nav-btn:hover { background: #7c3aed; color: #fff; }
+        .variant-nav-btn:disabled { opacity: 0.3; cursor: default; }
+        .variant-count { font-size: 0.7rem; color: #a78bfa; }
+        .regen-btn { background: none; border: none; color: #a78bfa; cursor: pointer; font-size: 0.85rem; display: flex; align-items: center; gap: 4px; padding: 2px 6px; border-radius: 6px; }
+        .regen-btn:hover { background: rgba(255, 255, 255, 0.1); }
+
+        /* ---------- SPOTIFY ---------- */
+        .spotify-bar { display: none; padding: 10px 20px; background: #130a24; border-top: 1px solid #221535; align-items: center; gap: 12px; flex-shrink: 0; z-index: 5; }
+        .spotify-bar iframe { border-radius: 12px; flex: 1; }
+        .spotify-close-btn { background: #ef4444; color: #fff; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+
+        /* ---------- PAINEL ADMIN ---------- */
+        .admin-warning { background: linear-gradient(90deg, #7f1d1d, #991b1b); border: 1px solid #ef4444; border-radius: 12px; padding: 12px 14px; margin-bottom: 16px; display: flex; align-items: flex-start; gap: 10px; position: relative; }
+        .admin-warning p { margin: 0; font-size: 0.85rem; color: #fecaca; padding-right: 20px; }
+        .admin-warning-close { position: absolute; top: 8px; right: 10px; background: none; border: none; color: #fecaca; font-size: 1rem; cursor: pointer; }
+        .admin-login-box input { width: 100%; background: #0a0514; border: 1px solid #3b2361; color: #fff; padding: 10px 14px; border-radius: 10px; margin: 8px 0; outline: none; font-family: 'Outfit', sans-serif; }
+        .admin-error { color: #f87171; font-size: 0.8rem; margin-top: 6px; display: none; }
+        .admin-stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 16px; }
+        .admin-stat-card { background: #0a0514; border: 1px solid #2d1b4e; border-radius: 12px; padding: 12px; }
+        .admin-stat-card .num { font-size: 1.5rem; font-weight: 700; color: #a78bfa; }
+        .admin-stat-card .label { font-size: 0.75rem; color: #cbd5e1; }
+        .admin-breakdown { margin-top: 14px; font-size: 0.8rem; }
+        .admin-breakdown-row { display: flex; justify-content: space-between; padding: 4px 0; border-bottom: 1px solid #1a102f; color: #e2e8f0; }
+        .admin-recent-row { font-size: 0.72rem; color: #cbd5e1; padding: 4px 0; border-bottom: 1px solid #1a102f; }
+
+        /* ---------- FORMATAÇÃO RICA DAS RESPOSTAS ---------- */
+        .rc-block { display: flex; flex-direction: column; gap: 2px; }
+        .rc-p { margin: 0 0 10px 0; }
+        .rc-p:last-child { margin-bottom: 0; }
+        .rc-heading { font-weight: 700; color: #d8b4fe; margin: 10px 0 8px 0; padding-left: 10px; border-left: 3px solid #7c3aed; letter-spacing: 0.2px; }
+        .rc-h2 { font-size: 1.05rem; }
+        .rc-h3 { font-size: 0.98rem; opacity: 0.95; }
+        .rc-h4 { font-size: 0.92rem; opacity: 0.85; }
+        .rc-list { margin: 4px 0 12px 0; padding-left: 4px; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .rc-list li { position: relative; padding-left: 20px; }
+        .rc-list li::before { content: '▸'; position: absolute; left: 0; color: #a78bfa; font-weight: 700; }
+        ol.rc-list { counter-reset: rc-counter; }
+        ol.rc-list li { counter-increment: rc-counter; }
+        ol.rc-list li::before { content: counter(rc-counter) '.'; color: #a78bfa; font-weight: 700; }
+        .rc-quote { border-left: 3px solid #3b2361; background: rgba(124, 58, 237, 0.08); padding: 8px 12px; margin: 6px 0 12px 0; border-radius: 0 8px 8px 0; color: #cbd5e1; font-style: italic; }
+        .rc-divider { height: 1px; background: linear-gradient(90deg, transparent, #3b2361, transparent); margin: 12px 0; }
+        .rc-inline-code { background: #0a0512; border: 1px solid #2d1b4e; color: #d8b4fe; padding: 1px 6px; border-radius: 5px; font-family: monospace; font-size: 0.88em; }
+
+        /* ---------- EASTER EGG ESCONDIDO (5 toques no logo) ---------- */
+        .friend-egg-bubble { background: linear-gradient(135deg, #7c3aed, #3b82f6); border: none; box-shadow: 0 6px 24px rgba(124, 58, 237, 0.55); animation: eggPop 0.4s ease; }
+        .friend-egg-title { font-weight: 700; font-size: 1.15rem; margin-bottom: 12px; text-align: center; }
+        .friend-egg-links { display: flex; flex-direction: column; gap: 8px; }
+        .friend-egg-link { background: rgba(255, 255, 255, 0.15); color: #fff; padding: 9px 14px; border-radius: 12px; text-decoration: none; font-weight: 600; text-align: center; transition: background 0.2s; }
+        .friend-egg-link:hover { background: rgba(255, 255, 255, 0.32); }
+        @keyframes eggPop { 0% { transform: scale(0.85); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        /* ---------- INTRO ANIMADA (primeira visita) ---------- */
+        .intro-screen {
+            position: fixed; inset: 0; z-index: 500;
+            background: radial-gradient(circle at 50% 40%, #1a0f30 0%, #05020a 75%);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 18px; opacity: 1; transition: opacity 0.6s ease;
+        }
+        .intro-screen.fade-out { opacity: 0; pointer-events: none; }
+        .intro-logo {
+            font-family: 'Outfit', sans-serif; font-weight: 700; font-size: 2.6rem;
+            background: linear-gradient(45deg, #fff, #a78bfa, #7c3aed);
+            background-size: 200% auto;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            animation: introShine 2.2s ease-in-out infinite, introPop 0.8s ease;
+        }
+        .intro-sub { color: #a78bfa; font-size: 0.9rem; opacity: 0; animation: introFadeIn 0.8s ease 0.5s forwards; }
+        .intro-orb { width: 70px; height: 70px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, #a78bfa, #7c3aed 60%, #4c1d95 100%); box-shadow: 0 0 40px rgba(124, 58, 237, 0.8); animation: introOrbPulse 1.6s ease-in-out infinite; }
+        .intro-enter-btn { background: #7c3aed; border: none; color: #fff; padding: 10px 24px; border-radius: 14px; font-weight: 600; cursor: pointer; font-family: 'Outfit', sans-serif; opacity: 0; animation: introFadeIn 0.8s ease 1.1s forwards; }
+        @keyframes introShine { 0%, 100% { background-position: 0% center; } 50% { background-position: 100% center; } }
+        @keyframes introPop { 0% { transform: scale(0.7); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes introFadeIn { to { opacity: 1; } }
+        @keyframes introOrbPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+
+        /* ---------- HORÁRIO / DATA / BADGES DE RODAPÉ ---------- */
+        .footer-badges { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; }
+        .mode-badge { background: rgba(255, 255, 255, 0.06); color: #cbd5e1; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; border: 1px solid rgba(255, 255, 255, 0.08); white-space: nowrap; }
+        .msg-time { font-size: 0.68rem; color: rgba(255, 255, 255, 0.5); white-space: nowrap; }
+        .msg-time-user { text-align: right; margin-top: 6px; color: rgba(255, 255, 255, 0.75); }
+
+        /* ---------- FONTES (BUSCA NA WEB) ---------- */
+        .sources-wrap { margin-top: 10px; }
+        .sources-toggle { background: rgba(124, 58, 237, 0.12); border: 1px solid rgba(124, 58, 237, 0.35); color: #d8b4fe; font-size: 0.75rem; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-family: 'Outfit', sans-serif; }
+        .sources-toggle:hover { background: #7c3aed; color: #fff; }
+        .sources-list { display: flex; flex-direction: column; gap: 6px; margin-top: 8px; }
+        .source-link { background: #0a0512; border: 1px solid #2d1b4e; color: #a78bfa; padding: 7px 12px; border-radius: 8px; font-size: 0.78rem; text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; display: block; transition: border-color 0.2s, color 0.2s; }
+        .source-link:hover { border-color: #7c3aed; color: #fff; }
+
+        /* ---------- PERSONALIZAR IA ---------- */
+        .field-label { font-size: 0.8rem; color: #a78bfa; font-weight: 600; margin: 14px 0 6px; display: block; }
+        .field-hint { font-size: 0.72rem; color: #8a7aa8; margin-top: -2px; margin-bottom: 6px; }
+        .modal-body textarea { width: 100%; background: #0a0514; border: 1px solid #3b2361; color: #fff; padding: 10px 14px; border-radius: 10px; outline: none; font-family: 'Outfit', sans-serif; resize: vertical; min-height: 64px; font-size: 0.85rem; }
+        .modal-body textarea:focus, .modal-body input:focus { border-color: #7c3aed; }
+        .switch-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #0a0514; border: 1px solid #2d1b4e; padding: 10px 14px; border-radius: 12px; margin: 4px 0 6px; }
+        .switch-row span:first-child { font-size: 0.85rem; }
+        .switch { position: relative; display: inline-block; width: 42px; height: 24px; flex-shrink: 0; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch-slider { position: absolute; cursor: pointer; inset: 0; background: #2d1b4e; border-radius: 24px; transition: 0.2s; }
+        .switch-slider::before { content: ''; position: absolute; width: 18px; height: 18px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: 0.2s; }
+        .switch input:checked + .switch-slider { background: #7c3aed; }
+        .switch input:checked + .switch-slider::before { transform: translateX(18px); }
+        .trait-chips-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin: 6px 0 4px; }
+        .trait-chip { background: #160d26; border: 1px solid #2d1b4e; color: #cbd5e1; padding: 6px 12px; border-radius: 14px; font-size: 0.78rem; cursor: pointer; font-family: 'Outfit', sans-serif; transition: all 0.15s; }
+        .trait-chip:hover { border-color: #7c3aed; }
+        .trait-chip.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; font-weight: 600; }
+        .modal-btn.secondary { background: #160d26; border: 1px solid #3b2361; color: #d8b4fe; }
+
+        /* ---------- CONTA / LOGIN ---------- */
+        .auth-tabs { display: flex; gap: 8px; margin-bottom: 4px; }
+        .auth-tab-btn { flex: 1; background: #160d26; border: 1px solid #2d1b4e; color: #cbd5e1; padding: 8px; border-radius: 10px; cursor: pointer; font-family: 'Outfit', sans-serif; font-size: 0.85rem; }
+        .auth-tab-btn.active { background: #7c3aed; border-color: #8b5cf6; color: #fff; font-weight: 600; }
+        .account-badge { font-size: 0.72rem; color: #a78bfa; padding: 2px 0; }
+        .account-info-box { background: #0a0514; border: 1px solid #2d1b4e; border-radius: 12px; padding: 14px; }
+        .account-info-box .email { font-size: 0.9rem; font-weight: 600; word-break: break-all; }
+        .account-info-box .sync-status { font-size: 0.78rem; color: #86efac; margin-top: 6px; }
+    </style>
+</head>
+<body>
+    <div class="intro-screen" id="introScreen">
+        <div class="intro-orb"></div>
+        <div class="intro-logo">NexusAI</div>
+        <div class="intro-sub">Sua IA pessoal está pronta para começar</div>
+        <button class="intro-enter-btn" onclick="closeIntro()">Entrar ➔</button>
+    </div>
+    <div class="app-wrapper">
+        <div class="mobile-banner" id="mobileBanner">
+            🚀 <b>NexusAI está em desenvolvimento!</b> Em breve disponível para Android e iPhone (iOS).
+        </div>
+
+        <div class="mobile-banner" id="securityBanner" style="background: linear-gradient(90deg, #7f1d1d, #b91c1c); justify-content: space-between;">
+            <span>⚠️ Não altere as configurações de segurança deste site.</span>
+            <button onclick="document.getElementById('securityBanner').style.display='none'" style="background:none; border:none; color:#fff; font-size:1rem; cursor:pointer; padding:0 4px;">✕</button>
+        </div>
+
+        <div class="sidebar-overlay" id="sidebarOverlay" onclick="toggleSidebar()"></div>
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <span class="sidebar-title">NexusAI Core</span>
+                <button class="close-sidebar" onclick="toggleSidebar()">✕</button>
+            </div>
+            
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); clearChat();">
+                <span id="sbNovaConversa">💬 Nova Conversa</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); openAccountModal();">
+                <span id="sbContaLabel">👤 Entrar / Criar Conta</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); activateMathMode();">
+                <span id="sbModoMatematica">🧮 Modo Matemática</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); openPersonalizeModal();">
+                <span id="sbPersonalizarIA">🧠 Personalizar IA</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); setupNotifications();">
+                <span id="notifSidebarLabel">🔔 Ativar Notificações</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="exportChat()">
+                <span id="sbExportar">📥 Exportar Conversa</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="openTerms()">
+                <span id="sbTermos">📜 Termos & Privacidade</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); openSpotifyModal();">
+                <span id="sbMusica">🎵 Música (Spotify)</span>
+            </a>
+            <a class="sidebar-menu-item" onclick="toggleSidebar(); openAdminModal();">
+                <span>🔒 Painel Admin</span>
+            </a>
+
+            <div class="stats-box">
+                <span class="stats-title">📲 Status do App</span>
+                <span>Engine: <b>Llama-3.3-70B</b></span>
+                <span>Status: <b style="color: #4ade80;">Em Desenvolvimento</b></span>
+                <span>Plataformas: <b>Web, Android & iOS</b></span>
+            </div>
+
+            <div class="stats-box">
+                <span class="stats-title">📊 Métricas da Sessão</span>
+                <span>Mensagens enviadas: <b id="statMsgs">0</b></span>
+                <span>Tempo médio: <b id="statSpeed">0.0s</b></span>
+                <span>Tokens estim.: <b id="statTokens">0</b></span>
+                <span>👥 Visitas registradas: <b id="statVisits">—</b></span>
+            </div>
+
+            <div class="stats-box">
+                <span class="stats-title">🌐 Sua Conexão</span>
+                <span>Seu IP: <b id="statMyIp">carregando...</b></span>
+                <span>Velocidade: <b id="statSpeedTest">—</b></span>
+                <span>Ping: <b id="statPing">—</b></span>
+                <button class="quick-btn" style="margin-top:4px;" onclick="runSpeedTest()">⚡ Testar Velocidade</button>
+                <span id="networkWarning" style="display:none; color:#fca5a5; font-size:0.72rem; margin-top:4px;">⚠️ Se tudo aqui aparecer "indisponível", abra o arquivo .html num navegador (Chrome/Safari), não no visualizador do app.</span>
+            </div>
+
+            <a href="https://instagram.com" target="_blank" class="sidebar-menu-item" style="margin-top: auto;">
+                <div class="insta-icon-badge">📷</div>
+                <span>Instagram @GUIWY_045</span>
+            </a>
+        </div>
+
+        <header>
+            <div class="header-left">
+                <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+                <div class="logo-area" onclick="handleLogoTap()">
+                    <div class="logo">NexusAI Pro</div>
+                    <div class="sub">@GUIWY_045</div>
+                </div>
+            </div>
+            <div style="display:flex; align-items:center;">
+                <div class="mood-orb-wrap" title="Humor da IA na conversa">
+                    <div class="mood-orb mood-neutro" id="moodOrb"></div>
+                    <span class="mood-orb-label" id="moodOrbLabel">neutro</span>
+                </div>
+                <select class="lang-select" id="langSelect" style="margin-left: 14px;">
+                    <option value="pt-BR">🇵🇹 PT-BR</option>
+                    <option value="en-US">🇺🇸 English</option>
+                    <option value="es-ES">🇪🇸 Español</option>
+                    <option value="fr-FR">🇫🇷 Français</option>
+                </select>
+                <div style="position:relative; margin-left: 10px;">
+                    <button class="menu-btn" onclick="toggleMoreMenu()" title="Mais opções">⋮</button>
+                    <div id="moreMenuDropdown" style="display:none; position:absolute; right:0; top:36px; background:#130a24; border:1px solid #3b2361; border-radius:12px; padding:8px; min-width:210px; z-index:60; box-shadow:0 10px 30px rgba(0,0,0,0.5); flex-direction:column; gap:6px;">
+                        <div id="usageInfoBox" style="padding:8px 10px; font-size:0.72rem; color:#a78bfa; border-bottom:1px solid #2d1b4e; margin-bottom:2px;">
+                            <div>🎯 Uso hoje: <b id="usageUsedLabel" style="color:#fff;">—</b></div>
+                            <div style="background:#2d1b4e; border-radius:6px; height:5px; margin:5px 0; overflow:hidden;"><div id="usageBarFill" style="height:100%; width:0%; background:linear-gradient(90deg,#7c3aed,#3b82f6); transition:width 0.3s;"></div></div>
+                            <div>⏳ Reseta em: <b id="usageResetLabel" style="color:#fff;">—</b></div>
+                        </div>
+                        <a class="sidebar-menu-item" id="ddPersonalizar" style="padding:8px 10px; font-size:0.85rem;" onclick="toggleMoreMenu(); openPersonalizeModal();">🧠 Personalizar IA</a>
+                        <a class="sidebar-menu-item" id="ddVoz" style="padding:8px 10px; font-size:0.85rem;" onclick="toggleMoreMenu(); openVoiceModal();">🎙️ Assistente de Voz</a>
+                        <a class="sidebar-menu-item" id="ddImagem" style="padding:8px 10px; font-size:0.85rem;" onclick="toggleMoreMenu(); openImageEnhanceModal();">🖼️ Melhorar Imagem</a>
+                        <a class="sidebar-menu-item" id="ddJogos" style="padding:8px 10px; font-size:0.85rem;" onclick="toggleMoreMenu(); openGamesModal();">🎮 Jogos</a>
+                        <a class="sidebar-menu-item" id="ddSugestoes" style="padding:8px 10px; font-size:0.85rem; background:#7c3aed;" onclick="toggleMoreMenu(); openFeedbackLink();">💡 Sugestões & Avaliação</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="modes">
+            <button class="mode-btn active" id="modeBtnPadrao" onclick="setMode('Padrão', this)">✨ Padrão</button>
+            <button class="mode-btn" id="modeBtnDireto" onclick="setMode('Direto', this)">🎯 Direto</button>
+            <button class="mode-btn" id="modeBtnPassoAPasso" onclick="setMode('Passo a Passo', this)">📚 Passo a Passo</button>
+            <button class="mode-btn" id="modeBtnProgramador" onclick="setMode('Programador', this)">💻 Dev/Code</button>
+            <button class="mode-btn" id="modeBtnMatematica" onclick="setMode('Matemática', this)">🧮 Matemática</button>
+            <button class="mode-btn" id="modeBtnComparar" onclick="setMode('Comparar', this)">🆚 Comparar Modelos</button>
+        </div>
+
+        <div class="quick-actions">
+            <button class="quick-btn" id="webSearchBtn" onclick="toggleWebSearch()">🔎 Buscar na Web: Desligado</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Resuma o seguinte texto de forma simples: ')">📝 Resumir Texto</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Corrija e otimize este código: ')">⚡ Otimizar Código</button>
+            <button class="quick-btn" onclick="insertQuickPrompt('Traduza o seguinte texto: ')">🌐 Traduzir</button>
+        </div>
+
+        <div class="chat-container" id="chatContainer">
+            <div class="message ai" id="welcomeMsg">✨ <b>NEXUSAI PRO v4.0</b><br><br>Bem-vindo! Manda sua mensagem aí embaixo pra começar a conversar.</div>
+        </div>
+
+        <div class="file-preview-bar" id="filePreviewBar">
+            <div class="file-preview-thumb" id="fileIcon">📄</div>
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <span style="font-size: 0.85rem; color: #fff; font-weight: bold;" id="fileName">arquivo.txt</span>
+                <span style="font-size: 0.75rem; color: #a78bfa;" id="fileSub">Anexo pronto</span>
+            </div>
+            <button class="remove-file-btn" onclick="removeAttachedFile()">✕</button>
+        </div>
+
+        <div class="spotify-bar" id="spotifyBar">
+            <div id="spotifyEmbedContainer" style="flex:1;"></div>
+            <button class="spotify-close-btn" onclick="closeSpotifyPlayer()">✕</button>
+        </div>
+
+        <div class="input-area">
+            <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="handleImageSelect(event)">
+            <input type="file" id="txtInput" accept=".txt,.json,.js,.html,.css,.py" style="display: none;" onchange="handleTxtSelect(event)">
+            
+            <div class="input-actions">
+                <button class="action-icon-btn" onclick="document.getElementById('imageInput').click()" title="Anexar Imagem">🖼️</button>
+                <button class="action-icon-btn" onclick="document.getElementById('txtInput').click()" title="Anexar Arquivo de Texto">📄</button>
+                <button class="action-icon-btn" onclick="openVoiceModal()" title="Assistente de Voz">🎙️</button>
+            </div>
+            <input type="text" id="userInput" placeholder="Digite sua mensagem para a NexusAI..." onkeypress="if(event.key==='Enter') sendMessage()">
+            <button class="send-btn" onclick="sendMessage()">➔</button>
+        </div>
+    </div>
+
+    <!-- Modal Spotify -->
+    <div class="modal" id="spotifyModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🎵 Tocar do Spotify</span>
+                <button class="close-sidebar" onclick="closeSpotifyModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:6px;"><b>🔥 Em alta agora</b> — playlists oficiais do Spotify, prontas pra tocar:</p>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-bottom:16px;">
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('playlist','37i9dQZF1DZ06evO0KCEQo')">🎶 This Is MC Lele JP</button>
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('playlist','37i9dQZF1DZ06evO1d7Y1E')">🎶 This Is MC Poze do Rodo</button>
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('playlist','37i9dQZF1E4zCrK7NUEMRe')">🎶 MC Japa Radio</button>
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('artist','2FDaBZt51fOXh2rbHL8Afr')">🎶 MC Magal (top faixas)</button>
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('playlist','37i9dQZF1DZ06evO4bQI7e')">🎶 This Is MC Ryan SP</button>
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('artist','0pcoadNMmvrUyab1RxWBoV')">🎶 MC Hariel (top faixas)</button>
+                    <button class="modal-btn" style="background:#160d26; border:1px solid #3b2361; text-align:left;" onclick="playSpotifyPreset('artist','4zHycuytm8FRNYatI5wf7g')">🎶 Hudson 22 (top faixas)</button>
+                </div>
+                <p style="border-top:1px solid #2d1b4e; padding-top:12px;">Ou cole o link de uma música, álbum ou playlist do Spotify (não precisa fazer login):</p>
+                <input type="text" id="spotifyLinkInput" placeholder="https://open.spotify.com/track/..." onkeypress="if(event.key==='Enter') playSpotifyLink()">
+                <button class="modal-btn" onclick="playSpotifyLink()">Tocar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Minha Conta (login / criar conta / histórico na nuvem) -->
+    <div class="modal" id="accountModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>👤 Minha Conta</span>
+                <button class="close-sidebar" onclick="closeAccountModal()">✕</button>
+            </div>
+            <div class="modal-body">
+
+                <div id="authFormsSection">
+                    <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:10px;">Crie uma conta pra salvar suas conversas na nuvem e acessá-las de qualquer aparelho.</p>
+
+                    <div class="auth-tabs">
+                        <button type="button" class="auth-tab-btn active" id="authTabLogin" onclick="setAuthTab('login')">Entrar</button>
+                        <button type="button" class="auth-tab-btn" id="authTabSignup" onclick="setAuthTab('signup')">Criar conta</button>
+                    </div>
+
+                    <input type="email" id="authEmail" placeholder="seu@email.com" autocomplete="email">
+                    <input type="password" id="authPassword" placeholder="Senha (mín. 6 caracteres)" autocomplete="current-password" onkeypress="if(event.key==='Enter') submitAuthForm()">
+
+                    <div class="admin-error" id="authError"></div>
+                    <div class="account-badge" id="authInfo" style="display:none;"></div>
+
+                    <button class="modal-btn" id="authSubmitBtn" onclick="submitAuthForm()">Entrar</button>
+                </div>
+
+                <div id="accountInfoSection" style="display:none;">
+                    <div class="account-info-box">
+                        <div class="email" id="accountEmailLabel"></div>
+                        <div class="sync-status">☁️ Histórico e personalização sincronizados nesta conta</div>
+                    </div>
+                    <button class="modal-btn secondary" onclick="signOutUser()">Sair da conta</button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Admin -->
+    <div class="modal" id="adminModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🔒 Painel Admin</span>
+                <button class="close-sidebar" onclick="closeAdminModal()">✕</button>
+            </div>
+
+            <div class="admin-warning" id="adminWarning">
+                <p>⚠️ Essa área é restrita ao administrador da NexusAI. Usuários comuns não têm acesso e não devem tentar entrar aqui.</p>
+                <button class="admin-warning-close" onclick="document.getElementById('adminWarning').style.display='none'">✕</button>
+            </div>
+
+            <div class="admin-login-box" id="adminLoginBox">
+                <input type="password" id="adminPasscodeInput" placeholder="Senha do painel" onkeypress="if(event.key==='Enter') submitAdminPasscode()">
+                <button class="modal-btn" onclick="submitAdminPasscode()">Entrar</button>
+                <div class="admin-error" id="adminError">Senha incorreta.</div>
+            </div>
+
+            <div id="adminStatsArea" style="display:none;">
+                <div class="admin-stats-grid">
+                    <div class="admin-stat-card"><div class="num" id="adminTotalEvents">0</div><div class="label">Eventos totais</div></div>
+                    <div class="admin-stat-card"><div class="num" id="adminUniqueSessions">0</div><div class="label">Usuários (sessões) únicos</div></div>
+                </div>
+                <div class="admin-breakdown">
+                    <b>Por tipo de evento</b>
+                    <div id="adminTypeBreakdown"></div>
+                </div>
+                <div class="admin-breakdown">
+                    <b>Por modo</b>
+                    <div id="adminModeBreakdown"></div>
+                </div>
+                <div class="admin-breakdown">
+                    <b>Por modelo</b>
+                    <div id="adminModelBreakdown"></div>
+                </div>
+                <div class="admin-breakdown">
+                    <b>Últimos eventos</b>
+                    <div id="adminRecentList"></div>
+                </div>
+                <button class="modal-btn" onclick="refreshAdminStats()" style="margin-top:14px;">🔄 Atualizar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Termos -->
+    <div class="modal" id="termsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>Termos de Uso e Privacidade</span>
+                <button class="close-sidebar" onclick="closeTerms()">✕</button>
+            </div>
+            <div>
+                <p><b>1. Estado do Projeto:</b> A NexusAI é um sistema em desenvolvimento ativo por @GUIWY_045. Versões dedicadas para Android e iOS estão sendo preparadas.</p>
+                <p><b>2. Armazenamento de Dados:</b> Seu histórico de conversa fica salvo só no seu navegador. As mensagens passam pelo nosso servidor pra falar com a IA, mas a chave de acesso à API fica guardada só no servidor — você não precisa (e não consegue) configurar chave nenhuma.</p>
+                <p><b>3. Uso da API Groq:</b> O serviço utiliza o modelo GPT-OSS 120B para texto e Qwen 3.6 27B para imagens, ambos via GroqCloud.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Personalizar IA -->
+    <div class="modal" id="personalizeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🧠 Personalizar IA</span>
+                <button class="close-sidebar" onclick="closePersonalizeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="font-size:0.8rem; color:#cbd5e1; margin-bottom:4px;">Ajuste como a NexusAI se comporta em <b>todas as conversas</b>, independente do modo selecionado.</p>
+
+                <div class="switch-row">
+                    <span>Ativar personalização</span>
+                    <label class="switch">
+                        <input type="checkbox" id="persoEnabled">
+                        <span class="switch-slider"></span>
+                    </label>
+                </div>
+
+                <span class="field-label">Como a IA deve te chamar?</span>
+                <input type="text" id="persoNickname" placeholder="Ex.: Gui, chefe, campeão...">
+
+                <span class="field-label">O que você faz / o que é importante saber sobre você?</span>
+                <input type="text" id="persoOccupation" placeholder="Ex.: sou estudante de programação, jogo bola nos fins de semana...">
+
+                <span class="field-label">Traços de personalidade da IA</span>
+                <span class="field-hint">Toque para ativar/desativar. Pode escolher mais de um.</span>
+                <div class="trait-chips-wrap" id="traitChipsWrap"></div>
+
+                <span class="field-label">O que a IA deve saber sobre você?</span>
+                <span class="field-hint">Interesses, valores, contexto que ela deve considerar nas respostas.</span>
+                <textarea id="persoAbout" placeholder="Ex.: prefiro respostas objetivas, estou aprendendo inglês, trabalho com design..."></textarea>
+
+                <span class="field-label">Como a IA deve responder?</span>
+                <span class="field-hint">Tom de voz, formato, o que evitar, etc.</span>
+                <textarea id="persoHowRespond" placeholder="Ex.: seja direta, use bullet points, evite emojis em excesso, sempre explique o porquê..."></textarea>
+
+                <div style="display:flex; gap:8px; margin-top:14px;">
+                    <button class="modal-btn secondary" style="margin-top:0;" onclick="closePersonalizeModal()">Cancelar</button>
+                    <button class="modal-btn" style="margin-top:0;" onclick="savePersonalization()">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Melhorar Imagem -->
+    <div class="modal" id="imageEnhanceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🖼️ Melhorar Imagem</span>
+                <button class="close-sidebar" onclick="closeImageEnhanceModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p>Escolha uma imagem e ajuste nitidez, brilho e contraste na hora, tudo no seu navegador.</p>
+                <input type="file" id="enhanceImageInput" accept="image/*" onchange="handleEnhanceImageSelect(event)" style="margin: 10px 0;">
+                <div id="enhanceControls" style="display:none; flex-direction:column; gap:10px; margin-top:8px;">
+                    <button class="modal-btn" id="ultraHDBtn" style="background:linear-gradient(45deg,#7c3aed,#3b82f6);" onclick="applyUltraHD()">🪄 Melhorar com IA (Ultra HD)</button>
+                    <span id="ultraHDStatus" style="display:none; font-size:0.72rem; color:#a78bfa;"></span>
+                    <span style="font-size:0.7rem; color:#a78bfa;">Usa uma rede neural que roda no seu navegador, sem conta e sem chave de API — a imagem nunca sai do seu aparelho.</span>
+                    <label style="font-size:0.8rem; color:#a78bfa;">Nitidez / Contraste: <span id="enhanceContrastVal">120</span>%
+                        <input type="range" id="enhanceContrast" min="100" max="200" value="120" oninput="applyEnhance()" style="width:100%;">
+                    </label>
+                    <label style="font-size:0.8rem; color:#a78bfa;">Brilho: <span id="enhanceBrightnessVal">110</span>%
+                        <input type="range" id="enhanceBrightness" min="80" max="160" value="110" oninput="applyEnhance()" style="width:100%;">
+                    </label>
+                    <label style="font-size:0.8rem; color:#a78bfa;">Saturação: <span id="enhanceSaturateVal">115</span>%
+                        <input type="range" id="enhanceSaturate" min="80" max="180" value="115" oninput="applyEnhance()" style="width:100%;">
+                    </label>
+                    <canvas id="enhanceCanvas" style="max-width:100%; border-radius:12px; border:1px solid #3b2361;"></canvas>
+                    <button class="modal-btn" onclick="downloadEnhancedImage()">📥 Baixar Imagem Melhorada</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Assistente de Voz (conversa em tempo real, tipo ligação) -->
+    <div class="modal" id="voiceModal">
+        <div class="modal-content voice-modal-content">
+            <div class="modal-header">
+                <span>🎙️ Assistente de Voz</span>
+                <button class="close-sidebar" onclick="closeVoiceModal()">✕</button>
+            </div>
+            <div class="modal-body voice-modal-body">
+                <div class="voice-orb-wrap">
+                    <div class="voice-orb" id="voiceOrb"></div>
+                </div>
+                <div class="voice-status" id="voiceStatus">Toque no microfone pra começar a falar</div>
+                <div class="voice-transcript" id="voiceTranscript"></div>
+                <div class="voice-controls">
+                    <button class="voice-mic-btn" id="voiceMicBtn" onclick="toggleVoiceListening()" title="Falar">🎤</button>
+                    <button class="voice-end-btn" onclick="closeVoiceModal()" title="Encerrar">📞</button>
+                </div>
+                <span class="voice-hint" id="voiceHint" style="display:none;">Seu navegador não suporta reconhecimento de voz. Tente pelo Chrome (Android) ou Safari (iPhone).</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Jogos -->
+    <div class="modal" id="gamesModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span>🎮 Jogos</span>
+                <button class="close-sidebar" onclick="closeGamesModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <p style="margin-bottom:10px;">Alguns joguinhos rápidos de navegador, sem instalar nada:</p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <a class="sidebar-menu-item" href="https://play2048.co" target="_blank" style="text-decoration:none;"><span>🔢 2048</span></a>
+                    <a class="sidebar-menu-item" href="https://www.chess.com/play/computer" target="_blank" style="text-decoration:none;"><span>♟️ Xadrez (Chess.com)</span></a>
+                    <a class="sidebar-menu-item" href="https://www.google.com/search?q=jogo+da+cobrinha" target="_blank" style="text-decoration:none;"><span>🐍 Jogo da Cobrinha</span></a>
+                    <a class="sidebar-menu-item" href="https://sudoku.com" target="_blank" style="text-decoration:none;"><span>🔲 Sudoku</span></a>
+                    <a class="sidebar-menu-item" href="https://poki.com" target="_blank" style="text-decoration:none;"><span>🕹️ Poki (vários jogos)</span></a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- IA de upscaling que roda no navegador, sem conta/chave (UpscalerJS + TensorFlow.js) -->
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@upscalerjs/default-model@latest/dist/umd/index.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/upscaler@latest/dist/browser/umd/upscaler.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script>
+        // ---------- IA DE UPSCALING LOCAL (sem API, sem chave) ----------
+        let aiUpscaler = null;
+        try {
+            if (typeof Upscaler !== 'undefined' && typeof DefaultUpscalerJSModel !== 'undefined') {
+                aiUpscaler = new Upscaler({ model: DefaultUpscalerJSModel });
+            }
+        } catch (e) { aiUpscaler = null; }
+
+        // ---------- EASTER EGG ESCONDIDO (5 toques rápidos no logo) ----------
+        let logoTapCount = 0;
+        let logoTapTimer = null;
+        function handleLogoTap() {
+            logoTapCount++;
+            clearTimeout(logoTapTimer);
+            logoTapTimer = setTimeout(() => { logoTapCount = 0; }, 1500);
+            if (logoTapCount >= 5) {
+                logoTapCount = 0;
+                revealFriendsEasterEgg();
+            }
+        }
+
+        function revealFriendsEasterEgg() {
+            const friends = [
+                { name: '@mmanholeto', url: 'https://www.instagram.com/mmanholeto?igsi=eTdhOHV6MjNpM2hi' },
+                { name: '@ruanzinn.7x', url: 'https://www.instagram.com/ruanzinn.7x?igsi=bXlkNnc0cHNkdXky' },
+                { name: '@_fonsecasz_', url: 'https://www.instagram.com/_fonsecasz_?igsi=M3l2OTlvbXI4ZHEy' },
+                { name: '@tavinho.184', url: 'https://www.instagram.com/tavinho.184?igsi=MTJ3MmV3OGl2ajh4Zg==' },
+                { name: '@heito3811', url: 'https://www.instagram.com/heito3811?igsi=OGM3cms5cDdtN3d4' }
+            ];
+            const container = document.getElementById('chatContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message ai friend-egg-bubble';
+
+            const title = document.createElement('div');
+            title.className = 'friend-egg-title';
+            title.textContent = '🎉 meus amigão 🎉';
+            wrapper.appendChild(title);
+
+            const linksWrap = document.createElement('div');
+            linksWrap.className = 'friend-egg-links';
+            friends.forEach(f => {
+                const a = document.createElement('a');
+                a.href = f.url;
+                a.target = '_blank';
+                a.rel = 'noopener';
+                a.className = 'friend-egg-link';
+                a.textContent = '📷 ' + f.name;
+                linksWrap.appendChild(a);
+            });
+            wrapper.appendChild(linksWrap);
+
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // ---------- INTRO DE PRIMEIRA VISITA ----------
+        function closeIntro() {
+            const el = document.getElementById('introScreen');
+            if (!el) return;
+            el.classList.add('fade-out');
+            setTimeout(() => { el.style.display = 'none'; }, 650);
+            try { localStorage.setItem('nexus_seen_intro', '1'); } catch (e) {}
+        }
+        (function initIntro() {
+            let alreadySeen = false;
+            try { alreadySeen = localStorage.getItem('nexus_seen_intro') === '1'; } catch (e) {}
+            if (alreadySeen) {
+                const el = document.getElementById('introScreen');
+                if (el) el.style.display = 'none';
+            } else {
+                setTimeout(closeIntro, 3200); // fecha sozinha se ninguém tocar
+            }
+        })();
+
+        let currentMode = 'Padrão';
+        let currentImageBase64 = null;
+        let currentTxtContent = null;
+        let currentFileName = null;
+
+        // Guarda o HTML original da mensagem de boas-vindas, pra poder restaurar
+        // esse estado "vazio" em qualquer modo.
+        const WELCOME_HTML = document.getElementById('welcomeMsg').outerHTML;
+
+        // messageStore é a fonte da verdade da conversa (permite variantes/árvore)
+        // cada item: { id, role: 'user'|'assistant'|'compare', text, variants, activeVariant, domEl, imageDataUrl, timestamp, sources }
+        let messageStore = [];
+        let nextMsgId = 1;
+
+        // ---------- CONVERSAS SEPARADAS POR MODO/FUNÇÃO ----------
+        // Cada modo (Padrão, Direto, Passo a Passo, Programador, Comparar) guarda
+        // sua própria conversa, salva no navegador, pra não misturar tudo.
+        const ALL_MODES = ['Padrão', 'Direto', 'Passo a Passo', 'Programador', 'Matemática', 'Comparar'];
+        let conversations = {};
+
+        function stripDomEls(arr) {
+            return (arr || []).map(m => {
+                const copy = Object.assign({}, m);
+                delete copy.domEl;
+                if (copy.responses) copy.responses = copy.responses.map(r => Object.assign({}, r));
+                return copy;
+            });
+        }
+
+        function loadConversations() {
+            try {
+                const raw = localStorage.getItem('nexus_conversations_v1');
+                if (raw) {
+                    const parsed = JSON.parse(raw);
+                    ALL_MODES.forEach(m => { if (parsed[m]) conversations[m] = parsed[m]; });
+                }
+            } catch (e) {}
+        }
+
+        function persistConversations() {
+            conversations[currentMode] = { messageStore: messageStore, nextMsgId: nextMsgId };
+            try {
+                const toSave = {};
+                ALL_MODES.forEach(m => {
+                    if (conversations[m]) {
+                        toSave[m] = { messageStore: stripDomEls(conversations[m].messageStore), nextMsgId: conversations[m].nextMsgId };
+                    }
+                });
+                localStorage.setItem('nexus_conversations_v1', JSON.stringify(toSave));
+                localStorage.setItem('nexus_last_mode', currentMode);
+            } catch (e) {
+                // provavelmente estourou o limite do localStorage (ex.: muitas imagens anexadas) — ignora silenciosamente
+            }
+            // Se tiver logado, também sobe pra nuvem (não bloqueia a UI — roda em segundo plano).
+            if (currentUser) syncConversationToCloud(currentMode);
+        }
+
+        // ---------- PERSONALIZAR IA ----------
+        const PERSONALITY_TRAITS = ['Direta ao ponto', 'Bem-humorada', 'Formal', 'Encorajadora', 'Questionadora', 'Poética', 'Sarcástica leve', 'Paciente e didática'];
+        let personalization = { enabled: false, nickname: '', occupation: '', traits: [], aboutYou: '', howToRespond: '' };
+
+        function loadPersonalization() {
+            try {
+                const raw = localStorage.getItem('nexus_personalization');
+                if (raw) personalization = Object.assign(personalization, JSON.parse(raw));
+            } catch (e) {}
+        }
+
+        function formatTimestamp(ts) {
+            if (!ts) return '';
+            const d = new Date(ts);
+            const date = d.toLocaleDateString('pt-BR');
+            const time = d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            return date + ' às ' + time;
+        }
+
+        let totalMessages = 0;
+        let totalTime = 0;
+        let estimatedTokens = 0;
+
+        const TEXT_MODEL = 'openai/gpt-oss-120b';
+        const WEB_SEARCH_MODEL = 'groq/compound';
+        const VISION_MODEL = 'qwen/qwen3.6-27b';
+        let webSearchEnabled = false;
+
+        // 👉 Troque pelo link do SEU formulário (Google Forms, Tally, etc.) — veja instruções no chat
+        const FEEDBACK_FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLScm48oRMNSB6IaWxIdtPYsswJkAc0T56D34wE2LBGHon6IuTw/viewform?usp=publish-editor';
+
+        function openFeedbackLink() {
+            if (!FEEDBACK_FORM_URL) {
+                alert('Ainda não configurado: cole o link do seu formulário de sugestões na constante FEEDBACK_FORM_URL, no código.');
+                return;
+            }
+            window.open(FEEDBACK_FORM_URL, '_blank');
+        }
+        const COMPARE_MODELS = [
+            { id: 'openai/gpt-oss-120b', label: 'GPT-OSS 120B' },
+            { id: 'qwen/qwen3.6-27b', label: 'Qwen 3.6 27B' }
+        ];
+
+        // ---------- MENU DE 3 PONTINHOS ----------
+        function toggleMoreMenu() {
+            const el = document.getElementById('moreMenuDropdown');
+            const isOpen = el.style.display === 'flex';
+            el.style.display = isOpen ? 'none' : 'flex';
+            if (!isOpen) refreshUsageInfo();
+        }
+        document.addEventListener('click', function (e) {
+            const dropdown = document.getElementById('moreMenuDropdown');
+            const wrapper = dropdown ? dropdown.parentElement : null;
+            if (dropdown && wrapper && !wrapper.contains(e.target)) dropdown.style.display = 'none';
+        });
+
+        // ---------- LIMITE DE USO DIÁRIO (mostrado no menu ⋮) ----------
+        async function refreshUsageInfo() {
+            try {
+                const headers = {};
+                if (currentUser) {
+                    const { data } = await sb.auth.getSession();
+                    if (data && data.session) headers['Authorization'] = 'Bearer ' + data.session.access_token;
+                }
+                const response = await fetch('/api/usage', { headers: headers });
+                const info = await response.json();
+                renderUsageInfo(info);
+            } catch (e) {}
+        }
+
+        function renderUsageInfo(info) {
+            if (!info) return;
+            const usedLabel = document.getElementById('usageUsedLabel');
+            const barFill = document.getElementById('usageBarFill');
+            const resetLabel = document.getElementById('usageResetLabel');
+            if (usedLabel) usedLabel.textContent = formatTokenCount(info.used) + ' / ' + formatTokenCount(info.limit) + ' tokens';
+            if (barFill) {
+                const pct = info.limit ? Math.min(100, (info.used / info.limit) * 100) : 0;
+                barFill.style.width = pct + '%';
+                barFill.style.background = pct >= 90 ? '#ef4444' : (pct >= 70 ? '#f59e0b' : 'linear-gradient(90deg,#7c3aed,#3b82f6)');
+            }
+            if (resetLabel) resetLabel.textContent = formatResetCountdown(info.resetAt);
+        }
+
+        function formatTokenCount(n) {
+            n = n || 0;
+            if (n >= 1000) return (n / 1000).toFixed(1).replace('.0', '') + 'k';
+            return String(n);
+        }
+
+        function formatResetCountdown(resetAtIso) {
+            if (!resetAtIso) return '—';
+            const diffMs = new Date(resetAtIso).getTime() - Date.now();
+            if (diffMs <= 0) return 'já resetou, atualize a página';
+            const h = Math.floor(diffMs / 3600000);
+            const m = Math.floor((diffMs % 3600000) / 60000);
+            return h > 0 ? `${h}h${String(m).padStart(2, '0')}min` : `${m}min`;
+        }
+
+        // ---------- JOGOS ----------
+        function openGamesModal() { document.getElementById('gamesModal').style.display = 'flex'; }
+        function closeGamesModal() { document.getElementById('gamesModal').style.display = 'none'; }
+
+        // ---------- MELHORAR IMAGEM ----------
+        let enhanceOriginalImg = null;
+        function openImageEnhanceModal() { document.getElementById('imageEnhanceModal').style.display = 'flex'; }
+        function closeImageEnhanceModal() {
+            document.getElementById('imageEnhanceModal').style.display = 'none';
+            document.getElementById('enhanceControls').style.display = 'none';
+            document.getElementById('enhanceImageInput').value = '';
+            enhanceOriginalImg = null;
+            enhanceFullResCanvas = null;
+            ultraHDActive = false;
+            const ultraBtn = document.getElementById('ultraHDBtn');
+            if (ultraBtn) ultraBtn.disabled = false;
+            const statusEl = document.getElementById('ultraHDStatus');
+            if (statusEl) { statusEl.style.display = 'none'; statusEl.innerHTML = ''; }
+        }
+        function handleEnhanceImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const img = new Image();
+                img.onload = function () {
+                    enhanceOriginalImg = img;
+                    document.getElementById('enhanceControls').style.display = 'flex';
+                    applyEnhance();
+                };
+                img.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+        let ultraHDActive = false;
+
+        // Espera o navegador desenhar o próximo frame antes de continuar —
+        // sem isso, o spinner/texto de "carregando" nunca chega a aparecer,
+        // porque o processamento pesado da IA trava a thread principal antes
+        // do repaint acontecer, e parece que o app "congelou".
+        function waitForPaint() {
+            return new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve)));
+        }
+
+        // Limita o tamanho da imagem antes de mandar pro modelo. Fotos de
+        // celular (3000-4000px) fazem o TensorFlow.js estourar memória e
+        // travar o navegador em aparelhos mais fracos.
+        const ULTRA_HD_MAX_DIM = 900;
+        function capImageForUpscale(img) {
+            const maxDim = Math.max(img.width, img.height);
+            if (maxDim <= ULTRA_HD_MAX_DIM) return Promise.resolve(img);
+            const scale = ULTRA_HD_MAX_DIM / maxDim;
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.round(img.width * scale);
+            canvas.height = Math.round(img.height * scale);
+            const ctx = canvas.getContext('2d');
+            ctx.imageSmoothingEnabled = true;
+            ctx.imageSmoothingQuality = 'high';
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            return new Promise((resolve, reject) => {
+                const resized = new Image();
+                resized.onload = () => resolve(resized);
+                resized.onerror = reject;
+                resized.src = canvas.toDataURL('image/png');
+            });
+        }
+
+        function withTimeout(promise, ms) {
+            return Promise.race([
+                promise,
+                new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms))
+            ]);
+        }
+
+        async function applyUltraHD() {
+            if (!enhanceOriginalImg || ultraHDActive) return;
+            ultraHDActive = true;
+
+            const btn = document.getElementById('ultraHDBtn');
+            const statusEl = document.getElementById('ultraHDStatus');
+            if (btn) btn.disabled = true;
+            if (statusEl) {
+                statusEl.style.display = 'block';
+                statusEl.innerHTML = '<span class="ultra-spinner"></span>Rodando rede neural no seu navegador... pode levar alguns segundos.';
+            }
+
+            // Deixa o spinner realmente aparecer na tela antes de travar a
+            // thread principal com o processamento da IA.
+            await waitForPaint();
+
+            try {
+                if (aiUpscaler) {
+                    try {
+                        const inputImg = await capImageForUpscale(enhanceOriginalImg);
+                        const resultSrc = await withTimeout(
+                            aiUpscaler.upscale(inputImg, { patchSize: 64, padding: 2 }),
+                            20000
+                        );
+                        await new Promise((resolve, reject) => {
+                            const upgraded = new Image();
+                            upgraded.onload = function () {
+                                enhanceOriginalImg = upgraded;
+                                document.getElementById('enhanceContrast').value = 112;
+                                document.getElementById('enhanceBrightness').value = 105;
+                                document.getElementById('enhanceSaturate').value = 110;
+                                applyEnhance();
+                                resolve();
+                            };
+                            upgraded.onerror = reject;
+                            upgraded.src = resultSrc;
+                        });
+                        if (statusEl) statusEl.textContent = '✅ Melhorado com IA real, 100% local (sem conta, sem chave, sem enviar sua imagem pra nenhum servidor).';
+                        sendFeatureNotification('🖼️ Melhorar Imagem', 'Sua imagem em Ultra HD está pronta.', 'nexus-image');
+                        return;
+                    } catch (err) {
+                        console.warn('IA de upscaling indisponível ou demorou demais, usando modo local:', err);
+                    }
+                }
+
+                // Plano B: se o modelo de IA não carregar ou travar (ex: sem
+                // internet, aparelho fraco, ou timeout), usa upscale + nitidez local
+                applyLocalUpscaleFallback();
+                if (statusEl) statusEl.textContent = 'ℹ️ A IA local não conseguiu rodar agora — usei um realce simples no lugar.';
+                sendFeatureNotification('🖼️ Melhorar Imagem', 'Sua imagem foi melhorada (modo simples).', 'nexus-image');
+            } finally {
+                ultraHDActive = false;
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function applyLocalUpscaleFallback() {
+            const scaleFactor = 2;
+            const srcCanvas = document.createElement('canvas');
+            srcCanvas.width = enhanceOriginalImg.width * scaleFactor;
+            srcCanvas.height = enhanceOriginalImg.height * scaleFactor;
+            const srcCtx = srcCanvas.getContext('2d');
+            srcCtx.imageSmoothingEnabled = true;
+            srcCtx.imageSmoothingQuality = 'high';
+            srcCtx.drawImage(enhanceOriginalImg, 0, 0, srcCanvas.width, srcCanvas.height);
+
+            const imgData = srcCtx.getImageData(0, 0, srcCanvas.width, srcCanvas.height);
+            const sharpened = unsharpMask(imgData, srcCanvas.width, srcCanvas.height, 0.6);
+            srcCtx.putImageData(sharpened, 0, 0);
+
+            const upgraded = new Image();
+            upgraded.onload = function () {
+                enhanceOriginalImg = upgraded;
+                document.getElementById('enhanceContrast').value = 130;
+                document.getElementById('enhanceBrightness').value = 108;
+                document.getElementById('enhanceSaturate').value = 118;
+                applyEnhance();
+            };
+            upgraded.src = srcCanvas.toDataURL('image/png');
+        }
+
+        // Unsharp mask leve: borrão simples (média de vizinhos) subtraído da imagem original
+        function unsharpMask(imgData, width, height, amount) {
+            const src = imgData.data;
+            const out = new Uint8ClampedArray(src.length);
+            const idx = (x, y) => (y * width + x) * 4;
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    for (let c = 0; c < 3; c++) {
+                        const i = idx(x, y) + c;
+                        let blurSum = 0, blurCount = 0;
+                        for (let dy = -1; dy <= 1; dy++) {
+                            for (let dx = -1; dx <= 1; dx++) {
+                                const nx = x + dx, ny = y + dy;
+                                if (nx >= 0 && nx < width && ny >= 0 && ny < height) {
+                                    blurSum += src[idx(nx, ny) + c];
+                                    blurCount++;
+                                }
+                            }
+                        }
+                        const blurVal = blurSum / blurCount;
+                        out[i] = src[i] + (src[i] - blurVal) * amount;
+                    }
+                    out[idx(x, y) + 3] = src[idx(x, y) + 3];
+                }
+            }
+            return new ImageData(out, width, height);
+        }
+
+        let enhanceFullResCanvas = null;
+        function applyEnhance() {
+            if (!enhanceOriginalImg) return;
+            const contrast = document.getElementById('enhanceContrast').value;
+            const brightness = document.getElementById('enhanceBrightness').value;
+            const saturate = document.getElementById('enhanceSaturate').value;
+            document.getElementById('enhanceContrastVal').textContent = contrast;
+            document.getElementById('enhanceBrightnessVal').textContent = brightness;
+            document.getElementById('enhanceSaturateVal').textContent = saturate;
+            const filterStr = `contrast(${contrast}%) brightness(${brightness}%) saturate(${saturate}%)`;
+
+            // Canvas de PRÉVIA (pequeno, só pra exibir na tela)
+            const canvas = document.getElementById('enhanceCanvas');
+            const maxW = 380;
+            const scale = Math.min(1, maxW / enhanceOriginalImg.width);
+            canvas.width = enhanceOriginalImg.width * scale;
+            canvas.height = enhanceOriginalImg.height * scale;
+            const ctx = canvas.getContext('2d');
+            ctx.filter = filterStr;
+            ctx.drawImage(enhanceOriginalImg, 0, 0, canvas.width, canvas.height);
+
+            // Canvas de EXPORTAÇÃO (resolução real da imagem, usado só no download)
+            enhanceFullResCanvas = document.createElement('canvas');
+            enhanceFullResCanvas.width = enhanceOriginalImg.width;
+            enhanceFullResCanvas.height = enhanceOriginalImg.height;
+            const fullCtx = enhanceFullResCanvas.getContext('2d');
+            fullCtx.filter = filterStr;
+            fullCtx.drawImage(enhanceOriginalImg, 0, 0);
+        }
+        function downloadEnhancedImage() {
+            const canvas = enhanceFullResCanvas || document.getElementById('enhanceCanvas');
+            const a = document.createElement('a');
+            a.href = canvas.toDataURL('image/png');
+            a.download = 'imagem-melhorada.png';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // ---------- CONTADOR DE VISITAS (real, via CountAPI) ----------
+        // OBS: api.countapi.xyz saiu do ar. Usando o sucessor mantido pela comunidade.
+        (function loadVisitCounter() {
+            fetch('https://countapi.mileshilliard.com/api/v1/hit/nexusai-guiwy045-site-visits')
+                .then(r => r.json())
+                .then(data => {
+                    const el = document.getElementById('statVisits');
+                    if (el && data && typeof data.value !== 'undefined') el.textContent = data.value;
+                })
+                .catch(() => {
+                    const el = document.getElementById('statVisits');
+                    if (el) el.textContent = 'indisponível';
+                });
+        })();
+
+        // ---------- SEU IP (visível só para você, no seu navegador) ----------
+        let ipFailed = false;
+        function maybeShowNetworkWarning() {
+            if (ipFailed) {
+                const w = document.getElementById('networkWarning');
+                if (w) w.style.display = 'block';
+            }
+        }
+        (function loadMyIp() {
+            fetch('https://api.ipify.org?format=json')
+                .then(r => r.json())
+                .then(data => {
+                    const el = document.getElementById('statMyIp');
+                    if (el && data && data.ip) el.textContent = data.ip;
+                })
+                .catch(() => {
+                    const el = document.getElementById('statMyIp');
+                    if (el) el.textContent = 'indisponível';
+                    ipFailed = true;
+                    maybeShowNetworkWarning();
+                });
+        })();
+
+        // ---------- TESTE DE VELOCIDADE DA INTERNET ----------
+        async function runSpeedTest() {
+            const speedEl = document.getElementById('statSpeedTest');
+            const pingEl = document.getElementById('statPing');
+            speedEl.textContent = 'testando...';
+            pingEl.textContent = 'testando...';
+
+            try {
+                // Ping: mede o tempo de uma requisição pequena (round-trip)
+                const pingStart = performance.now();
+                await fetch('https://speed.cloudflare.com/__down?bytes=1000', { cache: 'no-store' });
+                const pingMs = Math.round(performance.now() - pingStart);
+                pingEl.textContent = pingMs + ' ms';
+
+                // Download: baixa um arquivo de tamanho conhecido e mede o tempo
+                const bytes = 10000000; // 10 MB
+                const dlStart = performance.now();
+                const resp = await fetch('https://speed.cloudflare.com/__down?bytes=' + bytes, { cache: 'no-store' });
+                await resp.arrayBuffer();
+                const dlSeconds = (performance.now() - dlStart) / 1000;
+                const mbps = ((bytes * 8) / dlSeconds / 1e6).toFixed(1);
+                speedEl.textContent = mbps + ' Mbps';
+            } catch (err) {
+                speedEl.textContent = 'falhou';
+                pingEl.textContent = 'falhou';
+                ipFailed = true;
+                maybeShowNetworkWarning();
+            }
+        }
+        runSpeedTest();
+
+        // ---------- PERSONALIZAR IA (modal) ----------
+        function renderTraitChips() {
+            const wrap = document.getElementById('traitChipsWrap');
+            wrap.innerHTML = '';
+            PERSONALITY_TRAITS.forEach(t => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'trait-chip' + (personalization.traits.includes(t) ? ' active' : '');
+                chip.textContent = t;
+                chip.onclick = function () {
+                    const idx = personalization.traits.indexOf(t);
+                    if (idx === -1) personalization.traits.push(t); else personalization.traits.splice(idx, 1);
+                    renderTraitChips();
+                };
+                wrap.appendChild(chip);
+            });
+        }
+
+        function openPersonalizeModal() {
+            document.getElementById('persoEnabled').checked = !!personalization.enabled;
+            document.getElementById('persoNickname').value = personalization.nickname || '';
+            document.getElementById('persoOccupation').value = personalization.occupation || '';
+            document.getElementById('persoAbout').value = personalization.aboutYou || '';
+            document.getElementById('persoHowRespond').value = personalization.howToRespond || '';
+            renderTraitChips();
+            document.getElementById('personalizeModal').style.display = 'flex';
+        }
+
+        function closePersonalizeModal() {
+            document.getElementById('personalizeModal').style.display = 'none';
+        }
+
+        function savePersonalization() {
+            personalization.enabled = document.getElementById('persoEnabled').checked;
+            personalization.nickname = document.getElementById('persoNickname').value.trim();
+            personalization.occupation = document.getElementById('persoOccupation').value.trim();
+            personalization.aboutYou = document.getElementById('persoAbout').value.trim();
+            personalization.howToRespond = document.getElementById('persoHowRespond').value.trim();
+            try { localStorage.setItem('nexus_personalization', JSON.stringify(personalization)); } catch (e) {}
+            if (currentUser) syncPersonalizationToCloud();
+            closePersonalizeModal();
+        }
+
+        // ---------- TERMOS ----------
+        function openTerms() {
+            document.getElementById('termsModal').style.display = 'flex';
+        }
+
+        function closeTerms() {
+            document.getElementById('termsModal').style.display = 'none';
+        }
+
+        // ---------- SIDEBAR ----------
+        function toggleSidebar() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('sidebarOverlay').classList.toggle('active');
+        }
+
+        // ---------- MODOS ----------
+        function toggleWebSearch() {
+            webSearchEnabled = !webSearchEnabled;
+            const btn = document.getElementById('webSearchBtn');
+            btn.textContent = webSearchEnabled ? '🔎 Buscar na Web: Ligado' : '🔎 Buscar na Web: Desligado';
+            btn.style.background = webSearchEnabled ? '#7c3aed' : '';
+            btn.style.color = webSearchEnabled ? '#fff' : '';
+        }
+
+        function setMode(name, btn) {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            if (btn) btn.classList.add('active');
+
+            if (name === currentMode) return;
+
+            // salva a conversa do modo que está sendo deixado
+            persistConversations();
+
+            currentMode = name;
+            const saved = conversations[name];
+            messageStore = saved ? saved.messageStore : [];
+            nextMsgId = saved ? saved.nextMsgId : 1;
+
+            renderConversationFromStore();
+            try { localStorage.setItem('nexus_last_mode', currentMode); } catch (e) {}
+        }
+
+        function applyModeButtonHighlight(name) {
+            const btns = document.querySelectorAll('.mode-btn');
+            const idx = ALL_MODES.indexOf(name);
+            btns.forEach(b => b.classList.remove('active'));
+            if (idx !== -1 && btns[idx]) btns[idx].classList.add('active');
+        }
+
+        // ---------- RE-RENDERIZA A CONVERSA AO TROCAR DE MODO ----------
+        function renderConversationFromStore() {
+            const container = document.getElementById('chatContainer');
+            container.innerHTML = '';
+            if (!messageStore.length) {
+                container.innerHTML = WELCOME_HTML;
+                return;
+            }
+            messageStore.forEach(entry => {
+                if (entry.role === 'user') renderUserMessage(entry);
+                else if (entry.role === 'assistant') renderAssistantMessage(entry);
+                else if (entry.role === 'compare') renderCompareMessage(entry);
+            });
+        }
+
+        function getModeInstruction() {
+            switch (currentMode) {
+                case 'Direto':
+                    return 'Responda de forma direta e curta, sem rodeios.';
+                case 'Passo a Passo':
+                    return 'Explique a resposta em passos numerados, de forma didática.';
+                case 'Programador':
+                    return 'Responda com foco técnico, priorizando código correto e comentado quando fizer sentido.';
+                case 'Matemática':
+                    return 'Modo Matemática: resolva o problema com o máximo de cuidado e raciocínio possível, priorizando precisão acima de velocidade. Mostre o passo a passo completo do raciocínio, sem pular etapas importantes de conta. Depois de chegar a um resultado, refaça a verificação de um jeito diferente (recalculando por outro caminho, ou substituindo o resultado de volta no problema original) antes de responder — se achar um erro nessa checagem, corrija e explique onde estava o erro. Sempre termine a resposta com uma linha no formato exato: RESPOSTA_DESTACADA: <resultado final, curto>.';
+                case 'Comparar':
+                    return 'Responda de forma clara e completa.';
+                default:
+                    return 'Responda de forma clara, natural e útil.';
+            }
+        }
+
+        function activateMathMode() {
+            const btns = document.querySelectorAll('.mode-btn');
+            const idx = ALL_MODES.indexOf('Matemática');
+            setMode('Matemática', idx !== -1 ? btns[idx] : null);
+        }
+
+        const RESPOSTA_DESTACADA_INSTRUCTION = 'Quando a pergunta tiver uma resposta objetiva e direta (um fato, um número, o resultado de uma conta, uma definição curta, um sim/não), comece a resposta com uma linha nesse formato exato, sem nada antes: RESPOSTA_DESTACADA: <resposta curta e direta>. Depois dessa linha, pule uma linha em branco e continue explicando normalmente, com mais contexto e detalhes. Se a pergunta for aberta, subjetiva, criativa, ou não tiver uma resposta curta e única, não use essa linha — responda apenas normalmente.';
+
+        function buildSystemPrompt() {
+            let base = getModeInstruction() + '\n\n' + RESPOSTA_DESTACADA_INSTRUCTION;
+            if (personalization && personalization.enabled) {
+                const extra = [];
+                if (personalization.nickname) extra.push(`Chame o usuário de "${personalization.nickname}" quando fizer sentido.`);
+                if (personalization.occupation) extra.push(`Sobre o usuário: ${personalization.occupation}.`);
+                if (personalization.traits && personalization.traits.length) extra.push(`Adote este estilo de personalidade ao responder: ${personalization.traits.join(', ')}.`);
+                if (personalization.aboutYou) extra.push(`Informações que o usuário compartilhou sobre si mesmo (considere quando fizer sentido): ${personalization.aboutYou}`);
+                if (personalization.howToRespond) extra.push(`Instruções específicas de como responder, priorize sempre: ${personalization.howToRespond}`);
+                if (extra.length) base += '\n\n' + extra.join('\n');
+            }
+            return base;
+        }
+
+        // ---------- QUICK PROMPTS ----------
+        function insertQuickPrompt(text) {
+            const input = document.getElementById('userInput');
+            input.value = text;
+            input.focus();
+        }
+
+        // ---------- ANEXOS ----------
+        function showFilePreview(name, icon, sub) {
+            document.getElementById('fileName').textContent = name;
+            document.getElementById('fileIcon').textContent = icon;
+            document.getElementById('fileSub').textContent = sub;
+            document.getElementById('filePreviewBar').style.display = 'flex';
+        }
+
+        function removeAttachedFile() {
+            currentImageBase64 = null;
+            currentTxtContent = null;
+            currentFileName = null;
+            document.getElementById('imageInput').value = '';
+            document.getElementById('txtInput').value = '';
+            document.getElementById('filePreviewBar').style.display = 'none';
+        }
+
+        function handleImageSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentImageBase64 = e.target.result;
+                currentTxtContent = null;
+                currentFileName = file.name;
+                showFilePreview(file.name, '🖼️', 'Imagem anexada');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleTxtSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                currentTxtContent = e.target.result;
+                currentImageBase64 = null;
+                currentFileName = file.name;
+                showFilePreview(file.name, '📄', 'Arquivo de texto anexado');
+            };
+            reader.readAsText(file);
+        }
+
+        // ---------- SPOTIFY (embed simples, sem login) ----------
+        function openSpotifyModal() {
+            document.getElementById('spotifyModal').style.display = 'flex';
+        }
+
+        function closeSpotifyModal() {
+            document.getElementById('spotifyModal').style.display = 'none';
+        }
+
+        function playSpotifyPreset(type, id) {
+            const embedUrl = `https://open.spotify.com/embed/${type}/${id}?utm_source=generator&theme=0`;
+            const height = (type === 'track' || type === 'episode') ? 152 : 352;
+            document.getElementById('spotifyEmbedContainer').innerHTML =
+                `<iframe src="${embedUrl}" width="100%" height="${height}" frameborder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+            document.getElementById('spotifyBar').style.display = 'flex';
+            closeSpotifyModal();
+        }
+
+        function playSpotifyLink() {
+            const raw = document.getElementById('spotifyLinkInput').value.trim();
+            const match = raw.match(/open\.spotify\.com\/(track|album|playlist|episode|show|artist)\/([a-zA-Z0-9]+)/);
+            if (!match) {
+                alert('Link do Spotify inválido. Copie o link de compartilhamento de uma música, álbum, playlist ou artista.');
+                return;
+            }
+            const type = match[1];
+            const id = match[2];
+            const embedUrl = `https://open.spotify.com/embed/${type}/${id}?utm_source=generator&theme=0`;
+            const height = (type === 'track' || type === 'episode') ? 152 : 352;
+
+            document.getElementById('spotifyEmbedContainer').innerHTML =
+                `<iframe src="${embedUrl}" width="100%" height="${height}" frameborder="0"
+                    allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>`;
+
+            document.getElementById('spotifyBar').style.display = 'flex';
+            closeSpotifyModal();
+        }
+
+        function closeSpotifyPlayer() {
+            document.getElementById('spotifyBar').style.display = 'none';
+            document.getElementById('spotifyEmbedContainer').innerHTML = '';
+        }
+
+        // ---------- ORBE DE HUMOR ----------
+        const MOOD_WORDS = {
+            positivo: ['ótim', 'excelente', 'perfeito', 'sucesso', 'feliz', 'parabéns', 'consegui', 'funcionou', 'obrigad', 'legal', 'bom trabalho', 'incrível'],
+            negativo: ['erro', 'problema', 'falha', 'triste', 'ruim', 'desculp', 'não funciona', 'infelizmente', 'errado', 'difícil', 'complicado'],
+            animado: ['uau', 'incrível', 'demais', '🎉', '🚀', 'vamos', 'adorei', 'sensacional']
+        };
+
+        function classifyMood(text) {
+            const lower = (text || '').toLowerCase();
+            let scores = { positivo: 0, negativo: 0, animado: 0 };
+            Object.keys(MOOD_WORDS).forEach(mood => {
+                MOOD_WORDS[mood].forEach(word => {
+                    if (lower.includes(word)) scores[mood]++;
+                });
+            });
+            let best = 'neutro';
+            let bestScore = 0;
+            Object.keys(scores).forEach(mood => {
+                if (scores[mood] > bestScore) { best = mood; bestScore = scores[mood]; }
+            });
+            return best;
+        }
+
+        function updateMoodOrb(mood) {
+            const orb = document.getElementById('moodOrb');
+            const label = document.getElementById('moodOrbLabel');
+            orb.className = 'mood-orb mood-' + mood;
+            label.textContent = mood;
+            orb.classList.remove('pulse');
+            void orb.offsetWidth;
+            orb.classList.add('pulse');
+        }
+
+        // ---------- RENDER DE MENSAGENS ----------
+        function escapeHtml(str) {
+            const div = document.createElement('div');
+            div.textContent = str;
+            return div.innerHTML;
+        }
+
+        function renderInline(escapedLine) {
+            return escapedLine
+                .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+                .replace(/(^|[^*])\*(?!\*)(.+?)\*(?!\*)/g, '$1<em>$2</em>')
+                .replace(/`([^`]+?)`/g, '<code class="rc-inline-code">$1</code>');
+        }
+
+        function renderTextBlock(text) {
+            const rawLines = text.split('\n');
+            let html = '';
+            let listBuffer = [];
+            let listType = null;
+            let paraBuffer = [];
+
+            function flushList() {
+                if (listBuffer.length) {
+                    const tag = listType === 'ol' ? 'ol' : 'ul';
+                    html += `<${tag} class="rc-list">` + listBuffer.map(li => `<li>${li}</li>`).join('') + `</${tag}>`;
+                    listBuffer = [];
+                    listType = null;
+                }
+            }
+            function flushPara() {
+                if (paraBuffer.length) {
+                    html += '<p class="rc-p">' + paraBuffer.join('<br>') + '</p>';
+                    paraBuffer = [];
+                }
+            }
+
+            rawLines.forEach(line => {
+                const trimmed = line.trim();
+                const escaped = renderInline(escapeHtml(line));
+
+                if (!trimmed) { flushPara(); flushList(); return; }
+
+                const heading = trimmed.match(/^(#{2,4})\s+(.*)$/);
+                const bullet = trimmed.match(/^[-*]\s+(.*)$/);
+                const numbered = trimmed.match(/^\d+[.)]\s+(.*)$/);
+                const quote = trimmed.match(/^>\s?(.*)$/);
+                const hr = /^(-{3,}|\*{3,})$/.test(trimmed);
+
+                if (hr) { flushPara(); flushList(); html += '<div class="rc-divider"></div>'; return; }
+                if (heading) {
+                    flushPara(); flushList();
+                    const level = heading[1].length;
+                    html += `<div class="rc-heading rc-h${level}">${renderInline(escapeHtml(heading[2]))}</div>`;
+                    return;
+                }
+                if (quote) {
+                    flushPara(); flushList();
+                    html += `<div class="rc-quote">${renderInline(escapeHtml(quote[1]))}</div>`;
+                    return;
+                }
+                if (bullet) {
+                    flushPara();
+                    listType = 'ul';
+                    listBuffer.push(renderInline(escapeHtml(bullet[1])));
+                    return;
+                }
+                if (numbered) {
+                    flushPara();
+                    listType = 'ol';
+                    listBuffer.push(renderInline(escapeHtml(numbered[1])));
+                    return;
+                }
+                flushList();
+                paraBuffer.push(escaped);
+            });
+            flushPara();
+            flushList();
+            return html;
+        }
+
+        function renderContent(text) {
+            text = text || '';
+            let highlightHtml = '';
+            const marker = /^RESPOSTA_DESTACADA:\s*(.+?)\s*(?:\n|$)/i;
+            const m = text.match(marker);
+            if (m) {
+                highlightHtml = `<div class="rc-highlight-box"><span class="rc-highlight-label">✨ Resposta</span><div class="rc-highlight-text">${renderInline(escapeHtml(m[1].trim()))}</div></div>`;
+                text = text.slice(m[0].length);
+            }
+
+            const parts = text.split(/```([\s\S]*?)```/g);
+            let html = '';
+            parts.forEach((part, i) => {
+                if (i % 2 === 1) {
+                    let lines = part.split('\n');
+                    let lang = '';
+                    if (lines[0] && !lines[0].includes(' ')) {
+                        lang = lines.shift();
+                    }
+                    const code = lines.join('\n');
+                    const codeId = 'code_' + Math.random().toString(36).slice(2);
+                    html += `<div class="code-box-wrapper">
+                        <div class="code-header">
+                            <span>${escapeHtml(lang || 'código')}</span>
+                            <button class="copy-code-btn" onclick="copyCode('${codeId}')">Copiar</button>
+                        </div>
+                        <pre class="code-content" id="${codeId}">${escapeHtml(code)}</pre>
+                    </div>`;
+                } else if (part.trim()) {
+                    html += '<div class="rc-block">' + renderTextBlock(part) + '</div>';
+                }
+            });
+            return highlightHtml + (html || (text.trim() ? escapeHtml(text) : ''));
+        }
+
+        function copyCode(codeId) {
+            const el = document.getElementById(codeId);
+            if (!el) return;
+            navigator.clipboard.writeText(el.textContent).catch(() => {});
+        }
+
+        function speakText(text) {
+            try {
+                const utter = new SpeechSynthesisUtterance((text || '').replace(/```[\s\S]*?```/g, ''));
+                utter.lang = 'pt-BR';
+                speechSynthesis.cancel();
+                speechSynthesis.speak(utter);
+            } catch (e) {}
+        }
+
+        // ---------- MENSAGEM DE USUÁRIO ----------
+        function renderUserMessage(entry) {
+            const container = document.getElementById('chatContainer');
+            const msg = document.createElement('div');
+            msg.className = 'message user';
+            msg.innerHTML = renderContent(entry.text || '(arquivo anexado)');
+            if (entry.imageDataUrl) {
+                const img = document.createElement('img');
+                img.src = entry.imageDataUrl;
+                msg.appendChild(img);
+            }
+            if (entry.timestamp) {
+                const time = document.createElement('div');
+                time.className = 'msg-time msg-time-user';
+                time.textContent = formatTimestamp(entry.timestamp);
+                msg.appendChild(time);
+            }
+            entry.domEl = msg;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+            return msg;
+        }
+
+        // ---------- MENSAGEM DE IA (COM VARIANTES / ÁRVORE) ----------
+        function renderAssistantMessage(entry) {
+            // remove DOM antigo se existir (re-render ao trocar de variante)
+            if (entry.domEl && entry.domEl.parentNode) {
+                entry.domEl.parentNode.removeChild(entry.domEl);
+            }
+
+            const container = document.getElementById('chatContainer');
+            const msg = document.createElement('div');
+            msg.className = 'message ai';
+
+            const activeText = entry.variants[entry.activeVariant];
+            msg.innerHTML = renderContent(activeText);
+
+            const footer = document.createElement('div');
+            footer.className = 'message-footer';
+
+            const badgesWrap = document.createElement('div');
+            badgesWrap.className = 'footer-badges';
+
+            if (entry.speedLabel) {
+                const badge = document.createElement('span');
+                badge.className = 'ai-speed-badge';
+                badge.textContent = '⚡ ' + entry.speedLabel;
+                badgesWrap.appendChild(badge);
+            }
+
+            if (entry.modeUsed) {
+                const modeBadge = document.createElement('span');
+                modeBadge.className = 'mode-badge';
+                modeBadge.textContent = entry.modeUsed;
+                badgesWrap.appendChild(modeBadge);
+            }
+
+            if (entry.timestamp) {
+                const time = document.createElement('span');
+                time.className = 'msg-time';
+                time.textContent = formatTimestamp(entry.timestamp);
+                badgesWrap.appendChild(time);
+            }
+
+            footer.appendChild(badgesWrap);
+
+            const rightSide = document.createElement('div');
+            rightSide.style.display = 'flex';
+            rightSide.style.gap = '4px';
+            rightSide.style.alignItems = 'center';
+
+            const voiceBtn = document.createElement('button');
+            voiceBtn.className = 'voice-btn';
+            voiceBtn.textContent = '🔊';
+            voiceBtn.onclick = function () { speakText(entry.variants[entry.activeVariant]); };
+            rightSide.appendChild(voiceBtn);
+
+            const regenBtn = document.createElement('button');
+            regenBtn.className = 'regen-btn';
+            regenBtn.textContent = '🔀 Variar';
+            regenBtn.onclick = function () { regenerateVariant(entry.id); };
+            rightSide.appendChild(regenBtn);
+
+            footer.appendChild(rightSide);
+            msg.appendChild(footer);
+
+            if (entry.sources && entry.sources.length) {
+                const sourcesWrap = document.createElement('div');
+                sourcesWrap.className = 'sources-wrap';
+
+                const toggle = document.createElement('button');
+                toggle.className = 'sources-toggle';
+                toggle.textContent = '🔗 Fontes (' + entry.sources.length + ')';
+
+                const list = document.createElement('div');
+                list.className = 'sources-list';
+                list.style.display = 'none';
+                entry.sources.forEach(s => {
+                    const a = document.createElement('a');
+                    a.href = s.url;
+                    a.target = '_blank';
+                    a.rel = 'noopener';
+                    a.className = 'source-link';
+                    a.textContent = s.title || s.url;
+                    list.appendChild(a);
+                });
+
+                toggle.onclick = function () {
+                    list.style.display = list.style.display === 'none' ? 'flex' : 'none';
+                };
+
+                sourcesWrap.appendChild(toggle);
+                sourcesWrap.appendChild(list);
+                msg.appendChild(sourcesWrap);
+            }
+
+            if (entry.variants.length > 1) {
+                const nav = document.createElement('div');
+                nav.className = 'variant-nav';
+
+                const prevBtn = document.createElement('button');
+                prevBtn.className = 'variant-nav-btn';
+                prevBtn.textContent = '‹';
+                prevBtn.disabled = entry.activeVariant === 0;
+                prevBtn.onclick = function () { switchVariant(entry.id, entry.activeVariant - 1); };
+                nav.appendChild(prevBtn);
+
+                const count = document.createElement('span');
+                count.className = 'variant-count';
+                count.textContent = (entry.activeVariant + 1) + '/' + entry.variants.length;
+                nav.appendChild(count);
+
+                const nextBtn = document.createElement('button');
+                nextBtn.className = 'variant-nav-btn';
+                nextBtn.textContent = '›';
+                nextBtn.disabled = entry.activeVariant === entry.variants.length - 1;
+                nextBtn.onclick = function () { switchVariant(entry.id, entry.activeVariant + 1); };
+                nav.appendChild(nextBtn);
+
+                msg.appendChild(nav);
+            }
+
+            entry.domEl = msg;
+            container.appendChild(msg);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function switchVariant(entryId, newIndex) {
+            const entry = messageStore.find(m => m.id === entryId);
+            if (!entry || newIndex < 0 || newIndex >= entry.variants.length) return;
+            entry.activeVariant = newIndex;
+            // trocar de variante muda o rumo da conversa: remove tudo que veio depois dela
+            const idx = messageStore.indexOf(entry);
+            const removed = messageStore.splice(idx + 1);
+            removed.forEach(m => { if (m.domEl && m.domEl.parentNode) m.domEl.parentNode.removeChild(m.domEl); });
+            renderAssistantMessage(entry);
+            persistConversations();
+        }
+
+        async function regenerateVariant(entryId) {
+            const entry = messageStore.find(m => m.id === entryId);
+            if (!entry) return;
+
+            const idx = messageStore.indexOf(entry);
+            const priorEntries = messageStore.slice(0, idx);
+            const contextMessages = buildApiMessages(priorEntries);
+
+            // Usa o mesmo modelo que teria sido usado originalmente (imagem/busca na web/texto)
+            const lastUserEntry = [...priorEntries].reverse().find(m => m.role === 'user');
+            const model = (lastUserEntry && lastUserEntry.imageDataUrl) ? VISION_MODEL
+                : (webSearchEnabled ? WEB_SEARCH_MODEL : TEXT_MODEL);
+
+            const startTime = performance.now();
+            try {
+                const result = await callGroq(model, contextMessages);
+                const reply = result.content;
+                const elapsed = (performance.now() - startTime) / 1000;
+                entry.variants.push(reply);
+                entry.activeVariant = entry.variants.length - 1;
+                entry.speedLabel = elapsed.toFixed(1) + 's';
+                entry.timestamp = Date.now();
+                entry.modeUsed = currentMode;
+                entry.sources = result.sources || null;
+                renderAssistantMessage(entry);
+                updateMoodOrb(classifyMood(reply));
+                updateStats(elapsed, reply);
+                persistConversations();
+                logEvent('variante_gerada', currentMode, model);
+            } catch (err) {
+                alert('Erro ao gerar nova variante: ' + err.message);
+            }
+        }
+
+        function buildApiMessages(entries) {
+            const messages = [{ role: 'system', content: buildSystemPrompt() }];
+            entries.forEach(m => {
+                if (m.role === 'user') {
+                    if (m.imageDataUrl) {
+                        messages.push({
+                            role: 'user',
+                            content: [
+                                { type: 'text', text: m.text || 'Descreva esta imagem.' },
+                                { type: 'image_url', image_url: { url: m.imageDataUrl } }
+                            ]
+                        });
+                    } else {
+                        messages.push({ role: 'user', content: m.text });
+                    }
+                } else if (m.role === 'assistant') {
+                    messages.push({ role: 'assistant', content: m.variants[m.activeVariant] });
+                } else if (m.role === 'compare') {
+                    messages.push({ role: 'assistant', content: m.chosenText || m.responses[0].text });
+                }
+            });
+            return messages;
+        }
+
+        // ---------- SUPABASE (uso/analytics) ----------
+        const SUPABASE_URL = 'https://emaqzhowkoriwyatkkfk.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_K6e7PRwsPAeMsT8IyqiEVw_OHfXLTDj';
+
+        // Cliente oficial do Supabase (autenticação + tabelas), carregado via CDN
+        // no <head>. Usado pra login/criar conta e pra salvar/ler o histórico na nuvem.
+        const { createClient } = supabase;
+        const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let currentUser = null;
+        let authTab = 'login';
+
+        // ---------- MINHA CONTA (login / criar conta / sincronização) ----------
+        function openAccountModal() {
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('authInfo').style.display = 'none';
+            document.getElementById('accountModal').style.display = 'flex';
+        }
+
+        function closeAccountModal() {
+            document.getElementById('accountModal').style.display = 'none';
+        }
+
+        function setAuthTab(tab) {
+            authTab = tab;
+            document.getElementById('authTabLogin').classList.toggle('active', tab === 'login');
+            document.getElementById('authTabSignup').classList.toggle('active', tab === 'signup');
+            document.getElementById('authSubmitBtn').textContent = tab === 'login' ? 'Entrar' : 'Criar conta';
+            document.getElementById('authError').style.display = 'none';
+            document.getElementById('authInfo').style.display = 'none';
+        }
+
+        async function submitAuthForm() {
+            const email = document.getElementById('authEmail').value.trim();
+            const password = document.getElementById('authPassword').value;
+            const errBox = document.getElementById('authError');
+            const infoBox = document.getElementById('authInfo');
+            const btn = document.getElementById('authSubmitBtn');
+            errBox.style.display = 'none';
+            infoBox.style.display = 'none';
+
+            if (!email || !password) {
+                errBox.textContent = 'Preencha e-mail e senha.';
+                errBox.style.display = 'block';
+                return;
+            }
+
+            btn.disabled = true;
+            try {
+                if (authTab === 'signup') {
+                    const { data, error } = await sb.auth.signUp({ email: email, password: password, options: { emailRedirectTo: window.location.origin } });
+                    if (error) throw error;
+                    if (data.session) {
+                        await onLoggedIn(data.session.user);
+                    } else {
+                        infoBox.textContent = '✅ Conta criada! Verifique seu e-mail pra confirmar antes de entrar.';
+                        infoBox.style.display = 'block';
+                    }
+                } else {
+                    const { data, error } = await sb.auth.signInWithPassword({ email: email, password: password });
+                    if (error) throw error;
+                    await onLoggedIn(data.user);
+                }
+            } catch (err) {
+                errBox.textContent = err.message || 'Não deu pra completar. Tenta de novo.';
+                errBox.style.display = 'block';
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function signOutUser() {
+            try { await sb.auth.signOut(); } catch (e) {}
+            currentUser = null;
+            // Some vestígios da conta anterior e volta pro histórico local (convidado),
+            // pra não deixar dados de uma conta visíveis depois de sair num aparelho compartilhado.
+            conversations = {};
+            personalization = { enabled: false, nickname: '', occupation: '', traits: [], aboutYou: '', howToRespond: '' };
+            loadConversations();
+            loadPersonalization();
+            const saved = conversations[currentMode];
+            messageStore = saved ? saved.messageStore : [];
+            nextMsgId = saved ? saved.nextMsgId : 1;
+            renderConversationFromStore();
+            updateAccountUI();
+            closeAccountModal();
+        }
+
+        function updateAccountUI() {
+            const label = document.getElementById('sbContaLabel');
+            const formsSection = document.getElementById('authFormsSection');
+            const infoSection = document.getElementById('accountInfoSection');
+            if (currentUser) {
+                label.textContent = '☁️ ' + currentUser.email;
+                formsSection.style.display = 'none';
+                infoSection.style.display = 'block';
+                document.getElementById('accountEmailLabel').textContent = currentUser.email;
+            } else {
+                label.textContent = '👤 Entrar / Criar Conta';
+                formsSection.style.display = 'block';
+                infoSection.style.display = 'none';
+            }
+        }
+
+        // Roda uma vez, assim que o login/criação de conta é confirmado: sobe pra
+        // nuvem qualquer conversa que só existia neste aparelho (modo convidado) e
+        // depois faz a nuvem virar a fonte da verdade, pra funcionar em qualquer aparelho.
+        async function onLoggedIn(user) {
+            currentUser = user;
+            const localConversations = conversations;
+            const localPersonalization = personalization;
+
+            await syncFromCloud();
+
+            // migra pra nuvem os modos que só existiam localmente (convidado) e ainda
+            // não têm nada salvo na conta — não sobrescreve o que já está na nuvem.
+            for (const mode of ALL_MODES) {
+                const hasLocalData = localConversations[mode] && localConversations[mode].messageStore && localConversations[mode].messageStore.length;
+                const hasCloudData = conversations[mode] && conversations[mode].messageStore && conversations[mode].messageStore.length;
+                if (hasLocalData && !hasCloudData) {
+                    conversations[mode] = localConversations[mode];
+                    await syncConversationToCloud(mode);
+                }
+            }
+            if (localPersonalization && localPersonalization.enabled && !personalization.enabled) {
+                personalization = localPersonalization;
+                await syncPersonalizationToCloud();
+            }
+
+            const saved = conversations[currentMode];
+            messageStore = saved ? saved.messageStore : [];
+            nextMsgId = saved ? saved.nextMsgId : 1;
+            renderConversationFromStore();
+            updateAccountUI();
+            closeAccountModal();
+        }
+
+        async function syncFromCloud() {
+            if (!currentUser) return;
+            try {
+                const { data: convRows } = await sb.from('conversations').select('mode, data').eq('user_id', currentUser.id);
+                (convRows || []).forEach(row => {
+                    if (ALL_MODES.indexOf(row.mode) !== -1) conversations[row.mode] = row.data;
+                });
+            } catch (e) {}
+            try {
+                const { data: profileRows } = await sb.from('profiles').select('personalization').eq('user_id', currentUser.id).maybeSingle();
+                if (profileRows && profileRows.personalization) {
+                    personalization = Object.assign({ enabled: false, nickname: '', occupation: '', traits: [], aboutYou: '', howToRespond: '' }, profileRows.personalization);
+                }
+            } catch (e) {}
+        }
+
+        // Chamada de dentro de persistConversations() — não bloqueia a UI, e se falhar
+        // (sem internet, etc.) o dado continua salvo local até a próxima tentativa.
+        async function syncConversationToCloud(mode) {
+            if (!currentUser || !conversations[mode]) return;
+            try {
+                await sb.from('conversations').upsert({
+                    user_id: currentUser.id,
+                    mode: mode,
+                    data: { messageStore: stripDomEls(conversations[mode].messageStore), nextMsgId: conversations[mode].nextMsgId },
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id,mode' });
+            } catch (e) {}
+        }
+
+        async function syncPersonalizationToCloud() {
+            if (!currentUser) return;
+            try {
+                await sb.from('profiles').upsert({
+                    user_id: currentUser.id,
+                    personalization: personalization,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id' });
+            } catch (e) {}
+        }
+
+        // Restaura a sessão (se a pessoa já tinha feito login antes neste navegador)
+        // assim que a página carrega.
+        async function initAuth() {
+            try {
+                const { data } = await sb.auth.getSession();
+                if (data && data.session && data.session.user) {
+                    await onLoggedIn(data.session.user);
+                }
+            } catch (e) {}
+        }
+
+        function getSessionId() {
+            try {
+                let id = localStorage.getItem('nexus_session_id');
+                if (!id) {
+                    id = 'sess_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+                    localStorage.setItem('nexus_session_id', id);
+                }
+                return id;
+            } catch (e) {
+                return 'sess_temp_' + Date.now();
+            }
+        }
+
+        function logEvent(eventType, mode, model) {
+            try {
+                fetch(`${SUPABASE_URL}/rest/v1/usage_events`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': 'Bearer ' + SUPABASE_ANON_KEY,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify({
+                        session_id: getSessionId(),
+                        event_type: eventType,
+                        mode: mode || null,
+                        model: model || null
+                    })
+                }).catch(() => {});
+            } catch (e) {}
+        }
+
+        // ---------- PAINEL ADMIN ----------
+        function openAdminModal() {
+            document.getElementById('adminModal').style.display = 'flex';
+        }
+
+        function closeAdminModal() {
+            document.getElementById('adminModal').style.display = 'none';
+        }
+
+        async function submitAdminPasscode() {
+            const passcode = document.getElementById('adminPasscodeInput').value;
+            const errBox = document.getElementById('adminError');
+            errBox.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/admin-stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passcode: passcode })
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    errBox.textContent = data.error || 'Senha incorreta.';
+                    errBox.style.display = 'block';
+                    return;
+                }
+
+                document.getElementById('adminLoginBox').style.display = 'none';
+                document.getElementById('adminStatsArea').style.display = 'block';
+                renderAdminStats(data);
+            } catch (err) {
+                errBox.textContent = 'Erro ao conectar com o painel: ' + err.message;
+                errBox.style.display = 'block';
+            }
+        }
+
+        async function refreshAdminStats() {
+            const passcode = document.getElementById('adminPasscodeInput').value;
+            try {
+                const response = await fetch('/api/admin-stats', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ passcode: passcode })
+                });
+                const data = await response.json();
+                if (response.ok) renderAdminStats(data);
+            } catch (e) {}
+        }
+
+        function renderBreakdown(containerId, counts) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            const entries = Object.entries(counts || {}).sort((a, b) => b[1] - a[1]);
+            if (entries.length === 0) {
+                container.innerHTML = '<div class="admin-breakdown-row"><span>—</span></div>';
+                return;
+            }
+            entries.forEach(([key, count]) => {
+                const row = document.createElement('div');
+                row.className = 'admin-breakdown-row';
+                row.innerHTML = `<span>${escapeHtml(key)}</span><span>${count}</span>`;
+                container.appendChild(row);
+            });
+        }
+
+        function renderAdminStats(data) {
+            document.getElementById('adminTotalEvents').textContent = data.totalEvents;
+            document.getElementById('adminUniqueSessions').textContent = data.uniqueSessions;
+            renderBreakdown('adminTypeBreakdown', data.typeCounts);
+            renderBreakdown('adminModeBreakdown', data.modeCounts);
+            renderBreakdown('adminModelBreakdown', data.modelCounts);
+
+            const recentEl = document.getElementById('adminRecentList');
+            recentEl.innerHTML = '';
+            (data.recent || []).forEach(ev => {
+                const row = document.createElement('div');
+                row.className = 'admin-recent-row';
+                const time = ev.created_at ? new Date(ev.created_at).toLocaleString('pt-BR') : '';
+                row.textContent = `${time} · ${ev.session_id} · ${ev.event_type}${ev.mode ? ' · ' + ev.mode : ''}${ev.model ? ' · ' + ev.model : ''}`;
+                recentEl.appendChild(row);
+            });
+        }
+
+        // ---------- CHAMADA GROQ ----------
+        // Retorna { content, sources } — sources vem preenchido quando o modelo usa
+        // a busca na web (groq/compound) e traz resultados com título e link.
+        async function callGroq(model, messages, opts, isRetry) {
+            opts = opts || {};
+            const body = {
+                model: model,
+                messages: messages,
+                temperature: 0.7,
+                // Conta gratuita da Groq tem limite de 8.000 tokens/minuto — deixamos
+                // uma margem confortável pra não estourar isso numa única mensagem.
+                max_completion_tokens: opts.max_completion_tokens || 2000
+            };
+            // Modelos gpt-oss suportam "raciocínio" configurável.
+            // 'high' consome muito mais tokens, então só usamos no modo Matemática
+            // (onde precisão importa mais que economia); no resto fica em 'medium'.
+            if (model.indexOf('gpt-oss') !== -1) {
+                body.reasoning_effort = opts.reasoning_effort || 'medium';
+            }
+
+            const headers = { 'Content-Type': 'application/json' };
+            // Se a pessoa está logada, manda o token pro servidor confirmar quem é
+            // (assim o limite de uso é contado por pessoa, não por IP/rede compartilhada)
+            if (currentUser) {
+                try {
+                    const { data } = await sb.auth.getSession();
+                    if (data && data.session) headers['Authorization'] = 'Bearer ' + data.session.access_token;
+                } catch (e) {}
+            }
+
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: headers,
+                body: JSON.stringify(body)
+            });
+            if (!response.ok) {
+                const errBody = await response.text();
+
+                // Limite diário de tokens por pessoa atingido
+                if (response.status === 429) {
+                    let msg = 'Você atingiu seu limite de uso de hoje. Tenta de novo mais tarde.';
+                    try {
+                        const parsedErr = JSON.parse(errBody);
+                        if (parsedErr.usage) {
+                            renderUsageInfo(parsedErr.usage);
+                            msg = (parsedErr.error || msg) + ' Reseta em ' + formatResetCountdown(parsedErr.usage.resetAt) + '.';
+                        } else if (parsedErr.error) {
+                            msg = parsedErr.error;
+                        }
+                    } catch (e) {}
+                    throw new Error(msg);
+                }
+
+                // Se estourou o limite de tokens/minuto da Groq, tenta de novo uma vez
+                // só, pedindo uma resposta mais curta — em vez de já jogar o erro cru.
+                if (response.status === 413 && errBody.indexOf('rate_limit_exceeded') !== -1 && !isRetry) {
+                    const smallerOpts = Object.assign({}, opts, { max_completion_tokens: Math.min(opts.max_completion_tokens || 2000, 1000) });
+                    return callGroq(model, messages, smallerOpts, true);
+                }
+                if (response.status === 413 && errBody.indexOf('rate_limit_exceeded') !== -1) {
+                    throw new Error('A conta gratuita da Groq atingiu o limite de tokens por minuto. Espera um pouquinho e tenta de novo.');
+                }
+                throw new Error('HTTP ' + response.status + ': ' + errBody);
+            }
+            const data = await response.json();
+            const message = data.choices && data.choices[0] && data.choices[0].message;
+            const content = message ? message.content : '(sem resposta)';
+
+            // Atualiza a barrinha de uso no menu com a info que já veio nessa resposta
+            if (data.nexus_usage) renderUsageInfo(data.nexus_usage);
+
+            let sources = null;
+            if (message && Array.isArray(message.executed_tools)) {
+                for (const tool of message.executed_tools) {
+                    const results = tool && tool.search_results && tool.search_results.results;
+                    if (Array.isArray(results) && results.length) {
+                        sources = results.map(r => ({ title: r.title || r.url, url: r.url })).filter(s => s.url);
+                        break;
+                    }
+                }
+            }
+            return { content: content, sources: sources };
+        }
+
+        // ---------- ESTATÍSTICAS ----------
+        function updateStats(elapsedSeconds, responseText) {
+            totalMessages++;
+            totalTime += elapsedSeconds;
+            estimatedTokens += Math.round((responseText || '').length / 4);
+
+            document.getElementById('statMsgs').textContent = totalMessages;
+            document.getElementById('statSpeed').textContent = (totalTime / totalMessages).toFixed(1) + 's';
+            document.getElementById('statTokens').textContent = estimatedTokens;
+        }
+
+        // ---------- CHAT ----------
+        function clearChat() {
+            document.getElementById('chatContainer').innerHTML = WELCOME_HTML;
+            messageStore = [];
+            nextMsgId = 1;
+            conversations[currentMode] = { messageStore: [], nextMsgId: 1 };
+            persistConversations();
+            removeAttachedFile();
+        }
+
+        function exportChat() {
+            const lines = messageStore.map(m => {
+                const time = m.timestamp ? ' [' + formatTimestamp(m.timestamp) + ']' : '';
+                if (m.role === 'user') return 'Você' + time + ': ' + m.text;
+                if (m.role === 'assistant') {
+                    let out = 'NexusAI' + time + ': ' + m.variants[m.activeVariant];
+                    if (m.sources && m.sources.length) {
+                        out += '\nFontes:\n' + m.sources.map(s => '- ' + (s.title || s.url) + ' (' + s.url + ')').join('\n');
+                    }
+                    return out;
+                }
+                if (m.role === 'compare') return 'NexusAI (comparação)' + time + ': ' + (m.chosenText || m.responses.map(r => r.label + ': ' + r.text).join('\n'));
+                return '';
+            });
+            const blob = new Blob([lines.join('\n\n')], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'conversa-nexusai.txt';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // ---------- COMPARAR MODELOS ----------
+        function renderCompareMessage(entry) {
+            const container = document.getElementById('chatContainer');
+            const wrapper = document.createElement('div');
+            wrapper.className = 'message ai compare-wrapper';
+
+            const cols = document.createElement('div');
+            cols.className = 'compare-columns';
+
+            entry.responses.forEach((r, i) => {
+                const card = document.createElement('div');
+                card.className = 'compare-card';
+                if (entry.chosenIndex === i) card.classList.add('voted');
+
+                const name = document.createElement('div');
+                name.className = 'compare-model-name';
+                name.innerHTML = `<span>${escapeHtml(r.label)}</span><span>${(r.elapsed || 0).toFixed(1)}s</span>`;
+                card.appendChild(name);
+
+                const body = document.createElement('div');
+                body.innerHTML = renderContent(r.text);
+                card.appendChild(body);
+
+                const voteBtn = document.createElement('button');
+                voteBtn.className = 'compare-vote-btn';
+                if (entry.chosenIndex !== null && entry.chosenIndex !== undefined) {
+                    voteBtn.disabled = true;
+                    voteBtn.textContent = entry.chosenIndex === i ? '✅ Escolhida' : 'Não escolhida';
+                } else {
+                    voteBtn.textContent = '👍 Essa é melhor';
+                    voteBtn.onclick = function () { chooseCompareWinner(entry.id, i); };
+                }
+                card.appendChild(voteBtn);
+
+                cols.appendChild(card);
+            });
+
+            wrapper.appendChild(cols);
+
+            if (entry.timestamp) {
+                const time = document.createElement('div');
+                time.className = 'msg-time';
+                time.style.marginTop = '4px';
+                time.textContent = formatTimestamp(entry.timestamp);
+                wrapper.appendChild(time);
+            }
+
+            entry.domEl = wrapper;
+            container.appendChild(wrapper);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function chooseCompareWinner(entryId, index) {
+            const entry = messageStore.find(m => m.id === entryId);
+            if (!entry) return;
+            entry.chosenIndex = index;
+            entry.chosenText = entry.responses[index].text;
+            if (entry.domEl && entry.domEl.parentNode) entry.domEl.parentNode.removeChild(entry.domEl);
+            renderCompareMessage(entry);
+            updateMoodOrb(classifyMood(entry.chosenText));
+        }
+
+        async function sendCompareMessage(userMessageText, imageToSend) {
+            if (imageToSend) {
+                alert('O modo Comparar não suporta imagens ainda — a imagem será ignorada nesta mensagem.');
+            }
+            const contextBefore = buildApiMessages(messageStore);
+            const messages = [...contextBefore, { role: 'user', content: userMessageText }];
+
+            const entry = { id: nextMsgId++, role: 'compare', responses: [], chosenIndex: null, chosenText: null, domEl: null, timestamp: Date.now() };
+            messageStore.push(entry);
+
+            const promises = COMPARE_MODELS.map(async (m) => {
+                const start = performance.now();
+                try {
+                    const result = await callGroq(m.id, messages);
+                    const elapsed = (performance.now() - start) / 1000;
+                    return { label: m.label, text: result.content, elapsed: elapsed };
+                } catch (err) {
+                    return { label: m.label, text: '⚠️ Erro: ' + err.message, elapsed: 0 };
+                }
+            });
+
+            entry.responses = await Promise.all(promises);
+            renderCompareMessage(entry);
+            totalMessages++;
+            document.getElementById('statMsgs').textContent = totalMessages;
+            persistConversations();
+            sendFeatureNotification('🆚 Comparar Modelos', 'As respostas dos dois modelos já chegaram.', 'nexus-compare');
+            logEvent('mensagem_comparacao', 'Comparar', COMPARE_MODELS.map(m => m.id).join(','));
+        }
+
+        // ---------- ASSISTENTE DE VOZ (conversa em tempo real, tipo ligação) ----------
+        // Usa a Web Speech API do navegador: SpeechRecognition (ouvir e transcrever)
+        // e SpeechSynthesis (falar a resposta em voz alta). Tudo local ao navegador,
+        // só o texto reconhecido é que vai pra API (igual ao chat normal).
+        const SpeechRecognitionApi = window.SpeechRecognition || window.webkitSpeechRecognition;
+        let voiceRecognition = null;
+        let voiceListening = false;
+        let voiceModalOpen = false;
+        let voiceStopRequested = false;
+
+        function getVoiceLang() {
+            const sel = document.getElementById('langSelect');
+            return (sel && sel.value) || 'pt-BR';
+        }
+
+        function setVoiceState(state, text) {
+            const orb = document.getElementById('voiceOrb');
+            const statusEl = document.getElementById('voiceStatus');
+            const micBtn = document.getElementById('voiceMicBtn');
+            if (orb) orb.className = 'voice-orb' + (state ? ' ' + state : '');
+            if (statusEl && text) statusEl.textContent = text;
+            if (micBtn) micBtn.classList.toggle('active', state === 'listening');
+        }
+
+        function openVoiceModal() {
+            document.getElementById('voiceModal').style.display = 'flex';
+            voiceModalOpen = true;
+            voiceStopRequested = false;
+            document.getElementById('voiceTranscript').textContent = '';
+            const hint = document.getElementById('voiceHint');
+            const micBtn = document.getElementById('voiceMicBtn');
+            if (!SpeechRecognitionApi) {
+                if (hint) hint.style.display = 'block';
+                if (micBtn) micBtn.disabled = true;
+                setVoiceState('', 'Reconhecimento de voz indisponível neste navegador.');
+                return;
+            }
+            if (hint) hint.style.display = 'none';
+            if (micBtn) micBtn.disabled = false;
+            setVoiceState('', 'Toque no microfone pra começar a falar');
+        }
+
+        function closeVoiceModal() {
+            voiceModalOpen = false;
+            voiceStopRequested = true;
+            stopVoiceListening();
+            window.speechSynthesis && window.speechSynthesis.cancel();
+            document.getElementById('voiceModal').style.display = 'none';
+            setVoiceState('', 'Toque no microfone pra começar a falar');
+        }
+
+        function toggleVoiceListening() {
+            if (voiceListening) {
+                voiceStopRequested = true;
+                stopVoiceListening();
+            } else {
+                voiceStopRequested = false;
+                startVoiceListening();
+            }
+        }
+
+        function stopVoiceListening() {
+            voiceListening = false;
+            if (voiceRecognition) {
+                try { voiceRecognition.stop(); } catch (e) {}
+            }
+        }
+
+        function startVoiceListening() {
+            if (!SpeechRecognitionApi || voiceListening) return;
+
+            voiceRecognition = new SpeechRecognitionApi();
+            voiceRecognition.lang = getVoiceLang();
+            voiceRecognition.continuous = false;
+            voiceRecognition.interimResults = true;
+            voiceRecognition.maxAlternatives = 1;
+
+            let finalText = '';
+
+            voiceRecognition.onstart = function () {
+                voiceListening = true;
+                setVoiceState('listening', '🎧 Ouvindo...');
+            };
+
+            voiceRecognition.onresult = function (event) {
+                let interim = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    if (event.results[i].isFinal) finalText += transcript;
+                    else interim += transcript;
+                }
+                document.getElementById('voiceTranscript').textContent = finalText + interim;
+            };
+
+            voiceRecognition.onerror = function (event) {
+                voiceListening = false;
+                if (event.error === 'no-speech') {
+                    setVoiceState('', 'Não ouvi nada. Toque no microfone pra tentar de novo.');
+                } else if (event.error === 'not-allowed' || event.error === 'service-not-allowed') {
+                    setVoiceState('', '🚫 Permita o uso do microfone nas configurações do navegador.');
+                } else {
+                    setVoiceState('', 'Ops, deu um erro no microfone (' + event.error + '). Toque pra tentar de novo.');
+                }
+            };
+
+            voiceRecognition.onend = async function () {
+                voiceListening = false;
+                if (voiceStopRequested) {
+                    setVoiceState('', 'Toque no microfone pra começar a falar');
+                    return;
+                }
+                const text = finalText.trim();
+                if (!text) {
+                    if (!document.getElementById('voiceStatus').textContent.includes('Ops') &&
+                        !document.getElementById('voiceStatus').textContent.includes('Não ouvi') &&
+                        !document.getElementById('voiceStatus').textContent.includes('Permita')) {
+                        setVoiceState('', 'Toque no microfone pra começar a falar');
+                    }
+                    return;
+                }
+                await handleVoiceTurn(text);
+            };
+
+            try {
+                voiceRecognition.start();
+            } catch (e) {
+                voiceListening = false;
+                setVoiceState('', 'Não consegui acessar o microfone.');
+            }
+        }
+
+        async function handleVoiceTurn(text) {
+            setVoiceState('thinking', '💭 Pensando...');
+
+            // Entra na mesma conversa/histórico do modo atual, igual ao chat de texto
+            const userEntry = { id: nextMsgId++, role: 'user', text: text, imageDataUrl: null, domEl: null, timestamp: Date.now() };
+            messageStore.push(userEntry);
+            renderUserMessage(userEntry);
+            persistConversations();
+
+            try {
+                const apiMessages = buildApiMessages(messageStore);
+                const startTime = performance.now();
+                const result = await callGroq(TEXT_MODEL, apiMessages);
+                const elapsed = (performance.now() - startTime) / 1000;
+                const reply = result.content;
+
+                const aiEntry = { id: nextMsgId++, role: 'assistant', variants: [reply], activeVariant: 0, speedLabel: elapsed.toFixed(1) + 's', domEl: null, timestamp: Date.now(), modeUsed: currentMode, sources: result.sources || null };
+                messageStore.push(aiEntry);
+                renderAssistantMessage(aiEntry);
+                updateStats(elapsed, reply);
+                updateMoodOrb(classifyMood(reply));
+                persistConversations();
+
+                document.getElementById('voiceTranscript').textContent = '';
+                speakVoiceReply(reply);
+            } catch (err) {
+                setVoiceState('', '⚠️ Erro ao falar com a IA: ' + err.message);
+            }
+        }
+
+        function speakVoiceReply(text) {
+            if (!window.speechSynthesis) {
+                setVoiceState('', 'Toque no microfone pra continuar');
+                return;
+            }
+            // Fala só o texto puro, sem markdown/símbolos, pra não soar estranho
+            const clean = text
+                .replace(/```[\s\S]*?```/g, ' trecho de código. ')
+                .replace(/[*_#>`]/g, '')
+                .replace(/\[(.*?)\]\(.*?\)/g, '$1')
+                .trim();
+
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(clean || 'Não tenho uma resposta em texto pra falar agora.');
+            utterance.lang = getVoiceLang();
+            utterance.rate = 1.02;
+
+            utterance.onstart = function () { setVoiceState('speaking', '🔊 Falando...'); };
+            utterance.onend = function () {
+                if (!voiceModalOpen) return;
+                setVoiceState('', 'Toque no microfone pra continuar');
+                // Volta a ouvir automaticamente, criando um fluxo de conversa contínuo
+                if (!voiceStopRequested) startVoiceListening();
+            };
+            utterance.onerror = function () {
+                if (!voiceModalOpen) return;
+                setVoiceState('', 'Toque no microfone pra continuar');
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // ---------- INDICADOR "DIGITANDO..." ----------
+        function showTypingIndicator(label) {
+            const container = document.getElementById('chatContainer');
+            const el = document.createElement('div');
+            el.className = 'message ai';
+            el.innerHTML = '<div class="typing-row"><div class="typing-dots"><span></span><span></span><span></span></div>' +
+                (label ? '<span class="typing-label">' + escapeHtml(label) + '</span>' : '') + '</div>';
+            container.appendChild(el);
+            container.scrollTop = container.scrollHeight;
+            return el;
+        }
+        function removeTypingIndicator(el) {
+            if (el && el.parentNode) el.parentNode.removeChild(el);
+        }
+
+        // ---------- MODO MATEMÁTICA: resolve e depois confere com uma segunda
+        // passada, pedindo pra IA refazer a conta por conta própria antes de
+        // aceitar o resultado como final. Isso ajuda bastante a pegar erros
+        // de conta que passariam batido numa única resposta. ----------
+        async function solveMathWithVerification(apiMessages) {
+            const mathOpts = { reasoning_effort: 'high', max_completion_tokens: 3000 };
+            const draftResult = await callGroq(TEXT_MODEL, apiMessages, mathOpts);
+            const draft = draftResult.content;
+
+            const verifyMessages = apiMessages.concat([
+                { role: 'assistant', content: draft },
+                { role: 'user', content: 'Confira essa resposta com extremo rigor: refaça as contas por conta própria, do zero, sem só confiar no que já foi escrito acima. Se estiver certa, confirme e apresente a versão final organizada. Se encontrar qualquer erro, corrija e explique onde estava o erro. Termine sempre com uma linha no formato exato: RESPOSTA_DESTACADA: <resultado final>.' }
+            ]);
+            return await callGroq(TEXT_MODEL, verifyMessages, mathOpts);
+        }
+
+        // ---------- TOAST GENÉRICO ----------
+        function showToast(title, body, duration) {
+            let toast = document.getElementById('nexusToast');
+            if (!toast) {
+                toast = document.createElement('div');
+                toast.id = 'nexusToast';
+                toast.className = 'nexus-toast';
+                document.body.appendChild(toast);
+            }
+            toast.innerHTML = `<button class="nexus-toast-close" onclick="hideToast()">✕</button>
+                <div class="nexus-toast-title">${title}</div>
+                <div class="nexus-toast-body">${body}</div>`;
+            requestAnimationFrame(() => toast.classList.add('show'));
+            clearTimeout(toast._hideTimer);
+            toast._hideTimer = setTimeout(hideToast, duration || 7000);
+        }
+        function hideToast() {
+            const toast = document.getElementById('nexusToast');
+            if (toast) toast.classList.remove('show');
+        }
+
+        // ---------- NOTIFICAÇÕES PERSONALIZADAS ----------
+        // Cada função do app (chat normal, Modo Matemática, Comparar, Melhorar
+        // Imagem...) manda uma notificação com título/texto diferentes, falando
+        // sobre aquilo especificamente — só quando a aba está em segundo plano,
+        // pra não interromper quem já está olhando a tela.
+        function notificationsEnabled() {
+            try { return localStorage.getItem('nexus_notifications_enabled') === '1'; } catch (e) { return false; }
+        }
+
+        function updateNotifSidebarLabel() {
+            const el = document.getElementById('notifSidebarLabel');
+            if (!el) return;
+            el.textContent = notificationsEnabled() ? '🔔 Notificações ativadas' : '🔔 Ativar Notificações';
+        }
+
+        async function setupNotifications() {
+            if (!('Notification' in window)) {
+                showToast('🔔 Notificações', 'Seu navegador não suporta notificações. Tente pelo Chrome ou Safari.');
+                return;
+            }
+
+            if (Notification.permission === 'denied') {
+                showToast('🔔 Notificações bloqueadas', 'Você bloqueou as notificações antes. Pra ativar, permita nas configurações do site, no navegador.');
+                return;
+            }
+
+            let perm = Notification.permission;
+            if (perm !== 'granted') {
+                perm = await Notification.requestPermission();
+            }
+
+            if (perm === 'granted') {
+                try { localStorage.setItem('nexus_notifications_enabled', '1'); } catch (e) {}
+                updateNotifSidebarLabel();
+                showToast(
+                    '🔔 Notificações ativadas',
+                    'A partir de agora as notificações vêm <b>personalizadas pra cada função</b> que você estiver usando: uma quando o chat responder, outra diferente quando o Modo Matemática terminar de conferir a conta, outra quando a Imagem Ultra HD ficar pronta, e assim por diante. Elas só aparecem se você sair da aba.',
+                    9000
+                );
+            } else {
+                showToast('🔔 Notificações', 'Sem permissão, não dá pra te avisar quando sair da aba. Você pode ativar depois no menu.');
+            }
+        }
+
+        function sendFeatureNotification(title, body, tag) {
+            if (!notificationsEnabled()) return;
+            if (!('Notification' in window) || Notification.permission !== 'granted') return;
+            if (!document.hidden) return; // só notifica se o usuário não estiver olhando a aba
+            try {
+                new Notification(title, { body: body, tag: tag });
+            } catch (e) {}
+        }
+
+        function currentModeNotificationLabel() {
+            switch (currentMode) {
+                case 'Matemática': return '🧮 Modo Matemática';
+                case 'Programador': return '💻 Modo Dev/Code';
+                case 'Passo a Passo': return '📚 Passo a Passo';
+                case 'Direto': return '🎯 Modo Direto';
+                case 'Comparar': return '🆚 Comparar Modelos';
+                default: return '✨ NexusAI';
+            }
+        }
+
+        // ---------- ENVIO PRINCIPAL ----------
+        async function sendMessage() {
+            const input = document.getElementById('userInput');
+            const text = input.value.trim();
+            if (!text && !currentImageBase64 && !currentTxtContent) return;
+
+            let userMessageText = text;
+            if (currentTxtContent) {
+                userMessageText += `\n\n[Arquivo anexado: ${currentFileName}]\n${currentTxtContent}`;
+            }
+
+            const userEntry = { id: nextMsgId++, role: 'user', text: userMessageText, imageDataUrl: currentImageBase64, domEl: null, timestamp: Date.now() };
+            messageStore.push(userEntry);
+            renderUserMessage(userEntry);
+
+            input.value = '';
+            const imageToSend = currentImageBase64;
+            removeAttachedFile();
+            persistConversations();
+
+            if (currentMode === 'Comparar') {
+                await sendCompareMessage(userMessageText, imageToSend);
+                return;
+            }
+
+            const isMathMode = currentMode === 'Matemática' && !imageToSend;
+            const model = imageToSend ? VISION_MODEL : (webSearchEnabled ? WEB_SEARCH_MODEL : TEXT_MODEL);
+            const apiMessages = buildApiMessages(messageStore);
+            const startTime = performance.now();
+            const typingEl = showTypingIndicator(isMathMode ? '🧮 Resolvendo e conferindo o cálculo...' : null);
+
+            try {
+                const result = isMathMode
+                    ? await solveMathWithVerification(apiMessages)
+                    : await callGroq(model, apiMessages);
+                const reply = result.content;
+                const elapsed = (performance.now() - startTime) / 1000;
+                removeTypingIndicator(typingEl);
+
+                const aiEntry = { id: nextMsgId++, role: 'assistant', variants: [reply], activeVariant: 0, speedLabel: elapsed.toFixed(1) + 's', domEl: null, timestamp: Date.now(), modeUsed: currentMode, sources: result.sources || null };
+                messageStore.push(aiEntry);
+                renderAssistantMessage(aiEntry);
+
+                updateStats(elapsed, reply);
+                updateMoodOrb(classifyMood(reply));
+                persistConversations();
+
+                const cleanReplyPreview = reply.replace(/^RESPOSTA_DESTACADA:\s*/i, '').replace(/[#*`_>-]/g, '').trim().slice(0, 110);
+                sendFeatureNotification(currentModeNotificationLabel() + ' respondeu', cleanReplyPreview || 'Sua resposta chegou.', 'nexus-chat-' + currentMode);
+                logEvent('mensagem_enviada', currentMode, model);
+            } catch (err) {
+                removeTypingIndicator(typingEl);
+                const errEntry = { id: nextMsgId++, role: 'assistant', variants: ['⚠️ Erro ao contactar a API: ' + err.message], activeVariant: 0, speedLabel: '', domEl: null, timestamp: Date.now(), modeUsed: currentMode };
+                messageStore.push(errEntry);
+                renderAssistantMessage(errEntry);
+                persistConversations();
+            }
+        }
+
+        // ---------- INICIALIZAÇÃO: restaura modo, conversas e personalização salvos ----------
+        function initApp() {
+            loadPersonalization();
+            loadConversations();
+            updateNotifSidebarLabel();
+
+            let savedMode = 'Padrão';
+            try { savedMode = localStorage.getItem('nexus_last_mode') || 'Padrão'; } catch (e) {}
+            if (ALL_MODES.indexOf(savedMode) === -1) savedMode = 'Padrão';
+
+            currentMode = savedMode;
+            const saved = conversations[savedMode];
+            messageStore = saved ? saved.messageStore : [];
+            nextMsgId = saved ? saved.nextMsgId : 1;
+
+            applyModeButtonHighlight(savedMode);
+            renderConversationFromStore();
+
+            if (currentMode === 'Comparar') {
+                // nada especial a fazer aqui além de já estar com a conversa certa carregada
+            }
+
+            // Se a pessoa já tinha feito login antes neste navegador, restaura a sessão
+            // e substitui o histórico local pelo da nuvem (roda em segundo plano).
+            initAuth();
+        }
+        initApp();
+        logEvent('sessao_iniciada', null, null);
+        refreshUsageInfo();
+    </script>
+</body>
+</html>
