@@ -1,16 +1,18 @@
 // /api/chat.js
-// Rota de backend (Vercel Serverless Function) que fala com a Groq usando
-// a chave guardada só no servidor (variável de ambiente GROQ_API_KEY).
+// Rota de backend (Vercel Serverless Function) que fala com a OpenRouter usando
+// a chave guardada só no servidor (variável de ambiente OPENROUTER_API_KEY).
 // O navegador do usuário nunca vê essa chave — ele só chama esse endpoint.
 import { DAILY_TOKEN_LIMIT, resolveSubjectKey, getUsedTokens, addUsedTokens, getTodayKeyAndReset } from './_usageLimit.js';
 
-// Modelos permitidos (mesma lista que já existe no front-end).
-// Isso evita que alguém use seu endpoint pra chamar modelo caro/fora do previsto.
-const ALLOWED_MODELS = new Set([
-    'openai/gpt-oss-120b',
-    'qwen/qwen3.6-27b',
-    'groq/compound'
-]);
+// O front-end continua mandando esses 3 nomes de modelo (nada lá precisa
+// mudar). Aqui eles são traduzidos pro modelo real da OpenRouter — inclusive
+// "groq/compound" (que na Groq já vinha com busca na web embutida) agora
+// vira o modelo de texto normal + o plugin de busca na web da OpenRouter.
+const MODEL_MAP = {
+    'openai/gpt-oss-120b': { model: 'openai/gpt-oss-120b' },
+    'qwen/qwen3.6-27b': { model: 'qwen/qwen3.6-27b' },
+    'groq/compound': { model: 'openai/gpt-oss-120b', plugins: [{ id: 'web' }] }
+};
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -18,14 +20,14 @@ export default async function handler(req, res) {
         return res.status(405).json({ error: 'Método não permitido, use POST.' });
     }
 
-    const groqKey = process.env.GROQ_API_KEY;
-    if (!groqKey) {
-        return res.status(500).json({ error: 'GROQ_API_KEY não configurada no servidor.' });
+    const openrouterKey = process.env.OPENROUTER_API_KEY;
+    if (!openrouterKey) {
+        return res.status(500).json({ error: 'OPENROUTER_API_KEY não configurada no servidor.' });
     }
 
     const { model, messages, temperature, max_completion_tokens, reasoning_effort } = req.body || {};
 
-    if (!model || !ALLOWED_MODELS.has(model)) {
+    if (!model || !MODEL_MAP[model]) {
         return res.status(400).json({ error: 'Modelo inválido ou não permitido.' });
     }
     if (!Array.isArray(messages) || messages.length === 0) {
@@ -46,27 +48,35 @@ export default async function handler(req, res) {
         });
     }
 
-    const groqBody = {
-        model: model,
+    const mapped = MODEL_MAP[model];
+    const openrouterBody = {
+        model: mapped.model,
         messages: messages,
         temperature: typeof temperature === 'number' ? temperature : 0.7
     };
-    // Repassa esses campos só se vierem preenchidos (o front-end manda
-    // reasoning_effort='high' pra modelos gpt-oss, e um teto de tokens)
-    if (typeof max_completion_tokens === 'number') groqBody.max_completion_tokens = max_completion_tokens;
-    if (typeof reasoning_effort === 'string') groqBody.reasoning_effort = reasoning_effort;
+    if (mapped.plugins) openrouterBody.plugins = mapped.plugins;
+
+    // A OpenRouter usa nomes de campo um pouco diferentes da Groq pros mesmos
+    // conceitos: max_tokens no lugar de max_completion_tokens, e um objeto
+    // "reasoning: { effort }" no lugar de "reasoning_effort" solto.
+    if (typeof max_completion_tokens === 'number') openrouterBody.max_tokens = max_completion_tokens;
+    if (typeof reasoning_effort === 'string') openrouterBody.reasoning = { effort: reasoning_effort };
 
     try {
-        const groqResponse = await fetch('https://api.groq.com/openai/v1/chat/completions', {
+        const orResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': 'Bearer ' + groqKey
+                'Authorization': 'Bearer ' + openrouterKey,
+                // Recomendados pela OpenRouter (identificam seu app nos rankings
+                // deles); não são obrigatórios, mas não custa nada mandar.
+                'HTTP-Referer': 'https://ianexus-six.vercel.app',
+                'X-Title': 'NexusAI Pro'
             },
-            body: JSON.stringify(groqBody)
+            body: JSON.stringify(openrouterBody)
         });
 
-        const rawText = await groqResponse.text();
+        const rawText = await orResponse.text();
 
         // Soma os tokens gastos nessa chamada ao total do dia da pessoa e devolve
         // a informação de uso atualizada junto da resposta (evita uma segunda
@@ -84,16 +94,16 @@ export default async function handler(req, res) {
                     remaining: Math.max(0, DAILY_TOKEN_LIMIT - newUsed),
                     resetAt: resetAt
                 };
-                res.status(groqResponse.status);
+                res.status(orResponse.status);
                 res.setHeader('Content-Type', 'application/json');
                 return res.send(JSON.stringify(parsed));
             }
         } catch (e) {}
 
-        res.status(groqResponse.status);
+        res.status(orResponse.status);
         res.setHeader('Content-Type', 'application/json');
         return res.send(rawText);
     } catch (err) {
-        return res.status(502).json({ error: 'Erro ao falar com a Groq: ' + err.message });
+        return res.status(502).json({ error: 'Erro ao falar com a OpenRouter: ' + err.message });
     }
 }
