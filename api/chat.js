@@ -5,13 +5,26 @@
 import { DAILY_TOKEN_LIMIT, resolveSubjectKey, getUsedTokens, addUsedTokens, getTodayKeyAndReset } from './_usageLimit.js';
 
 // O front-end continua mandando esses 3 nomes de modelo (nada lá precisa
-// mudar). Aqui eles são traduzidos pro modelo real da OpenRouter — inclusive
-// "groq/compound" (que na Groq já vinha com busca na web embutida) agora
-// vira o modelo de texto normal + o plugin de busca na web da OpenRouter.
+// mudar). Aqui eles são traduzidos pro modelo real da OpenRouter, usando as
+// variantes ":free" — sem cobrar nada da conta, mesmo sem crédito.
+//
+// Dois detalhes importantes sobre o plano grátis da OpenRouter:
+// 1. Tem um limite de uso: 50 mensagens/dia sem nenhum crédito na conta, ou
+//    1000/dia se em algum momento você já colocou pelo menos US$10 de
+//    crédito (mesmo que não tenha gastado). Passar disso dá erro 429.
+// 2. A busca na web (plugin "web") tem custo por resultado SEMPRE, mesmo
+//    plugado num modelo grátis — por isso "groq/compound" (modo "Buscar na
+//    Web" do app) aqui só usa o modelo de texto grátis, sem o plugin. Ou
+//    seja: com a conta sem crédito, esse botão deixa de buscar na web de
+//    verdade (a IA responde só com o que já sabe).
 const MODEL_MAP = {
-    'openai/gpt-oss-120b': { model: 'openai/gpt-oss-120b' },
-    'qwen/qwen3.6-27b': { model: 'qwen/qwen3.6-27b' },
-    'groq/compound': { model: 'openai/gpt-oss-120b', plugins: [{ id: 'web' }] }
+    'openai/gpt-oss-120b': { model: 'openai/gpt-oss-120b:free' },
+    // Não existe uma variante ":free" confirmada do qwen3.6-27b (o modelo de
+    // visão original). Em vez de arriscar travar tudo se ela sumir do
+    // catálogo, uso o roteador de modelos grátis da própria OpenRouter, que
+    // escolhe sozinho um modelo grátis compatível com imagem pra cada pedido.
+    'qwen/qwen3.6-27b': { model: 'openrouter/free' },
+    'groq/compound': { model: 'openai/gpt-oss-120b:free' }
 };
 
 export default async function handler(req, res) {
