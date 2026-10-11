@@ -2,7 +2,8 @@ const $=s=>document.querySelector(s),G=window.GAMES;
 const C={FPS:["#ff3d9a","🎯"],Skate:["#27e1ff","🛹"],Aventura:["#ffb52e","🧭"],Esporte:["#3dff8b","⚽"],RPG:["#b987ff","⚔️"],"Estratégia":["#ff7a45","♟️"]};
 const col=g=>(C[g.categoria]||["#27e1ff"])[0];
 const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-const id=Math.random().toString(36).slice(2)+Date.now().toString(36);
+const novoId=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
+const id=(()=>{try{let v=localStorage.getItem("jid");if(!v){v=novoId();localStorage.setItem("jid",v)}return v}catch(e){return novoId()}})();
 let cat="Todos",sort="plays",q="",st={},plays={},busy=false;
 
 function chips(){
