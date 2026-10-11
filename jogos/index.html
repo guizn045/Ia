@@ -12,10 +12,12 @@
 
 <header>
   <div class="header-inner">
-    <h1>Jogos no Navegador</h1>
-    <div class="sub">Clássicos que rodam direto no navegador, todos em um só lugar</div>
+    <div class="brand">
+      <h1><span class="logo" aria-hidden="true">▶</span> Jogos no Navegador</h1>
+      <p class="sub">Clássicos que rodam direto no navegador, todos em um só lugar</p>
+    </div>
     <div class="search">
-      <input id="busca" type="search" placeholder="Buscar jogo..." autocomplete="off" aria-label="Buscar jogo">
+      <input id="busca" type="search" placeholder="Buscar jogo...  ( / )" autocomplete="off" aria-label="Buscar jogo">
       <button id="limpar" class="clear" type="button" aria-label="Limpar busca">✕</button>
     </div>
     <div id="chips" class="chips" role="group" aria-label="Filtrar por categoria"></div>
@@ -23,9 +25,13 @@
 </header>
 
 <main>
-  <div id="contador" class="count"></div>
+  <div class="toolbar">
+    <div id="contador" class="count" aria-live="polite"></div>
+    <button id="verificar" class="recheck" type="button">↻ Verificar status</button>
+  </div>
   <div id="grade" class="grid"></div>
   <div id="vazio" class="empty">Nenhum jogo encontrado.</div>
+  <p class="note">O status mostra se o site do jogo está respondendo agora. Não garante que o jogo em si esteja funcionando.</p>
 </main>
 
 <footer>Links para sites externos de terceiros. Os jogos pertencem aos seus respectivos detentores.</footer>
