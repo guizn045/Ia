@@ -1,43 +1,49 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0a0a12">
-<meta name="description" content="Catálogo de jogos clássicos que rodam direto no navegador, todos em um só lugar.">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Jogos no Navegador</title>
+<meta name="description" content="Clássicos que rodam direto no navegador. Um link só, sem instalar nada.">
+<meta name="theme-color" content="#08070f">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Manrope:wght@400;600&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-<header>
-  <div class="header-inner">
-    <div class="brand">
-      <h1><span class="logo" aria-hidden="true">▶</span> Jogos no Navegador</h1>
-      <p class="sub">Clássicos que rodam direto no navegador, todos em um só lugar</p>
-    </div>
-    <div class="search">
-      <input id="busca" type="search" placeholder="Buscar jogo...  ( / )" autocomplete="off" aria-label="Buscar jogo">
-      <button id="limpar" class="clear" type="button" aria-label="Limpar busca">✕</button>
-    </div>
-    <div id="chips" class="chips" role="group" aria-label="Filtrar por categoria"></div>
-  </div>
-</header>
-
 <main>
-  <div class="toolbar">
-    <div id="contador" class="count" aria-live="polite"></div>
-    <button id="verificar" class="recheck" type="button">↻ Verificar status</button>
+  <section class="hero">
+    <div class="intro">
+      <p class="brand">Jogos no Navegador</p>
+      <h1>Clássicos para jogar agora, sem instalar nada.</h1>
+      <div class="search">
+        <input id="q" type="search" placeholder="Buscar jogo ou categoria" autocomplete="off" aria-label="Buscar jogo">
+        <kbd>/</kbd>
+      </div>
+    </div>
+    <div class="board" aria-live="polite">
+      <div class="live" id="live"><i></i>Jogando agora</div>
+      <div class="big" id="on">–</div>
+      <dl>
+        <div><dt>Partidas</dt><dd id="tot">–</dd></div>
+        <div><dt>Jogos</dt><dd id="cnt">0</dd></div>
+        <div><dt>Online</dt><dd id="up">–</dd></div>
+      </dl>
+    </div>
+  </section>
+  <nav id="chips" aria-label="Categorias"></nav>
+  <div class="bar">
+    <span id="n"></span>
+    <span class="tools">
+      <select id="sort" aria-label="Ordenar"><option value="plays">Mais jogados</option><option value="az">A–Z</option></select>
+      <button id="ref" type="button">Verificar status</button>
+    </span>
   </div>
-  <div id="grade" class="grid"></div>
-  <div id="vazio" class="empty">Nenhum jogo encontrado.</div>
-  <p class="note">O status mostra se o site do jogo está respondendo agora. Não garante que o jogo em si esteja funcionando.</p>
+  <div id="grid"></div>
 </main>
-
-<footer>Links para sites externos de terceiros. Os jogos pertencem aos seus respectivos detentores.</footer>
-
-<div id="toast" class="toast" role="status" aria-live="polite"></div>
-
+<footer>Todos os jogos pertencem aos seus detentores. Este site só reúne links para sites externos de terceiros e não hospeda nenhum jogo.</footer>
+<div id="toast" role="status"></div>
 <script src="games.js"></script>
 <script src="app.js"></script>
 </body>

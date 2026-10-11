@@ -1,214 +1,86 @@
-(function () {
-  var GAMES = window.GAMES || [];
-  var ICONES = { "FPS": "🎯", "Skate": "🛹", "Aventura": "🗺️", "Esporte": "⚽", "RPG": "⚔️", "Estratégia": "🧠" };
-  var TEXTO = { check: "Verificando", on: "Online", off: "Fora do ar" };
-  var TIMEOUT_MS = 8000;
+const $=s=>document.querySelector(s),G=window.GAMES;
+const C={FPS:["#ff3d9a","🎯"],Skate:["#27e1ff","🛹"],Aventura:["#ffb52e","🧭"],Esporte:["#3dff8b","⚽"],RPG:["#b987ff","⚔️"],"Estratégia":["#ff7a45","♟️"]};
+const col=g=>(C[g.categoria]||["#27e1ff"])[0];
+const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
+const id=Math.random().toString(36).slice(2)+Date.now().toString(36);
+let cat="Todos",sort="plays",q="",st={},plays={},busy=false;
 
-  var grade = document.getElementById("grade");
-  var busca = document.getElementById("busca");
-  var limpar = document.getElementById("limpar");
-  var vazio = document.getElementById("vazio");
-  var contador = document.getElementById("contador");
-  var chipsEl = document.getElementById("chips");
-  var toast = document.getElementById("toast");
-  var botaoVerificar = document.getElementById("verificar");
+function chips(){
+  const cats=["Todos",...new Set(G.map(g=>g.categoria))];
+  $("#chips").innerHTML=cats.map(c=>{
+    const n=c=="Todos"?G.length:G.filter(g=>g.categoria==c).length;
+    const i=c=="Todos"?"🎮":(C[c]||[0,"🎮"])[1],k=(C[c]||[])[0]||"#27e1ff";
+    return `<button data-k="${c}" style="--c:${k}" class="${c==cat?"on":""}">${i} ${c} ${n}</button>`;
+  }).join("");
+}
 
-  var categoriaAtual = "Todos";
-  var status = {}; // índice do jogo -> "check" | "on" | "off"
+function render(){
+  const f=G.filter(g=>(cat=="Todos"||g.categoria==cat)&&norm(g.nome+" "+g.categoria+" "+g.desc).includes(norm(q)));
+  f.sort((a,b)=>sort=="az"?a.nome.localeCompare(b.nome):(plays[b.nome]||0)-(plays[a.nome]||0)||a.nome.localeCompare(b.nome));
+  $("#n").textContent=f.length+(f.length==1?" jogo":" jogos");
+  $("#grid").innerHTML=f.length?f.map(g=>{
+    const s=st[g.url],off=s===false,p=plays[g.nome]||0;
+    const stt=s===undefined?["","Verificando"]:s?["ok","Online"]:["no","Fora do ar"];
+    return `<article class="card${off?" off":""}" style="--c:${col(g)}">
+<div class="top"><span>${(C[g.categoria]||[0,""])[1]} ${g.categoria}</span><span class="st ${stt[0]}"><i></i>${stt[1]}</span></div>
+<h2>${g.nome}</h2><p>${g.desc}</p>
+<div class="meta">${p?`<b>${p.toLocaleString("pt-BR")}</b> ${p==1?"partida":"partidas"}`:"Ninguém jogou ainda"}</div>
+<div class="act"><a class="go" href="${g.url}" target="_blank" rel="noopener" data-p="${g.nome}">${off?"TENTAR MESMO":"JOGAR"}</a><button class="cp" data-c="${g.url}" aria-label="Copiar link de ${g.nome}">Copiar</button></div></article>`;
+  }).join(""):`<div class="empty">Nenhum jogo encontrado. Tente outro nome ou categoria.</div>`;
+  const up=G.filter(g=>st[g.url]).length,known=Object.keys(st).length;
+  $("#up").textContent=known?up+"/"+G.length:"–";
+  $("#cnt").textContent=G.length;
+}
 
-  function normalizar(s) {
-    return s.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
-  }
+function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),1800)}
 
-  function mostrarToast(msg) {
-    toast.textContent = msg;
-    toast.classList.add("show");
-    clearTimeout(mostrarToast.t);
-    mostrarToast.t = setTimeout(function () { toast.classList.remove("show"); }, 1600);
-  }
+async function ping(game){
+  try{
+    const r=await fetch("/api/stats",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,game}),keepalive:true});
+    const d=await r.json();
+    if(!d.ok)return;
+    plays=d.plays;
+    $("#on").textContent=d.online;
+    $("#live").classList.remove("off");
+    $("#tot").textContent=Object.values(plays).reduce((a,b)=>a+b,0).toLocaleString("pt-BR");
+    if(game||!ping.f){ping.f=1;render()}
+  }catch(e){}
+}
 
-  function copiar(url) {
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(url).then(
-        function () { mostrarToast("Link copiado!"); },
-        function () { mostrarToast("Não foi possível copiar"); }
-      );
-    } else {
-      mostrarToast("Não foi possível copiar");
-    }
-  }
-
-  /* ---------- Status ---------- */
-
-  // Usa no-cors: o navegador não deixa ler o conteúdo, mas se o servidor
-  // responder (qualquer resposta) a promessa resolve; se o site estiver fora
-  // do ar, sem DNS ou demorar demais, ela falha.
-  function checar(url) {
-    var ctrl = typeof AbortController !== "undefined" ? new AbortController() : null;
-    var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, TIMEOUT_MS);
-    var opcoes = { mode: "no-cors", cache: "no-store" };
-    if (ctrl) opcoes.signal = ctrl.signal;
-    return fetch(url, opcoes).then(
-      function () { clearTimeout(timer); return true; },
-      function () { clearTimeout(timer); return false; }
-    );
-  }
-
-  function aplicarStatus(i) {
-    var st = status[i] || "check";
-    var card = grade.querySelector('[data-i="' + i + '"]');
-    if (card) {
-      card.dataset.status = st;
-      var badge = card.querySelector(".badge");
-      badge.className = "badge " + st;
-      badge.querySelector(".txt").textContent = TEXTO[st];
-      card.querySelector(".btn").textContent = st === "off" ? "TENTAR MESMO" : "JOGAR ▶";
-    }
-    atualizarContador();
-  }
-
-  function verificarTodos() {
-    botaoVerificar.disabled = true;
-    GAMES.forEach(function (g, i) { status[i] = "check"; aplicarStatus(i); });
-    var tarefas = GAMES.map(function (g, i) {
-      return checar(g.url).then(function (ok) {
-        status[i] = ok ? "on" : "off";
-        aplicarStatus(i);
-      });
-    });
-    return Promise.all(tarefas).then(function () { botaoVerificar.disabled = false; });
-  }
-
-  function atualizarContador() {
-    var on = 0, off = 0, wait = 0;
-    GAMES.forEach(function (g, i) {
-      var st = status[i] || "check";
-      if (st === "on") on++; else if (st === "off") off++; else wait++;
-    });
-    var total = grade.children.length;
-    var partes = ["<b>" + total + (total === 1 ? " jogo</b>" : " jogos</b>")];
-    if (on) partes.push('<span class="on">' + on + " online</span>");
-    if (off) partes.push('<span class="off">' + off + " fora do ar</span>");
-    if (wait) partes.push(wait + " verificando");
-    contador.innerHTML = partes.join(" · ");
-  }
-
-  /* ---------- Cards ---------- */
-
-  function criarCard(g, i) {
-    var st = status[i] || "check";
-    var card = document.createElement("article");
-    card.className = "card";
-    card.dataset.i = i;
-    card.dataset.status = st;
-
-    var top = document.createElement("div");
-    top.className = "card-top";
-
-    var tag = document.createElement("span");
-    tag.className = "tag";
-    tag.textContent = (ICONES[g.categoria] ? ICONES[g.categoria] + " " : "") + (g.categoria || "Web");
-
-    var badge = document.createElement("span");
-    badge.className = "badge " + st;
-    var dot = document.createElement("span");
-    dot.className = "dot";
-    var txt = document.createElement("span");
-    txt.className = "txt";
-    txt.textContent = TEXTO[st];
-    badge.append(dot, txt);
-
-    top.append(tag, badge);
-
-    var h2 = document.createElement("h2");
-    h2.textContent = g.nome;
-
-    var p = document.createElement("p");
-    p.textContent = g.desc || "";
-
-    var actions = document.createElement("div");
-    actions.className = "actions";
-
-    var a = document.createElement("a");
-    a.className = "btn";
-    a.href = g.url;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    a.textContent = st === "off" ? "TENTAR MESMO" : "JOGAR ▶";
-
-    var c = document.createElement("button");
-    c.className = "copy";
-    c.type = "button";
-    c.setAttribute("aria-label", "Copiar link de " + g.nome);
-    c.textContent = "🔗";
-    c.addEventListener("click", function () { copiar(g.url); });
-
-    actions.append(a, c);
-    card.append(top, h2, p, actions);
-    return card;
-  }
-
-  function criarChips() {
-    var cats = ["Todos"];
-    GAMES.forEach(function (g) {
-      if (g.categoria && cats.indexOf(g.categoria) === -1) cats.push(g.categoria);
-    });
-    chipsEl.replaceChildren.apply(chipsEl, cats.map(function (cat) {
-      var b = document.createElement("button");
-      b.type = "button";
-      b.className = "chip" + (cat === categoriaAtual ? " active" : "");
-      b.textContent = cat === "Todos" ? "Todos" : (ICONES[cat] ? ICONES[cat] + " " : "") + cat;
-      b.dataset.cat = cat;
-      b.addEventListener("click", function () {
-        categoriaAtual = cat;
-        Array.prototype.forEach.call(chipsEl.children, function (el) {
-          el.classList.toggle("active", el.dataset.cat === cat);
-        });
-        render();
-      });
-      return b;
+async function check(fresh){
+  if(busy)return;busy=true;$("#ref").disabled=true;
+  try{
+    const r=await fetch("/api/status"+(fresh?"?t="+Date.now():""));
+    if(!r.ok)throw 0;st=await r.json();
+  }catch(e){
+    await Promise.all(G.map(async g=>{
+      const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);
+      try{await fetch(g.url,{mode:"no-cors",signal:c.signal});st[g.url]=true}catch(x){st[g.url]=false}
+      clearTimeout(t);
     }));
   }
+  busy=false;$("#ref").disabled=false;render();
+}
 
-  function render() {
-    var q = normalizar(busca.value.trim());
-    var cards = [];
-    GAMES.forEach(function (g, i) {
-      var okCat = categoriaAtual === "Todos" || g.categoria === categoriaAtual;
-      var texto = normalizar(g.nome + " " + (g.desc || "") + " " + (g.categoria || ""));
-      if (okCat && texto.indexOf(q) !== -1) cards.push(criarCard(g, i));
-    });
-
-    grade.replaceChildren.apply(grade, cards);
-    vazio.classList.toggle("show", cards.length === 0);
-    limpar.classList.toggle("show", busca.value.length > 0);
-    atualizarContador();
+$("#chips").onclick=e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.k;chips();render()};
+$("#q").oninput=e=>{q=e.target.value;render()};
+$("#sort").onchange=e=>{sort=e.target.value;render()};
+$("#ref").onclick=()=>{toast("Verificando os jogos…");check(true)};
+$("#grid").onclick=e=>{
+  const a=e.target.closest("[data-p]");
+  if(a){ping(a.dataset.p);return}
+  const b=e.target.closest("[data-c]");
+  if(b){
+    const u=b.dataset.c;
+    (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Link copiado")).catch(()=>{prompt("Copie o link:",u)});
   }
+};
+document.addEventListener("keydown",e=>{
+  if(e.key=="/"&&document.activeElement!=$("#q")){e.preventDefault();$("#q").focus()}
+  else if(e.key=="Escape"){$("#q").value="";q="";$("#q").blur();render()}
+});
 
-  /* ---------- Eventos ---------- */
-
-  busca.addEventListener("input", render);
-  limpar.addEventListener("click", function () {
-    busca.value = "";
-    busca.focus();
-    render();
-  });
-  botaoVerificar.addEventListener("click", verificarTodos);
-
-  // No PC: "/" foca na busca, Esc limpa
-  document.addEventListener("keydown", function (e) {
-    var digitando = /^(INPUT|TEXTAREA)$/.test((document.activeElement || {}).tagName || "");
-    if (e.key === "/" && !digitando) {
-      e.preventDefault();
-      busca.focus();
-    } else if (e.key === "Escape" && document.activeElement === busca) {
-      busca.value = "";
-      render();
-      busca.blur();
-    }
-  });
-
-  criarChips();
-  render();
-  verificarTodos();
-})();
+$("#live").classList.add("off");
+chips();render();check();ping();
+setInterval(()=>ping(),30000);
+setInterval(()=>check(),300000);
