@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0a0a12">
+<meta name="description" content="Catálogo de jogos clássicos que rodam direto no navegador, todos em um só lugar.">
+<title>Jogos no Navegador</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <h1>Jogos no Navegador</h1>
+    <div class="sub">Clássicos que rodam direto no navegador, todos em um só lugar</div>
+    <div class="search">
+      <input id="busca" type="search" placeholder="Buscar jogo..." autocomplete="off" aria-label="Buscar jogo">
+      <button id="limpar" class="clear" type="button" aria-label="Limpar busca">✕</button>
+    </div>
+    <div id="chips" class="chips" role="group" aria-label="Filtrar por categoria"></div>
+  </div>
+</header>
+
+<main>
+  <div id="contador" class="count"></div>
+  <div id="grade" class="grid"></div>
+  <div id="vazio" class="empty">Nenhum jogo encontrado.</div>
+</main>
+
+<footer>Links para sites externos de terceiros. Os jogos pertencem aos seus respectivos detentores.</footer>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+<script src="games.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
