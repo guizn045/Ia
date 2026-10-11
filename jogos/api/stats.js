@@ -9,9 +9,9 @@ module.exports=async(req,res)=>{
   cmd.push(["ZREMRANGEBYSCORE","online",0,now-70000],["ZCARD","online"],["HGETALL","plays"]);
   try{
     const o=await redis(cmd);
-    if(!o)return res.json({ok:false});
+    if(!o)return res.json({ok:false,why:"sem-variaveis"});
     const h=o[o.length-1]||[],plays={};
     for(let i=0;i<h.length;i+=2)plays[h[i]]=+h[i+1];
     res.json({ok:true,online:o[o.length-2],plays});
-  }catch(e){res.json({ok:false})}
+  }catch(e){res.json({ok:false,why:String(e.message).slice(0,60)})}
 };
