@@ -3,13 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="color-scheme" content="light dark">
+<meta name="color-scheme" content="dark">
 <title>Jogos no navegador</title>
-<meta name="description" content="Jogos clássicos que abrem direto no navegador, reunidos em uma lista simples.">
-<meta name="theme-color" content="#f4f6f7">
+<meta name="description" content="Jogos clássicos que abrem direto no navegador. Sem instalar nada e sem criar conta.">
+<meta name="theme-color" content="#0a0c0f">
 <script>
-/* Roda antes da página aparecer, para não piscar o tema errado nem o aviso já dispensado. */
-try{var t=JSON.parse(localStorage.getItem("tema"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}
+/* Roda antes da página aparecer, para o aviso já dispensado não piscar. */
 try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttribute("data-aviso","off")}catch(e){}
 </script>
 <link rel="stylesheet" href="style.css">
@@ -22,15 +21,16 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
   <div id="aviso" class="alert" role="status">
     <div class="wrap">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
-      <p><strong>Atualização recorrente no sistema operacional da plataforma.</strong> Melhorias de desempenho estão sendo aplicadas de forma contínua no servidor. Durante esse período, alguns recursos podem responder com lentidão.</p>
+      <p><strong>Atualização recorrente no sistema operacional da plataforma.</strong><span class="more"> Melhorias de desempenho estão sendo aplicadas de forma contínua no servidor. Durante esse período, alguns recursos podem responder com lentidão.</span></p>
       <button id="avisoX" type="button" aria-label="Dispensar aviso">&times;</button>
     </div>
   </div>
 
   <header class="top">
     <div class="wrap">
-      <h1>Jogos no navegador</h1>
-      <p class="sub">Jogos clássicos que abrem direto na aba. Sem instalar nada e sem criar conta.</p>
+      <div class="brand"><span class="logo" aria-hidden="true"></span>Jogos no navegador</div>
+      <h1>Jogue clássicos direto na aba.</h1>
+      <p class="sub">Sem instalar nada e sem criar conta. Escolha um jogo e toque em Jogar.</p>
       <p id="live" class="live" aria-live="polite"><span>Carregando…</span></p>
       <a id="last" class="last" href="#" target="_blank" rel="noopener" hidden></a>
     </div>
@@ -38,6 +38,7 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
 
   <main class="wrap">
     <div class="search">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l4.5 4.5"/></svg>
       <input id="q" type="search" placeholder="Buscar jogo" autocomplete="off" aria-label="Buscar jogo">
       <kbd aria-hidden="true">/</kbd>
     </div>
@@ -48,7 +49,6 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
       <span class="tools">
         <button id="ord" type="button"></button>
         <button id="ref" type="button">Verificar status</button>
-        <button id="tema" type="button"></button>
         <button id="sorteio" type="button" class="outline">Sortear</button>
       </span>
     </div>

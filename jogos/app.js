@@ -72,6 +72,19 @@
       (cheia ? "currentColor" : "none") + '" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
   };
 
+  var ICONE_LINK = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
+
+  /* capa de cada jogo: cor pela categoria, com uma pequena variação pelo nome */
+  var MATIZ = { "FPS": 8, "Terror": 350, "Skate": 195, "Aventura": 32, "Esporte": 150, "RPG": 22, "Estratégia": 262, "Plataforma": 330 };
+  function hash(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
+  function capa(g) {
+    var n = hash(g.nome), h = MATIZ[g.categoria];
+    if (h === undefined) h = hash(g.categoria || "") % 360;
+    h = (h + (n % 17) - 8 + 360) % 360;
+    return "--h:" + h + ";--a:" + (110 + n % 100) + "deg;--ox:" + (10 + n % 70) + "%";
+  }
+  function inicial(g) { var m = g.nome.match(/[A-Za-z0-9]/); return m ? m[0].toUpperCase() : "?"; }
+
   /* ---------- desenho ---------- */
   function favCount() { return G.filter(function (g) { return favs.has(g.nome); }).length; }
 
@@ -111,21 +124,24 @@
     list = visiveis();
     if (sel >= list.length) sel = list.length - 1;
     $("#count").textContent = list.length + (list.length === 1 ? " jogo" : " jogos");
-    $("#ord").textContent = "Ordem: " + (sort === "plays" ? "mais jogados" : "A a Z");
+    $("#ord").textContent = sort === "plays" ? "Mais jogados" : "A a Z";
+    $("#ord").title = "Trocar a ordem da lista";
 
     var h = "";
     list.forEach(function (g, i) {
       var s = statusDe(g), off = st[g.url] === false, fav = favs.has(g.nome);
       h += '<li class="row' + (off ? " off" : "") + (i === sel ? " sel" : "") + '" data-nome="' + esc(g.nome) + '">' +
-        '<div class="main"><h2>' + esc(g.nome) + "</h2><p>" + esc(g.desc || "") + "</p></div>" +
-        '<div class="info"><span class="cat">' + esc(g.categoria) + "</span>" +
-        '<span class="st ' + s[0] + '"><i></i>' + s[1] + "</span>" +
+        '<div class="cover" style="' + capa(g) + '"><span class="mono" aria-hidden="true">' + inicial(g) + "</span>" +
+        '<span class="cat">' + esc(g.categoria) + "</span>" +
+        '<button type="button" class="fav" data-a="fav" aria-pressed="' + fav + '" aria-label="' + (fav ? "Tirar dos favoritos: " : "Favoritar: ") + esc(g.nome) + '">' + ESTRELA(fav) + "</button>" +
+        "<h2>" + esc(g.nome) + "</h2></div>" +
+        '<div class="body"><p>' + esc(g.desc || "") + "</p>" +
+        '<div class="meta"><span class="st ' + s[0] + '"><i></i>' + s[1] + "</span>" +
         '<span class="pl">' + fmtPlays(plays[g.nome] || 0) + "</span></div>" +
         '<div class="acts">' +
-        '<button type="button" class="fav" data-a="fav" aria-pressed="' + fav + '" aria-label="' + (fav ? "Tirar dos favoritos: " : "Favoritar: ") + esc(g.nome) + '">' + ESTRELA(fav) + "</button>" +
-        '<button type="button" class="cp" data-a="cp">Copiar link</button>' +
         '<a class="go" data-a="go" href="' + esc(g.url) + '" target="_blank" rel="noopener">' + (off ? "Tentar mesmo" : "Jogar") + "</a>" +
-        "</div></li>";
+        '<button type="button" class="cp" data-a="cp" title="Copiar link" aria-label="Copiar link de ' + esc(g.nome) + '">' + ICONE_LINK + "</button>" +
+        "</div></div></li>";
     });
     $("#list").innerHTML = h || '<li class="none">' +
       (cat === "fav" ? "Nenhum favorito ainda. Toque na estrela de um jogo para guardá-lo aqui." : "Nenhum jogo encontrado. Tente outra palavra ou outra categoria.") + "</li>";
@@ -167,7 +183,9 @@
     if (Object.keys(st).length) {
       p.push(G.filter(function (g) { return st[g.url]; }).length + " de " + G.length + " no ar");
     }
-    $("#live").innerHTML = (p.length ? p : ["Carregando…"]).map(function (t) { return "<span>" + esc(t) + "</span>"; }).join(" ");
+    $("#live").innerHTML = (p.length ? p : ["Carregando…"]).map(function (t) { return "<span>" + esc(t) + "</span>"; }).join("");
+    var primeiro = $("#live").firstElementChild;
+    if (primeiro && online !== null) primeiro.classList.add("on"); // bolinha verde no "jogando agora"
   }
 
   function mostrarUltimo() {
@@ -247,24 +265,11 @@
     toast("Sorteado: " + g.nome);
   }
 
-  /* ---------- tema ---------- */
-  function temaAtual() {
-    var t = root.getAttribute("data-theme");
-    if (t === "light" || t === "dark") return t;
-    return window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
-  }
-  function corDaBarra() { return temaAtual() === "dark" ? "#17191b" : "#f4f6f7"; }
+  /* ---------- cor da barra do navegador ---------- */
+  function corDaBarra() { return "#0a0c0f"; }
   function definirCorDaBarra(c) {
     var m = document.querySelector('meta[name="theme-color"]');
     if (m) m.setAttribute("content", c);
-  }
-  function rotuloTema() { $("#tema").textContent = temaAtual() === "dark" ? "Tema claro" : "Tema escuro"; }
-  function alternarTema() {
-    var novo = temaAtual() === "dark" ? "light" : "dark";
-    root.setAttribute("data-theme", novo);
-    gravar("tema", novo);
-    rotuloTema();
-    definirCorDaBarra(corDaBarra());
   }
 
   /* ---------- modo privacidade ("boss key") ----------
@@ -311,7 +316,6 @@
     gravar("ord", sort); render(); salvarHash();
   });
   $("#ref").addEventListener("click", function () { toast("Verificando os jogos"); check(true); });
-  $("#tema").addEventListener("click", alternarTema);
   $("#sorteio").addEventListener("click", sortear);
   $("#last").addEventListener("click", function () { if (last) ping(last.nome); });
   $("#avisoX").addEventListener("click", function () {
@@ -349,7 +353,6 @@
 
   /* ---------- início ---------- */
   $("#q").value = q;
-  rotuloTema();
   tabs(); render(); mostrarUltimo(); live();
   check(); ping();
   setInterval(function () { ping(); }, 30000);

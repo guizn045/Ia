@@ -5,7 +5,7 @@ Lista de jogos clássicos que abrem direto no navegador. Site estático (HTML, C
 ## Arquivos
 
 - `index.html`: a página, incluindo o aviso de manutenção e a tela de privacidade
-- `style.css`: visual sóbrio (cinza escuro, branco e azul petróleo), fontes do sistema, tema claro/escuro
+- `style.css`: visual escuro de biblioteca de jogos (cards com capa gerada pela cor da categoria), fontes do sistema
 - `games.js`: **a lista de jogos** (é aqui que você adiciona novos)
 - `app.js`: busca, categorias, favoritos, sortear, atalhos, status, placar e modo de privacidade
 - `api/status.js`: o servidor testa os links dos jogos e guarda o resultado por 2 minutos
