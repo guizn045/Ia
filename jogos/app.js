@@ -1,87 +1,357 @@
-const $=s=>document.querySelector(s),G=window.GAMES;
-const C={FPS:["#ff3d9a","🎯"],Skate:["#27e1ff","🛹"],Aventura:["#ffb52e","🧭"],Esporte:["#3dff8b","⚽"],RPG:["#b987ff","⚔️"],"Estratégia":["#ff7a45","♟️"]};
-const col=g=>(C[g.categoria]||["#27e1ff"])[0];
-const norm=t=>t.normalize("NFD").replace(/[\u0300-\u036f]/g,"").toLowerCase();
-const novoId=()=>Math.random().toString(36).slice(2)+Date.now().toString(36);
-const id=(()=>{try{let v=localStorage.getItem("jid");if(!v){v=novoId();localStorage.setItem("jid",v)}return v}catch(e){return novoId()}})();
-let cat="Todos",sort="plays",q="",st={},plays={},busy=false;
+(function () {
+  "use strict";
 
-function chips(){
-  const cats=["Todos",...new Set(G.map(g=>g.categoria))];
-  $("#chips").innerHTML=cats.map(c=>{
-    const n=c=="Todos"?G.length:G.filter(g=>g.categoria==c).length;
-    const i=c=="Todos"?"🎮":(C[c]||[0,"🎮"])[1],k=(C[c]||[])[0]||"#27e1ff";
-    return `<button data-k="${c}" style="--c:${k}" class="${c==cat?"on":""}">${i} ${c} ${n}</button>`;
-  }).join("");
-}
+  var G = window.GAMES || [];
+  var root = document.documentElement;
+  var $ = function (s) { return document.querySelector(s); };
+  var reduce = !!(window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches);
 
-function render(){
-  const f=G.filter(g=>(cat=="Todos"||g.categoria==cat)&&norm(g.nome+" "+g.categoria+" "+g.desc).includes(norm(q)));
-  f.sort((a,b)=>sort=="az"?a.nome.localeCompare(b.nome):(plays[b.nome]||0)-(plays[a.nome]||0)||a.nome.localeCompare(b.nome));
-  $("#n").textContent=f.length+(f.length==1?" jogo":" jogos");
-  $("#grid").innerHTML=f.length?f.map(g=>{
-    const s=st[g.url],off=s===false,p=plays[g.nome]||0;
-    const stt=s===undefined?["","Verificando"]:s?["ok","Online"]:["no","Fora do ar"];
-    return `<article class="card${off?" off":""}" style="--c:${col(g)}">
-<div class="top"><span>${(C[g.categoria]||[0,""])[1]} ${g.categoria}</span><span class="st ${stt[0]}"><i></i>${stt[1]}</span></div>
-<h2>${g.nome}</h2><p>${g.desc}</p>
-<div class="meta">${p?`<b>${p.toLocaleString("pt-BR")}</b> ${p==1?"partida":"partidas"}`:"Ninguém jogou ainda"}</div>
-<div class="act"><a class="go" href="${g.url}" target="_blank" rel="noopener" data-p="${g.nome}">${off?"TENTAR MESMO":"JOGAR"}</a><button class="cp" data-c="${g.url}" aria-label="Copiar link de ${g.nome}">Copiar</button></div></article>`;
-  }).join(""):`<div class="empty">Nenhum jogo encontrado. Tente outro nome ou categoria.</div>`;
-  const up=G.filter(g=>st[g.url]).length,known=Object.keys(st).length;
-  $("#up").textContent=known?up+"/"+G.length:"–";
-  $("#cnt").textContent=G.length;
-}
+  /* ---------- armazenamento (pode estar bloqueado, então tudo com try/catch) ---------- */
+  function ler(k, d) { try { var v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch (e) { return d; } }
+  function gravar(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  function novoId() { return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+  // mesma pessoa = mesmo id, para atualizar a página não somar de novo no "jogando agora"
+  var id = (function () {
+    try { var v = localStorage.getItem("jid"); if (!v) { v = novoId(); localStorage.setItem("jid", v); } return v; }
+    catch (e) { return novoId(); }
+  })();
 
-function toast(t){const e=$("#toast");e.textContent=t;e.classList.add("show");clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove("show"),1800)}
+  /* ---------- estado ---------- */
+  var byName = {}, cats = [];
+  G.forEach(function (g) {
+    byName[g.nome] = g;
+    if (cats.indexOf(g.categoria) < 0) cats.push(g.categoria);
+  });
+  var st = {}, plays = {}, online = null, hasStats = false, busy = false;
+  var favLista = ler("fav", []);
+  var favs = new Set(Array.isArray(favLista) ? favLista : []);
+  var last = ler("last", null);
+  var cat = "Todos", q = "", sel = -1, list = [], sort = "plays";
 
-async function ping(game){
-  try{
-    const r=await fetch("/api/stats",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({id,game}),keepalive:true});
-    const d=await r.json();
-    if(!d.ok)return;
-    plays=d.plays;
-    $("#on").textContent=d.online;
-    $("#live").classList.remove("off");
-    $("#tot").textContent=Object.values(plays).reduce((a,b)=>a+b,0).toLocaleString("pt-BR");
-    if(game||!ping.f){ping.f=1;render()}
-  }catch(e){}
-}
-
-async function check(fresh){
-  if(busy)return;busy=true;$("#ref").disabled=true;
-  try{
-    const r=await fetch("/api/status"+(fresh?"?t="+Date.now():""));
-    if(!r.ok)throw 0;st=await r.json();
-  }catch(e){
-    await Promise.all(G.map(async g=>{
-      const c=new AbortController(),t=setTimeout(()=>c.abort(),8000);
-      try{await fetch(g.url,{mode:"no-cors",signal:c.signal});st[g.url]=true}catch(x){st[g.url]=false}
-      clearTimeout(t);
-    }));
+  // filtros na URL: #c=Terror&q=quake&o=az (dá para mandar o link já filtrado)
+  function lerHash() {
+    var p = new URLSearchParams(location.hash.slice(1)), c = p.get("c"), o = p.get("o");
+    cat = (c === "fav" || cats.indexOf(c) > -1) ? c : "Todos";
+    q = p.get("q") || "";
+    sort = (o === "az" || o === "plays") ? o : (ler("ord", "plays") === "az" ? "az" : "plays");
+    sel = -1;
   }
-  busy=false;$("#ref").disabled=false;render();
-}
-
-$("#chips").onclick=e=>{const b=e.target.closest("button");if(!b)return;cat=b.dataset.k;chips();render()};
-$("#q").oninput=e=>{q=e.target.value;render()};
-$("#sort").onchange=e=>{sort=e.target.value;render()};
-$("#ref").onclick=()=>{toast("Verificando os jogos…");check(true)};
-$("#grid").onclick=e=>{
-  const a=e.target.closest("[data-p]");
-  if(a){ping(a.dataset.p);return}
-  const b=e.target.closest("[data-c]");
-  if(b){
-    const u=b.dataset.c;
-    (navigator.clipboard?navigator.clipboard.writeText(u):Promise.reject()).then(()=>toast("Link copiado")).catch(()=>{prompt("Copie o link:",u)});
+  lerHash();
+  function salvarHash() {
+    var p = new URLSearchParams();
+    if (cat !== "Todos") p.set("c", cat);
+    if (q) p.set("q", q);
+    if (sort !== "plays") p.set("o", sort);
+    var h = p.toString();
+    try { history.replaceState(null, "", h ? "#" + h : location.pathname + location.search); } catch (e) {}
   }
-};
-document.addEventListener("keydown",e=>{
-  if(e.key=="/"&&document.activeElement!=$("#q")){e.preventDefault();$("#q").focus()}
-  else if(e.key=="Escape"){$("#q").value="";q="";$("#q").blur();render()}
-});
 
-$("#live").classList.add("off");
-chips();render();check();ping();
-setInterval(()=>ping(),30000);
-setInterval(()=>check(),300000);
+  /* ---------- utilidades ---------- */
+  function norm(t) { return String(t).normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase(); }
+  function esc(t) {
+    return String(t).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+  function fmtPlays(p) {
+    return p ? p.toLocaleString("pt-BR") + (p === 1 ? " partida" : " partidas") : "Sem partidas";
+  }
+  function statusDe(g) {
+    var s = st[g.url];
+    return s === undefined ? ["chk", "Verificando"] : s ? ["ok", "No ar"] : ["bad", "Fora do ar"];
+  }
+  function toast(t) {
+    var e = $("#toast");
+    e.textContent = t;
+    e.classList.add("show");
+    clearTimeout(toast.t);
+    toast.t = setTimeout(function () { e.classList.remove("show"); }, 1800);
+  }
+  var ESTRELA = function (cheia) {
+    return '<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M12 3.5l2.6 5.5 6 .8-4.4 4.2 1.1 6-5.3-2.9-5.3 2.9 1.1-6L3.4 9.8l6-.8z" fill="' +
+      (cheia ? "currentColor" : "none") + '" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg>';
+  };
+
+  /* ---------- desenho ---------- */
+  function favCount() { return G.filter(function (g) { return favs.has(g.nome); }).length; }
+
+  function tabs() {
+    var items = [["Todos", "Todos", G.length], ["fav", "Favoritos", favCount()]];
+    cats.forEach(function (c) {
+      items.push([c, c, G.filter(function (g) { return g.categoria === c; }).length]);
+    });
+    $("#tabs").innerHTML = items.map(function (i) {
+      var on = cat === i[0];
+      return '<button type="button" data-k="' + esc(i[0]) + '"' + (on ? ' class="on" aria-current="true"' : "") + ">" +
+        esc(i[1]) + "<small>" + i[2] + "</small></button>";
+    }).join("");
+  }
+
+  function visiveis() {
+    var nq = norm(q.trim());
+    var f = G.filter(function (g) {
+      if (cat === "fav" && !favs.has(g.nome)) return false;
+      if (cat !== "Todos" && cat !== "fav" && g.categoria !== cat) return false;
+      return !nq || norm(g.nome + " " + g.categoria + " " + (g.desc || "")).indexOf(nq) > -1;
+    });
+    f.sort(function (a, b) {
+      if (sort === "plays") { var d = (plays[b.nome] || 0) - (plays[a.nome] || 0); if (d) return d; }
+      return a.nome.localeCompare(b.nome, "pt");
+    });
+    return f;
+  }
+
+  function render() {
+    // mantém o foco no mesmo botão depois de redesenhar a lista
+    var ae = document.activeElement, fk = null;
+    if (ae && ae.dataset && ae.dataset.a && ae.closest) {
+      var rr = ae.closest(".row");
+      if (rr) fk = [rr.dataset.nome, ae.dataset.a];
+    }
+    list = visiveis();
+    if (sel >= list.length) sel = list.length - 1;
+    $("#count").textContent = list.length + (list.length === 1 ? " jogo" : " jogos");
+    $("#ord").textContent = "Ordem: " + (sort === "plays" ? "mais jogados" : "A a Z");
+
+    var h = "";
+    list.forEach(function (g, i) {
+      var s = statusDe(g), off = st[g.url] === false, fav = favs.has(g.nome);
+      h += '<li class="row' + (off ? " off" : "") + (i === sel ? " sel" : "") + '" data-nome="' + esc(g.nome) + '">' +
+        '<div class="main"><h2>' + esc(g.nome) + "</h2><p>" + esc(g.desc || "") + "</p></div>" +
+        '<div class="info"><span class="cat">' + esc(g.categoria) + "</span>" +
+        '<span class="st ' + s[0] + '"><i></i>' + s[1] + "</span>" +
+        '<span class="pl">' + fmtPlays(plays[g.nome] || 0) + "</span></div>" +
+        '<div class="acts">' +
+        '<button type="button" class="fav" data-a="fav" aria-pressed="' + fav + '" aria-label="' + (fav ? "Tirar dos favoritos: " : "Favoritar: ") + esc(g.nome) + '">' + ESTRELA(fav) + "</button>" +
+        '<button type="button" class="cp" data-a="cp">Copiar link</button>' +
+        '<a class="go" data-a="go" href="' + esc(g.url) + '" target="_blank" rel="noopener">' + (off ? "Tentar mesmo" : "Jogar") + "</a>" +
+        "</div></li>";
+    });
+    $("#list").innerHTML = h || '<li class="none">' +
+      (cat === "fav" ? "Nenhum favorito ainda. Toque na estrela de um jogo para guardá-lo aqui." : "Nenhum jogo encontrado. Tente outra palavra ou outra categoria.") + "</li>";
+
+    if (fk) {
+      var rows = $("#list").children;
+      for (var i = 0; i < rows.length; i++) {
+        if (rows[i].dataset.nome === fk[0]) {
+          var el = rows[i].querySelector('[data-a="' + fk[1] + '"]');
+          if (el) el.focus({ preventScroll: true });
+        }
+      }
+    }
+  }
+
+  // atualiza status e partidas sem reordenar (as linhas não pulam debaixo do dedo)
+  function meta() {
+    var rows = $("#list").children;
+    for (var i = 0; i < rows.length; i++) {
+      var r = rows[i], g = byName[r.dataset.nome];
+      if (!g) continue;
+      var s = statusDe(g), off = st[g.url] === false;
+      r.classList.toggle("off", off);
+      var e = r.querySelector(".st");
+      e.className = "st " + s[0];
+      e.innerHTML = "<i></i>" + s[1];
+      r.querySelector(".pl").textContent = fmtPlays(plays[g.nome] || 0);
+      r.querySelector(".go").textContent = off ? "Tentar mesmo" : "Jogar";
+    }
+  }
+
+  function live() {
+    var p = [];
+    if (online !== null) p.push(online + (online === 1 ? " pessoa jogando agora" : " pessoas jogando agora"));
+    if (hasStats) {
+      var tot = Object.keys(plays).reduce(function (a, k) { return a + plays[k]; }, 0);
+      p.push(tot.toLocaleString("pt-BR") + (tot === 1 ? " partida no total" : " partidas no total"));
+    }
+    if (Object.keys(st).length) {
+      p.push(G.filter(function (g) { return st[g.url]; }).length + " de " + G.length + " no ar");
+    }
+    $("#live").innerHTML = (p.length ? p : ["Carregando…"]).map(function (t) { return "<span>" + esc(t) + "</span>"; }).join(" ");
+  }
+
+  function mostrarUltimo() {
+    var a = $("#last");
+    if (last && byName[last.nome]) {
+      a.hidden = false;
+      a.href = byName[last.nome].url;
+      a.textContent = "Continuar: " + last.nome;
+    } else a.hidden = true;
+  }
+
+  /* ---------- rede ---------- */
+  function ping(game) {
+    return fetch("/api/stats", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: id, game: game }), keepalive: true })
+      .then(function (r) { return r.json(); })
+      .then(function (d) {
+        if (!d || !d.ok) return;
+        plays = d.plays || {}; online = d.online; hasStats = true;
+        if (!ping.f) { ping.f = 1; render(); } else meta(); // só reordena na primeira vez
+        live();
+      })
+      .catch(function () {});
+  }
+
+  function check(fresh) {
+    if (busy) return Promise.resolve();
+    busy = true; $("#ref").disabled = true;
+    return fetch("/api/status" + (fresh ? "?t=" + Date.now() : ""))
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); })
+      .then(function (d) { st = d; })
+      .catch(function () { // sem servidor (ex.: GitHub Pages): cada navegador testa por conta própria
+        return Promise.all(G.map(function (g) {
+          var c = new AbortController(), t = setTimeout(function () { c.abort(); }, 8000);
+          return fetch(g.url, { mode: "no-cors", signal: c.signal })
+            .then(function () { st[g.url] = true; }, function () { st[g.url] = false; })
+            .then(function () { clearTimeout(t); });
+        }));
+      })
+      .then(function () { busy = false; $("#ref").disabled = false; meta(); live(); });
+  }
+
+  /* ---------- ações ---------- */
+  function copiar(url) {
+    (navigator.clipboard ? navigator.clipboard.writeText(url) : Promise.reject())
+      .then(function () { toast("Link copiado"); })
+      .catch(function () { prompt("Copie o link:", url); });
+  }
+  function jogou(g) {
+    ping(g.nome);
+    last = { nome: g.nome };
+    gravar("last", last);
+    mostrarUltimo();
+  }
+  function favoritar(nome) {
+    if (favs.has(nome)) { favs.delete(nome); toast("Removido dos favoritos"); }
+    else { favs.add(nome); toast("Adicionado aos favoritos"); }
+    gravar("fav", Array.from(favs));
+    tabs(); render();
+  }
+  function marcar(i) {
+    sel = i;
+    var rows = $("#list").children;
+    for (var k = 0; k < rows.length; k++) rows[k].classList.toggle("sel", k === i);
+    if (rows[i]) rows[i].scrollIntoView({ block: "nearest" });
+  }
+  function sortear() {
+    var pool = list.filter(function (g) { return st[g.url] !== false; });
+    if (!pool.length) pool = list;
+    if (!pool.length) { toast("Não há jogos para sortear aqui"); return; }
+    var g = pool[Math.floor(Math.random() * pool.length)];
+    sel = list.indexOf(g);
+    render();
+    var r = $("#list").children[sel];
+    r.scrollIntoView({ block: "center", behavior: reduce ? "auto" : "smooth" });
+    var go = r.querySelector(".go");
+    if (go) go.focus({ preventScroll: true });
+    toast("Sorteado: " + g.nome);
+  }
+
+  /* ---------- tema ---------- */
+  function temaAtual() {
+    var t = root.getAttribute("data-theme");
+    if (t === "light" || t === "dark") return t;
+    return window.matchMedia && matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  }
+  function corDaBarra() { return temaAtual() === "dark" ? "#17191b" : "#f4f6f7"; }
+  function definirCorDaBarra(c) {
+    var m = document.querySelector('meta[name="theme-color"]');
+    if (m) m.setAttribute("content", c);
+  }
+  function rotuloTema() { $("#tema").textContent = temaAtual() === "dark" ? "Tema claro" : "Tema escuro"; }
+  function alternarTema() {
+    var novo = temaAtual() === "dark" ? "light" : "dark";
+    root.setAttribute("data-theme", novo);
+    gravar("tema", novo);
+    rotuloTema();
+    definirCorDaBarra(corDaBarra());
+  }
+
+  /* ---------- modo privacidade ("boss key") ----------
+     Esc ou o botão do canto escondem tudo e mostram uma tela em branco com um indicador estático.
+     Para voltar: Esc de novo, ou dois toques/cliques seguidos no canto inferior direito da tela. */
+  var oculta = false, yGuardado = 0, tituloGuardado = document.title, toqueAnterior = 0;
+  function ocultar(ligar) {
+    if (ligar === undefined) ligar = !oculta;
+    if (ligar === oculta) return;
+    oculta = ligar;
+    if (ligar) {
+      yGuardado = window.scrollY;
+      tituloGuardado = document.title;
+      if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+      root.classList.add("boss-on");
+      document.title = "Documento sem título";
+      definirCorDaBarra("#ffffff");
+    } else {
+      root.classList.remove("boss-on");
+      document.title = tituloGuardado;
+      definirCorDaBarra(corDaBarra());
+      window.scrollTo(0, yGuardado);
+    }
+  }
+
+  /* ---------- eventos ---------- */
+  $("#list").addEventListener("click", function (e) {
+    var b = e.target.closest("[data-a]");
+    if (!b) return;
+    var g = byName[b.closest(".row").dataset.nome], a = b.dataset.a;
+    if (a === "go") jogou(g);
+    else if (a === "fav") favoritar(g.nome);
+    else if (a === "cp") copiar(g.url);
+  });
+  $("#tabs").addEventListener("click", function (e) {
+    var b = e.target.closest("button");
+    if (!b) return;
+    cat = b.dataset.k; sel = -1;
+    tabs(); render(); salvarHash();
+  });
+  $("#q").addEventListener("input", function (e) { q = e.target.value; sel = -1; render(); salvarHash(); });
+  $("#ord").addEventListener("click", function () {
+    sort = sort === "plays" ? "az" : "plays";
+    gravar("ord", sort); render(); salvarHash();
+  });
+  $("#ref").addEventListener("click", function () { toast("Verificando os jogos"); check(true); });
+  $("#tema").addEventListener("click", alternarTema);
+  $("#sorteio").addEventListener("click", sortear);
+  $("#last").addEventListener("click", function () { if (last) ping(last.nome); });
+  $("#avisoX").addEventListener("click", function () {
+    root.setAttribute("data-aviso", "off");
+    try { sessionStorage.setItem("aviso", "off"); } catch (e) {}
+  });
+  window.addEventListener("hashchange", function () { lerHash(); $("#q").value = q; tabs(); render(); });
+  $("#boss").addEventListener("click", function () { ocultar(true); });
+  $("#hot").addEventListener("click", function () {
+    var agora = Date.now();
+    if (agora - toqueAnterior < 450) { toqueAnterior = 0; ocultar(false); }
+    else toqueAnterior = agora;
+  });
+
+  document.addEventListener("keydown", function (e) {
+    // Esc vale em qualquer lugar, até dentro da busca
+    if (e.key === "Escape" || e.key === "Esc") {
+      e.preventDefault();
+      if (!e.repeat) ocultar();
+      return;
+    }
+    if (oculta || e.ctrlKey || e.metaKey || e.altKey) return;
+    var t = e.target, digitando = t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName);
+    if (digitando) { if (e.key === "Enter") t.blur(); return; }
+    var k = e.key;
+    if (k === "/") { e.preventDefault(); $("#q").focus(); }
+    else if (k === "j" || k === "ArrowDown") { if (list.length) { e.preventDefault(); marcar(sel < 0 ? 0 : Math.min(list.length - 1, sel + 1)); } }
+    else if (k === "k" || k === "ArrowUp") { if (list.length) { e.preventDefault(); marcar(sel < 0 ? list.length - 1 : Math.max(0, sel - 1)); } }
+    else if (k === "Enter") {
+      if (sel >= 0 && document.activeElement === document.body) { var go = $("#list").children[sel].querySelector(".go"); if (go) go.click(); }
+    }
+    else if (k === "f") { if (sel >= 0 && list[sel]) favoritar(list[sel].nome); else toast("Escolha um jogo com j ou k antes"); }
+    else if (k === "r") sortear();
+  });
+
+  /* ---------- início ---------- */
+  $("#q").value = q;
+  rotuloTema();
+  tabs(); render(); mostrarUltimo(); live();
+  check(); ping();
+  setInterval(function () { ping(); }, 30000);
+  setInterval(function () { check(); }, 300000);
+})();

@@ -12,12 +12,23 @@ var JOGOS=[
 {nome:"Quake 3",categoria:"FPS",url:"https://q3.pieter.com",desc:"Arena rápida contra bots"},
 {nome:"Return to Castle Wolfenstein",categoria:"FPS",url:"https://rtcw.pieter.com",desc:"Nazistas, ocultismo e muito tiro"},
 {nome:"Unreal Tournament",categoria:"FPS",url:"https://ut.pieter.com",desc:"Arena clássica de 1999"},
+{nome:"ULTRAKILL",categoria:"FPS",url:"https://cake-logic.itch.io/ultrakill-web-port",desc:"Tiro frenético em que o sangue recupera sua vida"},
+{nome:"FNAF 1",categoria:"Terror",url:"https://dorukyum.github.io/FNAF-Web/",desc:"Vigie as câmeras e sobreviva à noite"},
+{nome:"FNAF 2",categoria:"Terror",url:"https://fivenightsatfreddysonline.github.io/",desc:"Máscara, lanterna e uma sala sem portas"},
+{nome:"FNAF 4",categoria:"Terror",url:"https://ubg365.github.io/fnaf-4/",desc:"Terror no quarto de uma criança, guiado pelo som"},
+{nome:"Granny: Chapter 3",categoria:"Terror",url:"https://horror-games-hub.vercel.app/games/granny3/",desc:"Fuja sem fazer barulho"},
+{nome:"Buckshot Roulette",categoria:"Terror",url:"https://funny-school.github.io/game/buckshotroulette/",desc:"Roleta-russa com escopeta contra um crupiê"},
 {nome:"Skate 3",categoria:"Skate",url:"https://skate.aaddpp.lol",desc:"Manobras em Port Carverton"},
 {nome:"Skate Rust",categoria:"Skate",url:"https://global-terror.net",desc:"Skate com visual cru"},
 {nome:"GTA Vice City",categoria:"Aventura",url:"https://joncodeofficial.github.io/gta-vice-city-wasm/",desc:"Miami dos anos 80"},
+{nome:"GTA V",categoria:"Aventura",url:"https://gta.deloskiyt.pl/",desc:"Los Santos em mundo aberto"},
 {nome:"The Simpsons: Hit & Run",categoria:"Aventura",url:"https://shar-wasm.cjoseph.workers.dev/?skipmovie",desc:"Springfield em mundo aberto"},
+{nome:"Pizza Tower",categoria:"Plataforma",url:"https://classroomlesson.github.io/basic-ruffle-player/html/pizza_tower/index.html",desc:"Plataforma de corrida com combos e visual de desenho animado"},
 {nome:"PES 6",categoria:"Esporte",url:"https://pes6.optijuegos.net",desc:"Futebol clássico"},
+{nome:"Retro Bowl",categoria:"Esporte",url:"https://ubghyper.github.io/retro-bowl/",desc:"Futebol americano em pixel art, você é técnico e jogador"},
 {nome:"Diablo",categoria:"RPG",url:"https://johnimril.github.io/diablo_web/",desc:"Desça até o inferno"},
+{nome:"Command & Conquer: Red Alert 2",categoria:"Estratégia",url:"https://chronodivide.com",desc:"Estratégia em tempo real: Aliados contra Soviéticos"},
+{nome:"Balatro",categoria:"Estratégia",url:"https://outblade.github.io/balatro-web/",desc:"Pôquer com coringas que mudam as regras"},
 {nome:"Hedgewars",categoria:"Estratégia",url:"https://webwars.link",desc:"Ouriços com bazuca por turnos"}
 ];
 if(typeof module!=="undefined")module.exports=JOGOS;else window.GAMES=JOGOS;

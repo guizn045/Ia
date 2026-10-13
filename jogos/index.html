@@ -3,47 +3,75 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Jogos no Navegador</title>
-<meta name="description" content="Clássicos que rodam direto no navegador. Um link só, sem instalar nada.">
-<meta name="theme-color" content="#08070f">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=Manrope:wght@400;600&display=swap">
+<meta name="color-scheme" content="light dark">
+<title>Jogos no navegador</title>
+<meta name="description" content="Jogos clássicos que abrem direto no navegador, reunidos em uma lista simples.">
+<meta name="theme-color" content="#f4f6f7">
+<script>
+/* Roda antes da página aparecer, para não piscar o tema errado nem o aviso já dispensado. */
+try{var t=JSON.parse(localStorage.getItem("tema"));if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}
+try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttribute("data-aviso","off")}catch(e){}
+</script>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<main>
-  <section class="hero">
-    <div class="intro">
-      <p class="brand">Jogos no Navegador</p>
-      <h1>Clássicos para jogar agora, sem instalar nada.</h1>
-      <div class="search">
-        <input id="q" type="search" placeholder="Buscar jogo ou categoria" autocomplete="off" aria-label="Buscar jogo">
-        <kbd>/</kbd>
-      </div>
+
+<div id="app" class="app">
+
+  <!-- Aviso no topo. Para remover de vez, apague este bloco inteiro. -->
+  <div id="aviso" class="alert" role="status">
+    <div class="wrap">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>
+      <p><strong>Atualização recorrente no sistema operacional da plataforma.</strong> Melhorias de desempenho estão sendo aplicadas de forma contínua no servidor. Durante esse período, alguns recursos podem responder com lentidão.</p>
+      <button id="avisoX" type="button" aria-label="Dispensar aviso">&times;</button>
     </div>
-    <div class="board" aria-live="polite">
-      <div class="live" id="live"><i></i>Jogando agora</div>
-      <div class="big" id="on">–</div>
-      <dl>
-        <div><dt>Partidas</dt><dd id="tot">–</dd></div>
-        <div><dt>Jogos</dt><dd id="cnt">0</dd></div>
-        <div><dt>Online</dt><dd id="up">–</dd></div>
-      </dl>
-    </div>
-  </section>
-  <nav id="chips" aria-label="Categorias"></nav>
-  <div class="bar">
-    <span id="n"></span>
-    <span class="tools">
-      <select id="sort" aria-label="Ordenar"><option value="plays">Mais jogados</option><option value="az">A–Z</option></select>
-      <button id="ref" type="button">Verificar status</button>
-    </span>
   </div>
-  <div id="grid"></div>
-</main>
-<footer>Todos os jogos pertencem aos seus detentores. Este site só reúne links para sites externos de terceiros e não hospeda nenhum jogo.</footer>
-<div id="toast" role="status"></div>
+
+  <header class="top">
+    <div class="wrap">
+      <h1>Jogos no navegador</h1>
+      <p class="sub">Jogos clássicos que abrem direto na aba. Sem instalar nada e sem criar conta.</p>
+      <p id="live" class="live" aria-live="polite"><span>Carregando…</span></p>
+      <a id="last" class="last" href="#" target="_blank" rel="noopener" hidden></a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <div class="search">
+      <input id="q" type="search" placeholder="Buscar jogo" autocomplete="off" aria-label="Buscar jogo">
+      <kbd aria-hidden="true">/</kbd>
+    </div>
+    <nav id="tabs" class="tabs" aria-label="Categorias"></nav>
+
+    <div class="bar">
+      <span id="count" aria-live="polite"></span>
+      <span class="tools">
+        <button id="ord" type="button"></button>
+        <button id="ref" type="button">Verificar status</button>
+        <button id="tema" type="button"></button>
+        <button id="sorteio" type="button" class="outline">Sortear</button>
+      </span>
+    </div>
+
+    <ul id="list" class="list"></ul>
+    <noscript><p class="none">Ative o JavaScript para ver a lista de jogos.</p></noscript>
+
+    <footer>
+      <p>Os jogos pertencem aos seus detentores. Este site só reúne links para sites de terceiros e não hospeda nenhum jogo.</p>
+      <p class="keys"><b>/</b> buscar &nbsp; <b>j</b> <b>k</b> mover &nbsp; <b>Enter</b> abrir &nbsp; <b>f</b> favoritar &nbsp; <b>r</b> sortear &nbsp; <b>Esc</b> ocultar a página</p>
+    </footer>
+  </main>
+
+  <div id="toast" role="status"></div>
+</div>
+
+<!-- Tela de privacidade: aparece no lugar de tudo acima quando a página é ocultada (Esc ou botão). -->
+<div id="blank" class="blank" aria-hidden="true"><div class="ring"></div><p>Carregando…</p></div>
+<div id="hot" class="hot" aria-hidden="true"></div>
+<button id="boss" class="boss" type="button" aria-label="Ocultar página (Esc)">
+  <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a14 14 0 0 1-2.6 3.3M6.6 6.7A14.5 14.5 0 0 0 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.8-.4 4-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
+</button>
+
 <script src="games.js"></script>
 <script src="app.js"></script>
 </body>
