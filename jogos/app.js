@@ -27,6 +27,7 @@
   var favs = new Set(Array.isArray(favLista) ? favLista : []);
   var last = ler("last", null);
   var cat = "Todos", q = "", sel = -1, list = [], sort = "plays";
+  var semArte = {}; // jogos cuja imagem de capa não carregou (voltam para a capa gerada)
 
   // filtros na URL: #c=Terror&q=quake&o=az (dá para mandar o link já filtrado)
   function lerHash() {
@@ -129,17 +130,19 @@
 
     var h = "";
     list.forEach(function (g, i) {
-      var s = statusDe(g), off = st[g.url] === false, fav = favs.has(g.nome);
+      var s = statusDe(g), off = st[g.url] === false, fav = favs.has(g.nome), img = g.img && !semArte[g.nome];
       h += '<li class="row' + (off ? " off" : "") + (i === sel ? " sel" : "") + '" data-nome="' + esc(g.nome) + '">' +
-        '<div class="cover" style="' + capa(g) + '"><span class="mono" aria-hidden="true">' + inicial(g) + "</span>" +
+        '<div class="cover' + (img ? " has-img" : "") + '" style="' + capa(g) + '">' +
+        (img ? '<img class="art" src="' + esc(g.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">' : "") +
+        '<span class="mono" aria-hidden="true">' + inicial(g) + "</span>" +
         '<span class="cat">' + esc(g.categoria) + "</span>" +
         '<button type="button" class="fav" data-a="fav" aria-pressed="' + fav + '" aria-label="' + (fav ? "Tirar dos favoritos: " : "Favoritar: ") + esc(g.nome) + '">' + ESTRELA(fav) + "</button>" +
-        "<h2>" + esc(g.nome) + "</h2></div>" +
-        '<div class="body"><p>' + esc(g.desc || "") + "</p>" +
+        "</div>" +
+        '<div class="body"><h2>' + esc(g.nome) + "</h2><p>" + esc(g.desc || "") + "</p>" +
         '<div class="meta"><span class="st ' + s[0] + '"><i></i>' + s[1] + "</span>" +
         '<span class="pl">' + fmtPlays(plays[g.nome] || 0) + "</span></div>" +
         '<div class="acts">' +
-        '<a class="go" data-a="go" href="' + esc(g.url) + '" target="_blank" rel="noopener">' + (off ? "Tentar mesmo" : "Jogar") + "</a>" +
+        '<a class="go" data-a="go" href="' + esc(g.url) + '" target="_blank" rel="noopener">' + (off ? "Tentar" : "Jogar") + "</a>" +
         '<button type="button" class="cp" data-a="cp" title="Copiar link" aria-label="Copiar link de ' + esc(g.nome) + '">' + ICONE_LINK + "</button>" +
         "</div></div></li>";
     });
@@ -169,7 +172,7 @@
       e.className = "st " + s[0];
       e.innerHTML = "<i></i>" + s[1];
       r.querySelector(".pl").textContent = fmtPlays(plays[g.nome] || 0);
-      r.querySelector(".go").textContent = off ? "Tentar mesmo" : "Jogar";
+      r.querySelector(".go").textContent = off ? "Tentar" : "Jogar";
     }
   }
 
@@ -304,6 +307,14 @@
     else if (a === "fav") favoritar(g.nome);
     else if (a === "cp") copiar(g.url);
   });
+  // se a imagem de capa não carregar, volta para a capa gerada (o evento "error" não sobe, por isso a captura)
+  $("#list").addEventListener("error", function (e) {
+    var im = e.target;
+    if (!im || im.className !== "art") return;
+    var r = im.closest(".row");
+    if (r) { semArte[r.dataset.nome] = true; r.querySelector(".cover").classList.remove("has-img"); }
+    im.remove();
+  }, true);
   $("#tabs").addEventListener("click", function (e) {
     var b = e.target.closest("button");
     if (!b) return;

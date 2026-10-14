@@ -20,6 +20,8 @@ Em `games.js`, copie uma linha e mude os campos:
 {nome:"Nome do jogo",categoria:"FPS",url:"https://exemplo.com",desc:"Descrição curta"},
 ```
 
+Para pôr uma imagem de capa, acrescente `img:"endereço-da-imagem"` na linha (ou coloque um arquivo de imagem na pasta e use `img:"capa-nome.jpg"`). Sem `img`, ou se a imagem não carregar, o site gera uma capa colorida pela categoria. As capas atuais vêm das imagens oficiais da Steam.
+
 Uma categoria nova aparece sozinha nas abas. O contador de partidas só conta jogos que estão em `games.js`.
 
 ## Modo de privacidade
