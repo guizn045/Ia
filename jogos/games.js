@@ -1,6 +1,7 @@
 // LISTA DE JOGOS. Para adicionar, copie uma linha e troque os dados.
 // "img" é opcional: endereço de uma imagem de capa. Sem "img" (ou se a imagem não carregar), o site gera uma capa colorida.
-// Dá para usar um arquivo seu: coloque a imagem na pasta e escreva img:"capa-nome.jpg".
+// Dá para usar um arquivo seu: coloque a imagem na pasta "capas" e escreva img:"capas/nome.jpg".
+// "pos" é opcional e escolhe qual parte da imagem aparece (ex.: pos:"50% 20%" mostra mais o topo).
 var S="https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/";
 var JOGOS=[
 {nome:"BO1 Zombies",categoria:"FPS",url:"https://vel.gg/bo1z",desc:"Zumbis do Black Ops 1",img:S+"42700/header.jpg"},
@@ -19,19 +20,19 @@ var JOGOS=[
 {nome:"FNAF 1",categoria:"Terror",url:"https://dorukyum.github.io/FNAF-Web/",desc:"Vigie as câmeras e sobreviva à noite",img:S+"319510/header.jpg"},
 {nome:"FNAF 2",categoria:"Terror",url:"https://fivenightsatfreddysonline.github.io/",desc:"Máscara, lanterna e uma sala sem portas",img:S+"332800/header.jpg"},
 {nome:"FNAF 4",categoria:"Terror",url:"https://ubg365.github.io/fnaf-4/",desc:"Terror no quarto de uma criança, guiado pelo som",img:S+"388090/header.jpg"},
-{nome:"Granny: Chapter 3",categoria:"Terror",url:"https://horror-games-hub.vercel.app/games/granny3/",desc:"Fuja sem fazer barulho"},
+{nome:"Granny: Chapter 3",categoria:"Terror",url:"https://horror-games-hub.vercel.app/games/granny3/",desc:"Fuja sem fazer barulho",img:"capas/granny-3.jpg",pos:"50% 12%"},
 {nome:"Buckshot Roulette",categoria:"Terror",url:"https://funny-school.github.io/game/buckshotroulette/",desc:"Roleta-russa com escopeta contra um crupiê",img:S+"2835570/header.jpg"},
-{nome:"Skate 3",categoria:"Skate",url:"https://skate.aaddpp.lol",desc:"Manobras em Port Carverton"},
+{nome:"Skate 3",categoria:"Skate",url:"https://skate.aaddpp.lol",desc:"Manobras em Port Carverton",img:"capas/skate-3.jpg",pos:"50% 35%"},
 {nome:"Skate Rust",categoria:"Skate",url:"https://global-terror.net",desc:"Skate com visual cru"},
 {nome:"GTA Vice City",categoria:"Aventura",url:"https://joncodeofficial.github.io/gta-vice-city-wasm/",desc:"Miami dos anos 80",img:S+"12110/header.jpg"},
 {nome:"GTA V",categoria:"Aventura",url:"https://gta.deloskiyt.pl/",desc:"Los Santos em mundo aberto",img:S+"271590/header.jpg"},
-{nome:"The Simpsons: Hit & Run",categoria:"Aventura",url:"https://shar-wasm.cjoseph.workers.dev/?skipmovie",desc:"Springfield em mundo aberto"},
+{nome:"The Simpsons: Hit & Run",categoria:"Aventura",url:"https://shar-wasm.cjoseph.workers.dev/?skipmovie",desc:"Springfield em mundo aberto",img:"capas/simpsons-hit-and-run.jpg",pos:"50% 30%"},
 {nome:"Pizza Tower",categoria:"Plataforma",url:"https://classroomlesson.github.io/basic-ruffle-player/html/pizza_tower/index.html",desc:"Plataforma de corrida com combos e visual de desenho animado",img:S+"2231450/header.jpg"},
-{nome:"PES 6",categoria:"Esporte",url:"https://pes6.optijuegos.net",desc:"Futebol clássico"},
-{nome:"Retro Bowl",categoria:"Esporte",url:"https://ubghyper.github.io/retro-bowl/",desc:"Futebol americano em pixel art, você é técnico e jogador"},
+{nome:"PES 6",categoria:"Esporte",url:"https://pes6.optijuegos.net",desc:"Futebol clássico",img:"capas/pes-6.jpg",pos:"50% 62%"},
+{nome:"Retro Bowl",categoria:"Esporte",url:"https://ubghyper.github.io/retro-bowl/",desc:"Futebol americano em pixel art, você é técnico e jogador",img:"capas/retro-bowl.jpg",pos:"50% 40%"},
 {nome:"Diablo",categoria:"RPG",url:"https://johnimril.github.io/diablo_web/",desc:"Desça até o inferno",img:"https://johnimril.github.io/diablo_web/og-image.png"},
 {nome:"Command & Conquer: Red Alert 2",categoria:"Estratégia",url:"https://chronodivide.com",desc:"Estratégia em tempo real: Aliados contra Soviéticos",img:S+"2229850/header.jpg"},
 {nome:"Balatro",categoria:"Estratégia",url:"https://outblade.github.io/balatro-web/",desc:"Pôquer com coringas que mudam as regras",img:S+"2379780/7a85430784e4d613cdb0547414d8cf16ffa45747/header.jpg"},
-{nome:"Hedgewars",categoria:"Estratégia",url:"https://webwars.link",desc:"Ouriços com bazuca por turnos"}
+{nome:"Hedgewars",categoria:"Estratégia",url:"https://webwars.link",desc:"Ouriços com bazuca por turnos",img:"capas/hedgewars.jpg",pos:"50% 40%"}
 ];
 if(typeof module!=="undefined")module.exports=JOGOS;else window.GAMES=JOGOS;

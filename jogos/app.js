@@ -133,7 +133,7 @@
       var s = statusDe(g), off = st[g.url] === false, fav = favs.has(g.nome), img = g.img && !semArte[g.nome];
       h += '<li class="row' + (off ? " off" : "") + (i === sel ? " sel" : "") + '" data-nome="' + esc(g.nome) + '">' +
         '<div class="cover' + (img ? " has-img" : "") + '" style="' + capa(g) + '">' +
-        (img ? '<img class="art" src="' + esc(g.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer">' : "") +
+        (img ? '<img class="art" src="' + esc(g.img) + '" alt="" loading="lazy" decoding="async" referrerpolicy="no-referrer"' + (g.pos ? ' style="object-position:' + esc(g.pos) + '"' : "") + ">" : "") +
         '<span class="mono" aria-hidden="true">' + inicial(g) + "</span>" +
         '<span class="cat">' + esc(g.categoria) + "</span>" +
         '<button type="button" class="fav" data-a="fav" aria-pressed="' + fav + '" aria-label="' + (fav ? "Tirar dos favoritos: " : "Favoritar: ") + esc(g.nome) + '">' + ESTRELA(fav) + "</button>" +
