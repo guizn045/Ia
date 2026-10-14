@@ -29,8 +29,8 @@ var JOGOS=[
 {nome:"Pizza Tower",categoria:"Plataforma",url:"https://classroomlesson.github.io/basic-ruffle-player/html/pizza_tower/index.html",desc:"Plataforma de corrida com combos e visual de desenho animado",img:S+"2231450/header.jpg"},
 {nome:"PES 6",categoria:"Esporte",url:"https://pes6.optijuegos.net",desc:"Futebol clássico"},
 {nome:"Retro Bowl",categoria:"Esporte",url:"https://ubghyper.github.io/retro-bowl/",desc:"Futebol americano em pixel art, você é técnico e jogador"},
-{nome:"Diablo",categoria:"RPG",url:"https://johnimril.github.io/diablo_web/",desc:"Desça até o inferno"},
-{nome:"Command & Conquer: Red Alert 2",categoria:"Estratégia",url:"https://chronodivide.com",desc:"Estratégia em tempo real: Aliados contra Soviéticos"},
+{nome:"Diablo",categoria:"RPG",url:"https://johnimril.github.io/diablo_web/",desc:"Desça até o inferno",img:"https://johnimril.github.io/diablo_web/og-image.png"},
+{nome:"Command & Conquer: Red Alert 2",categoria:"Estratégia",url:"https://chronodivide.com",desc:"Estratégia em tempo real: Aliados contra Soviéticos",img:S+"2229850/header.jpg"},
 {nome:"Balatro",categoria:"Estratégia",url:"https://outblade.github.io/balatro-web/",desc:"Pôquer com coringas que mudam as regras",img:S+"2379780/7a85430784e4d613cdb0547414d8cf16ffa45747/header.jpg"},
 {nome:"Hedgewars",categoria:"Estratégia",url:"https://webwars.link",desc:"Ouriços com bazuca por turnos"}
 ];
