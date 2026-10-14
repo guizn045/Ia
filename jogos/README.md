@@ -48,3 +48,6 @@ Dá para mandar o link já filtrado: `#c=Terror`, `#q=quake`, `#o=az` (e combina
 2. Para o placar e as partidas funcionarem: no projeto, em **Storage** (ou Marketplace), adicione **Upstash Redis**, conecte ao projeto e faça um **Redeploy**.
 
 Sem o Redis o site funciona normalmente, só não mostra "jogando agora" e as partidas. Em hospedagem sem funções (GitHub Pages), o status é testado no navegador de cada pessoa e o placar fica desligado.
+
+## Player de música (Spotify)
+Botão "Música" no canto inferior esquerdo. As playlists ficam em `musica.js`: para adicionar, copie uma linha e troque o `id` (trecho final do link `open.spotify.com/playlist/ID`). O player é o oficial incorporado do Spotify; músicas inteiras só tocam se a pessoa estiver logada no Spotify no navegador (senão, trechos de 30 s). No modo de privacidade (Esc) o som é cortado.

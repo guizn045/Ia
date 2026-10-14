@@ -72,7 +72,23 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a14 14 0 0 1-2.6 3.3M6.6 6.7A14.5 14.5 0 0 0 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.8-.4 4-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
 </button>
 
+<!-- Player de música: fica fora do #app. -->
+<div id="mp" class="mp">
+  <button id="mpBtn" class="mpbtn" type="button" aria-expanded="false" aria-controls="mpPanel" aria-label="Música">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 18V5l11-2v13"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="17.5" cy="16" r="2.5"/></svg>
+    <span>Música</span>
+  </button>
+  <section id="mpPanel" class="mppanel" aria-label="Player de música">
+    <header><strong>Música para jogar</strong><button id="mpX" type="button" aria-label="Fechar">&times;</button></header>
+    <div id="mpList" class="mplist"></div>
+    <div id="mpEmbed" class="mpembed"></div>
+    <p class="mpnote">Toque em play. Para ouvir as músicas inteiras, entre na sua conta do Spotify neste navegador; sem login tocam trechos de 30 segundos. A música toca nesta aba, então deixe-a aberta e abra o jogo em outra. <a id="mpOpen" href="#" target="_blank" rel="noopener" hidden>Abrir no Spotify</a></p>
+  </section>
+</div>
+
 <script src="games.js"></script>
+<script src="musica.js"></script>
 <script src="app.js"></script>
+<script src="player.js"></script>
 </body>
 </html>
