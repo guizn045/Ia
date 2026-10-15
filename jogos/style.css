@@ -164,3 +164,11 @@ html.boss-on .blank,html.boss-on .hot{display:block}
 .mpnote a{color:var(--acc)}
 html.boss-on .mp{display:none}
 @media(max-width:599px){.mp{bottom:66px}}
+/* Modo discreto (tecla D) */
+.veu{position:fixed;inset:0;z-index:900;pointer-events:none;display:none;--x:50vw;--y:30vh;
+ -webkit-backdrop-filter:blur(7px) brightness(.42) contrast(.55) saturate(.6) hue-rotate(150deg);
+ backdrop-filter:blur(7px) brightness(.42) contrast(.55) saturate(.6) hue-rotate(150deg);
+ -webkit-mask-image:radial-gradient(circle 150px at var(--x) var(--y),transparent 0,transparent 55%,#000 100%);
+ mask-image:radial-gradient(circle 150px at var(--x) var(--y),transparent 0,transparent 55%,#000 100%)}
+html.discreto .veu{display:block}
+html.boss-on .veu{display:none!important}

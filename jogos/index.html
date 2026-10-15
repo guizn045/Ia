@@ -58,7 +58,7 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
 
     <footer>
       <p>Os jogos pertencem aos seus detentores. Este site só reúne links para sites de terceiros e não hospeda nenhum jogo.</p>
-      <p class="keys"><b>/</b> buscar &nbsp; <b>j</b> <b>k</b> mover &nbsp; <b>Enter</b> abrir &nbsp; <b>f</b> favoritar &nbsp; <b>r</b> sortear &nbsp; <b>Esc</b> ocultar a página</p>
+      <p class="keys"><b>/</b> buscar &nbsp; <b>j</b> <b>k</b> mover &nbsp; <b>Enter</b> abrir &nbsp; <b>f</b> favoritar &nbsp; <b>r</b> sortear &nbsp; <b>D</b> modo discreto &nbsp; <b>Esc</b> ocultar a página</p>
     </footer>
   </main>
 
@@ -67,6 +67,7 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
 
 <!-- Tela de privacidade: aparece no lugar de tudo acima quando a página é ocultada (Esc ou botão). -->
 <div id="blank" class="blank" aria-hidden="true"><div class="ring"></div><p>Carregando…</p></div>
+<div id="veu" class="veu" aria-hidden="true"></div>
 <div id="hot" class="hot" aria-hidden="true"></div>
 <button id="boss" class="boss" type="button" aria-label="Ocultar página (Esc)">
   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 3l18 18"/><path d="M10.6 6.2A9.8 9.8 0 0 1 12 6c5 0 8.5 4 9.5 6a14 14 0 0 1-2.6 3.3M6.6 6.7A14.5 14.5 0 0 0 2.5 12c1 2 4.5 6 9.5 6 1.5 0 2.8-.4 4-1"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/></svg>
@@ -90,5 +91,6 @@ try{if(sessionStorage.getItem("aviso")==="off")document.documentElement.setAttri
 <script src="musica.js"></script>
 <script src="app.js"></script>
 <script src="player.js"></script>
+<script src="discreto.js"></script>
 </body>
 </html>

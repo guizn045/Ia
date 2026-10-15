@@ -51,3 +51,6 @@ Sem o Redis o site funciona normalmente, só não mostra "jogando agora" e as pa
 
 ## Player de música (Spotify)
 Botão "Música" no canto inferior esquerdo. As playlists ficam em `musica.js`: para adicionar, copie uma linha e troque o `id` (trecho final do link `open.spotify.com/playlist/ID`). O player é o oficial incorporado do Spotify; músicas inteiras só tocam se a pessoa estiver logada no Spotify no navegador (senão, trechos de 30 s). No modo de privacidade (Esc) o som é cortado.
+
+## Modo discreto
+Tecla `D` liga e desliga: a tela fica escura, embaçada e com cores trocadas, e só um círculo em volta do mouse (ou do dedo) fica nítido. Arquivo: `discreto.js` + bloco "Modo discreto" no `style.css`. O Esc (ocultar a página) continua valendo por cima.
