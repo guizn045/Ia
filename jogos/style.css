@@ -172,3 +172,6 @@ html.boss-on .mp{display:none}
  mask-image:radial-gradient(circle 150px at var(--x) var(--y),transparent 0,transparent 55%,#000 100%)}
 html.discreto .veu{display:block}
 html.boss-on .veu{display:none!important}
+.disc{bottom:calc(env(safe-area-inset-bottom) + 62px)}
+.disc[aria-pressed="true"]{color:var(--acc);border-color:var(--acc);opacity:1}
+html.discreto .disc{z-index:1001}

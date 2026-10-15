@@ -11,13 +11,17 @@
   function mover(px, py) { x = px; y = py; if (!quadro) quadro = requestAnimationFrame(pos); }
   function ligar(on) {
     h.classList.toggle("discreto", on);
+    var b = document.getElementById("disc"); if (b) b.setAttribute("aria-pressed", on ? "true" : "false");
     pos();
     var t = document.getElementById("toast");
     if (t) { t.textContent = on ? "Modo discreto ligado (D para sair)" : "Modo discreto desligado"; t.classList.add("show"); clearTimeout(ligar.t); ligar.t = setTimeout(function () { t.classList.remove("show"); }, 1500); }
   }
-  addEventListener("mousemove", function (e) { mover(e.clientX, e.clientY); }, { passive: true });
-  addEventListener("touchstart", function (e) { var p = e.touches[0]; mover(p.clientX, p.clientY); }, { passive: true });
-  addEventListener("touchmove", function (e) { var p = e.touches[0]; mover(p.clientX, p.clientY); }, { passive: true });
+  var tt = 0;
+  addEventListener("mousemove", function (e) { if (Date.now() - tt < 800) return; mover(e.clientX, e.clientY); }, { passive: true });
+  addEventListener("touchstart", function (e) { tt = Date.now(); var p = e.touches[0]; mover(p.clientX, p.clientY - 80); }, { passive: true });
+  addEventListener("touchmove", function (e) { tt = Date.now(); var p = e.touches[0]; mover(p.clientX, p.clientY - 80); }, { passive: true });
+  var bt = document.getElementById("disc");
+  if (bt) bt.addEventListener("click", function () { ligar(!h.classList.contains("discreto")); });
   document.addEventListener("keydown", function (e) {
     if ((e.key !== "d" && e.key !== "D") || e.ctrlKey || e.metaKey || e.altKey || e.repeat) return;
     var t = e.target; if (t && /^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName)) return;
