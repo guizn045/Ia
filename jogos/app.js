@@ -76,7 +76,7 @@
   var ICONE_LINK = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>';
 
   /* capa de cada jogo: cor pela categoria, com uma pequena variação pelo nome */
-  var MATIZ = { "FPS": 8, "Terror": 350, "Skate": 195, "Aventura": 32, "Esporte": 150, "RPG": 22, "Estratégia": 262, "Plataforma": 330 };
+  var MATIZ = { "FPS": 8, "Terror": 350, "Skate": 195, "Aventura": 32, "Esporte": 150, "RPG": 22, "Estratégia": 262, "Plataforma": 330, "Corrida": 48 };
   function hash(s) { var h = 0; for (var i = 0; i < s.length; i++) h = (h * 31 + s.charCodeAt(i)) >>> 0; return h; }
   function capa(g) {
     var n = hash(g.nome), h = MATIZ[g.categoria];

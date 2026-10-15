@@ -33,6 +33,11 @@ var JOGOS=[
 {nome:"Diablo",categoria:"RPG",url:"https://johnimril.github.io/diablo_web/",desc:"Desça até o inferno",img:"https://johnimril.github.io/diablo_web/og-image.png"},
 {nome:"Command & Conquer: Red Alert 2",categoria:"Estratégia",url:"https://chronodivide.com",desc:"Estratégia em tempo real: Aliados contra Soviéticos",img:S+"2229850/header.jpg"},
 {nome:"Balatro",categoria:"Estratégia",url:"https://outblade.github.io/balatro-web/",desc:"Pôquer com coringas que mudam as regras",img:S+"2379780/7a85430784e4d613cdb0547414d8cf16ffa45747/header.jpg"},
-{nome:"Hedgewars",categoria:"Estratégia",url:"https://webwars.link",desc:"Ouriços com bazuca por turnos",img:"capas/hedgewars.jpg",pos:"50% 40%"}
+{nome:"Hedgewars",categoria:"Estratégia",url:"https://webwars.link",desc:"Ouriços com bazuca por turnos",img:"capas/hedgewars.jpg",pos:"50% 40%"},
+{nome:"Top Speed Racing 3D",categoria:"Corrida",url:"https://topspeedracing3d.github.io/",desc:"Corrida 3D em alta velocidade"},
+{nome:"Night City Racing",categoria:"Corrida",url:"https://nightcityracing.github.io/",desc:"Corrida noturna pelas ruas da cidade"},
+{nome:"Traffic Jam 3D",categoria:"Corrida",url:"https://trafficjam3d.github.io/trafficjam3d/",desc:"Desvie do trânsito sem bater"},
+{nome:"PolyTrack",categoria:"Corrida",url:"https://polytrack.github.io/",desc:"Pistas low-poly cheias de rampas e loopings"},
+{nome:"Madalin Stunt Cars 3",categoria:"Corrida",url:"https://ubg365.github.io/madalin-stunt-cars-3/",desc:"Manobras e acrobacias com carros esportivos"}
 ];
 if(typeof module!=="undefined")module.exports=JOGOS;else window.GAMES=JOGOS;
