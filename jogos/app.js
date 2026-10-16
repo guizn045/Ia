@@ -59,7 +59,7 @@
   }
   function statusDe(g) {
     var s = st[g.url];
-    return s === undefined ? ["chk", "Verificando"] : s ? ["ok", "No ar"] : ["bad", "Fora do ar"];
+    return s === undefined ? ["chk", "Verificando"] : s === null ? ["chk", "Sem verificação"] : s ? ["ok", "No ar"] : ["bad", "Fora do ar"];
   }
   function toast(t) {
     var e = $("#toast");
