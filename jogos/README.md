@@ -54,3 +54,6 @@ Botão "Música" no canto inferior esquerdo. As playlists ficam em `musica.js`: 
 
 ## Modo discreto
 Tecla `D` (no celular, o botão redondo pontilhado acima do botão de ocultar) liga e desliga: a tela fica escura, embaçada e com cores trocadas, e só um círculo em volta do mouse (ou do dedo) fica nítido. Arquivo: `discreto.js` + bloco "Modo discreto" no `style.css`. O Esc (ocultar a página) continua valendo por cima.
+
+## Entrada interativa
+`intro.js`: fundo de partículas que reagem ao mouse/dedo (sempre ligado, para sozinho no modo de privacidade) e, uma vez por sessão, tela de abertura com 2 perguntas (categoria e música) que filtra o catálogo, abre o player e destaca uma sugestão. Links com filtro (`#c=...`) pulam a tela. Para desligar só a abertura, veja o comentário no topo do `intro.js`.

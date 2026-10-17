@@ -38,6 +38,7 @@
     panel.classList.toggle("open",v); btn.setAttribute("aria-expanded",v?"true":"false");
     if(v&&atual<0){var s=get(),i=0;for(var k=0;k<L.length;k++)if(L[k].id===s)i=k;escolher(i)}
   }
+  window.addEventListener("mp:abrir",function(){abrir(true)});
   btn.addEventListener("click",function(){abrir(!panel.classList.contains("open"))});
   close.addEventListener("click",function(){abrir(false)});
   // Modo de privacidade: corta o som e esconde o player; ao voltar, recarrega a playlist.
