@@ -201,3 +201,10 @@ html.boss-on .fx,html.boss-on .intro{display:none!important}
 .row.dica{animation:dica 1s ease-in-out 4}
 @keyframes dica{50%{box-shadow:0 0 0 3px var(--acc),0 0 28px rgba(61,242,166,.45)}}
 @media(prefers-reduced-motion:reduce){.intro h2.grande span,.intro .sub2,.intro .bt{animation:none;opacity:1;transform:none}.row.dica{animation:none;box-shadow:0 0 0 3px var(--acc)}.intro{transition:none}}
+/* Assinatura @Guiwy_045 */
+.tag{font-weight:700;background:linear-gradient(90deg,var(--mut) 0,var(--acc) 40%,#7ad7ff 60%,var(--mut) 100%);background-size:250% 100%;-webkit-background-clip:text;background-clip:text;color:transparent;-webkit-text-fill-color:transparent;animation:brilho 3.5s linear infinite}
+.by{margin:0}
+.intro .por{margin:-12px 0 26px;font-size:16px;color:var(--mut);opacity:0;animation:sobe .5s 1.1s forwards}
+.intro .por .tag{font-size:18px}
+@keyframes brilho{to{background-position:-250% 0}}
+@media(prefers-reduced-motion:reduce){.tag{animation:none;color:var(--acc);-webkit-text-fill-color:var(--acc);background:none}.intro .por{animation:none;opacity:1}}

@@ -100,7 +100,7 @@
       var t = "Jogos no navegador";
       html += '<p class="ola">Bem-vindo</p><h2 class="grande" aria-label="' + t + '">' +
         t.split("").map(function (c, i) { return '<span style="--i:' + i + '" aria-hidden="true">' + (c === " " ? "&nbsp;" : c) + "</span>"; }).join("") +
-        '</h2><p class="sub2">Clássicos direto na aba, sem instalar nada.</p>' +
+        '</h2><p class="sub2">Clássicos direto na aba, sem instalar nada.</p><p class="por">por <span class="tag">@Guiwy_045</span></p>' +
         '<button class="bt" type="button" data-a="entrar">Entrar</button>';
     } else if (passo === 1) {
       html += '<p class="ola">Pergunta 1 de 2</p><h2>O que você quer jogar hoje?</h2><div class="chips">' +
