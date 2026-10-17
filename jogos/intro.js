@@ -79,7 +79,6 @@
     if (filtro) {
       location.hash = "c=" + encodeURIComponent(filtro); // o catálogo já escuta a mudança do hash
     }
-    setTimeout(function () { dica(filtro); }, 60);
   }
   function dica(filtro) {
     var rows = [].slice.call(document.querySelectorAll("#list .row:not(.off)"));
@@ -112,7 +111,7 @@
         '<button type="button" data-a="musica" data-v="1">Sim, funk</button>' +
         '<button type="button" data-a="musica" data-v="0">Não, só jogar</button></div>';
     }
-    html += pontos() + "</div>";
+    html += "</div>";
     el.innerHTML = html;
     var b = el.querySelector(".bt, .chips button");
     if (b) b.focus({ preventScroll: true });
@@ -121,7 +120,7 @@
     var b = e.target.closest("button"); if (!b) return;
     var a = b.dataset.a;
     if (a === "pular") sair(null);
-    else if (a === "entrar") { passo = 1; desenhar(); }
+    else if (a === "entrar") sair(null);
     else if (a === "cat") { escolha = b.dataset.v || null; passo = 2; desenhar(); }
     else if (a === "musica") {
       if (b.dataset.v === "1") window.dispatchEvent(new Event("mp:abrir"));
