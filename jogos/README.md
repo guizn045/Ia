@@ -57,3 +57,9 @@ Tecla `D` (no celular, o botão redondo pontilhado acima do botão de ocultar) l
 
 ## Entrada interativa
 `intro.js`: fundo de partículas que reagem ao mouse/dedo (sempre ligado, para sozinho no modo de privacidade) e, uma vez por sessão, uma tela de abertura com o botão "Entrar" (ou "Pular"). Links com filtro (`#c=...`) pulam a tela. Para desligar a abertura, apague a linha `<script src="intro.js">` do `index.html` (o fundo também sai).
+
+## Backend e filtros (atualização)
+- `api/stats.js`: aceita só `id` válido, limita 10 envios por minuto por visitante (Redis) e responde 503 se o Redis cair; o site então esconde o contador.
+- `api/status.js`: guarda o último resultado no Redis e só marca "fora do ar" na 2ª falha seguida; cache de 5 min; falhas aparecem nos logs da Vercel.
+- `vercel.json`: cabeçalhos de segurança (impede abrir o site dentro de outro site, etc.).
+- Botões "Só no ar" (lembra a escolha) e "Compartilhar" (copia o link com o filtro atual) na barra da lista.

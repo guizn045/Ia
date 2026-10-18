@@ -26,7 +26,7 @@
   var favLista = ler("fav", []);
   var favs = new Set(Array.isArray(favLista) ? favLista : []);
   var last = ler("last", null);
-  var cat = "Todos", q = "", sel = -1, list = [], sort = "plays";
+  var cat = "Todos", q = "", sel = -1, list = [], sort = "plays", soNoAr = ler("so", false) === true;
   var semArte = {}; // jogos cuja imagem de capa não carregou (voltam para a capa gerada)
 
   // filtros na URL: #c=Terror&q=quake&o=az (dá para mandar o link já filtrado)
@@ -55,6 +55,7 @@
     });
   }
   function fmtPlays(p) {
+    if (!hasStats) return ""; // contador fora do ar: não mostra "Sem partidas" falso
     return p ? p.toLocaleString("pt-BR") + (p === 1 ? " partida" : " partidas") : "Sem partidas";
   }
   function statusDe(g) {
@@ -106,6 +107,7 @@
     var f = G.filter(function (g) {
       if (cat === "fav" && !favs.has(g.nome)) return false;
       if (cat !== "Todos" && cat !== "fav" && g.categoria !== cat) return false;
+      if (soNoAr && st[g.url] === false) return false;
       return !nq || norm(g.nome + " " + g.categoria + " " + (g.desc || "")).indexOf(nq) > -1;
     });
     f.sort(function (a, b) {
@@ -205,7 +207,11 @@
     return fetch("/api/stats", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ id: id, game: game }), keepalive: true })
       .then(function (r) { return r.json(); })
       .then(function (d) {
-        if (!d || !d.ok) return;
+        if (!d || !d.ok) { // Redis fora do ar ou limite: esconde o contador em vez de mostrar zero
+          if (d && d.why === "limite") return;
+          if (hasStats || online !== null) { hasStats = false; online = null; meta(); live(); }
+          return;
+        }
         plays = d.plays || {}; online = d.online; hasStats = true;
         if (!ping.f) { ping.f = 1; render(); } else meta(); // só reordena na primeira vez
         live();
@@ -227,7 +233,7 @@
             .then(function () { clearTimeout(t); });
         }));
       })
-      .then(function () { busy = false; $("#ref").disabled = false; meta(); live(); });
+      .then(function () { busy = false; $("#ref").disabled = false; meta(); live(); if (soNoAr) render(); });
   }
 
   /* ---------- ações ---------- */
@@ -328,6 +334,14 @@
   });
   $("#ref").addEventListener("click", function () { toast("Verificando os jogos"); check(true); });
   $("#sorteio").addEventListener("click", sortear);
+  function marcarSo() { var b = $("#so"); b.setAttribute("aria-pressed", soNoAr ? "true" : "false"); }
+  marcarSo();
+  $("#so").addEventListener("click", function () { soNoAr = !soNoAr; gravar("so", soNoAr); marcarSo(); sel = -1; render(); });
+  $("#share").addEventListener("click", function () {
+    var url = location.href;
+    if (navigator.share) navigator.share({ title: document.title, url: url }).catch(function () {});
+    else copiar(url);
+  });
   $("#last").addEventListener("click", function () { if (last) ping(last.nome); });
   $("#avisoX").addEventListener("click", function () {
     root.setAttribute("data-aviso", "off");

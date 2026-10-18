@@ -1,6 +1,6 @@
 // Verifica cada jogo. Valores: true = no ar, false = fora do ar, null = não deu para saber.
 // Só marca "fora do ar" com certeza: erro 404/5xx, página de "site não encontrado", ou página vazia.
-const G=require("../games.js");
+const G=require("../games.js"),redis=require("./_r");
 const MORTO=[/DEPLOYMENT_NOT_FOUND/i,/There isn.t a GitHub Pages site here/i,/Application failed to respond/i,/This domain (is|has been)/i,/domain (is )?for sale/i,/account (has been )?suspended/i,/Site not found/i,/no such app/i];
 const TITULO_RUIM=/\b(404|not found|error|suspended|expired|unavailable|bad gateway)\b/i;
 
@@ -26,10 +26,29 @@ async function checar(url){
   if(r==="erro"){await new Promise(a=>setTimeout(a,800));r=await uma(url)}
   return r==="erro"?false:r;            // falhou duas vezes (sem resposta): fora do ar
 }
+// Memória no Redis: um jogo só vira "fora do ar" depois de 2 checagens seguidas falhando.
+async function memoria(){
+  try{const r=await redis([["HGETALL","st_last"],["HGETALL","st_fail"]]);if(!r)return null;
+    const m=a=>{const o={};for(let i=0;a&&i<a.length;i+=2)o[a[i]]=a[i+1];return o};
+    return {last:m(r[0]),fail:m(r[1])};
+  }catch(e){console.error("status: Redis indisponível:",String(e.message).slice(0,80));return null}
+}
 module.exports=async(req,res)=>{
-  const out={};
-  await Promise.all(G.map(async g=>{out[g.url]=await checar(g.url)}));
-  res.setHeader("Cache-Control","s-maxage=120, stale-while-revalidate=600");
+  const out={},mem=await memoria(),cmd=[];
+  await Promise.all(G.map(async g=>{
+    const r=await checar(g.url);
+    let v=r;
+    if(r===false){
+      console.warn("status: sem resposta de",g.nome,g.url);
+      const falhas=(+(mem&&mem.fail[g.url])||0)+1;
+      if(mem){cmd.push(["HSET","st_fail",g.url,String(falhas)]);}
+      if(mem&&falhas<2&&mem.last[g.url]==="1")v=true; // 1ª falha: mantém "no ar" até confirmar
+    }else if(mem){cmd.push(["HSET","st_fail",g.url,"0"]);}
+    if(mem)cmd.push(["HSET","st_last",g.url,v===true?"1":v===false?"0":"n"]);
+    out[g.url]=v;
+  }));
+  if(cmd.length){try{await redis(cmd)}catch(e){}}
+  res.setHeader("Cache-Control","s-maxage=300, stale-while-revalidate=900");
   res.json(out);
 };
 module.exports.checar=checar;

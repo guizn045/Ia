@@ -208,3 +208,5 @@ html.boss-on .fx,html.boss-on .intro{display:none!important}
 .intro .por .tag{font-size:18px}
 @keyframes brilho{to{background-position:-250% 0}}
 @media(prefers-reduced-motion:reduce){.tag{animation:none;color:var(--acc);-webkit-text-fill-color:var(--acc);background:none}.intro .por{animation:none;opacity:1}}
+.tools button[aria-pressed="true"]{color:var(--acc)}
+@media(max-width:599px){.tools{justify-content:flex-start}}
