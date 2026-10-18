@@ -45,6 +45,7 @@ var JOGOS=[
 {nome:"S.T.A.L.K.E.R.: Shadow of Chernobyl",categoria:"FPS",url:"https://stalker-web.pages.dev",desc:"Explore a Zona de Exclusão de Chernobyl",img:S+"4500/header.jpg"},
 {nome:"Star Wars Jedi Academy",categoria:"FPS",url:"https://virtastic.github.io/jka-web/",desc:"Duelos de sabre de luz e Força",img:S+"6020/header.jpg"},
 {nome:"The Elder Scrolls III: Morrowind",categoria:"RPG",url:"https://morrowind.virtastic.app",desc:"RPG de mundo aberto clássico",img:S+"22320/header.jpg"},
-{nome:"Cossacks: European Wars",categoria:"Estratégia",url:"https://mistercoderman.github.io/cossacks-1.52-platform/web/",desc:"Estratégia militar em tempo real"}
+{nome:"Cossacks: European Wars",categoria:"Estratégia",url:"https://mistercoderman.github.io/cossacks-1.52-platform/web/",desc:"Estratégia militar em tempo real"},
+{nome:"Need for Speed II SE",categoria:"Corrida",url:"https://riza.github.io/NFS2WEB/",desc:"Port nativo em WebGL e WebAssembly a 60 FPS"}
 ];
 if(typeof module!=="undefined")module.exports=JOGOS;else window.GAMES=JOGOS;
