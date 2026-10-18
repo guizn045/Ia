@@ -38,6 +38,14 @@ var JOGOS=[
 {nome:"Night City Racing",categoria:"Corrida",url:"https://nightcityracing.github.io/",desc:"Corrida noturna pelas ruas da cidade"},
 {nome:"Traffic Jam 3D",categoria:"Corrida",url:"https://trafficjam3d.github.io/trafficjam3d/",desc:"Desvie do trânsito sem bater"},
 {nome:"PolyTrack",categoria:"Corrida",url:"https://polytrack.github.io/",desc:"Pistas low-poly cheias de rampas e loopings"},
-{nome:"Madalin Stunt Cars 3",categoria:"Corrida",url:"https://ubg365.github.io/madalin-stunt-cars-3/",desc:"Manobras e acrobacias com carros esportivos"}
+{nome:"Madalin Stunt Cars 3",categoria:"Corrida",url:"https://ubg365.github.io/madalin-stunt-cars-3/",desc:"Manobras e acrobacias com carros esportivos"},
+{nome:"Return to Castle Wolfenstein (completo)",categoria:"FPS",url:"https://ecatomb.github.io/rtcw-wasm/",desc:"Shooter 3D clássico completo rodando via WebAssembly",img:S+"9010/header.jpg"},
+{nome:"Half-Life: Blue Shift",categoria:"FPS",url:"https://x8bitrain.github.io/webXash/?bshift",desc:"A expansão clássica da Valve, inteira",img:S+"130/header.jpg"},
+{nome:"Smokin' Guns",categoria:"FPS",url:"https://smokin-guns.org/web/",desc:"Tiro multiplayer no Velho Oeste, engine do Quake III"},
+{nome:"GTA: San Andreas",categoria:"Aventura",url:"https://gta-sa-web.github.io/port/",desc:"Engine em JavaScript com mapa e física 3D",img:S+"12120/header.jpg"},
+{nome:"S.T.A.L.K.E.R.",categoria:"FPS",url:"https://andrey-prikazchikov.github.io/Roentgen-Engine/",desc:"Chernobyl em 3D",img:S+"4500/header.jpg"},
+{nome:"Star Wars Jedi Academy",categoria:"FPS",url:"https://virtastic.github.io/jka-web/",desc:"Duelos de sabre de luz e Força",img:S+"6020/header.jpg"},
+{nome:"The Elder Scrolls III: Morrowind",categoria:"RPG",url:"https://virtastic.github.io/openmw-web/",desc:"RPG de mundo aberto clássico",img:S+"22320/header.jpg"},
+{nome:"Cossacks",categoria:"Estratégia",url:"https://mistercoderman.github.io/cossacks-1.52-platform/",desc:"Estratégia militar em tempo real"}
 ];
 if(typeof module!=="undefined")module.exports=JOGOS;else window.GAMES=JOGOS;
