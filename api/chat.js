@@ -10,40 +10,25 @@ export default async function handler(req, res) {
     const { messages } = req.body;
     const userMessage = messages[messages.length - 1].content;
 
-    // Utilizando um endpoint alternativo de alta performance focado em modelos abertos e livres
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    // Gateway público e aberto, totalmente gratuito e sem necessidade de chaves (API Key)
+    const response = await fetch("https://text.pollinations.ai/", {
       method: "POST",
-      headers: {
-        "Authorization": `Bearer ${process.env.GROQ_API_KEY || "demo"}`,
-        "Content-Type": "application/json"
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: userMessage }],
-        temperature: 0.9
+        model: "openai-large", // Roteamento para modelos avançados abertos
+        json: false
       })
     });
 
-    const data = await response.json();
-    let replyText = "";
+    const replyText = await response.text();
 
-    if (data.choices && data.choices[0]?.message?.content) {
-      replyText = data.choices[0].message.content;
-    } else if (data.error) {
-      replyText = "Aviso: " + (data.error.message || JSON.stringify(data.error));
-    } else {
-      // Fallback para uma API de inferência direta livre
-      const altResponse = await fetch("https://router.huggingface.co/hf-inference/models/cognitivecomputations/dolphin-2.9.2-llama3-8b", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ inputs: userMessage, parameters: { max_new_tokens: 800 } })
-      });
-      const altData = await altResponse.json();
-      replyText = altData[0]?.generated_text || "Sistema online e pronto.";
+    if (!replyText || replyText.includes("<html>")) {
+      return res.status(200).json({ reply: "O motor livre está a processar. Tente enviar a mensagem novamente em instantes." });
     }
 
     return res.status(200).json({ reply: replyText });
   } catch (error) {
-    return res.status(500).json({ reply: "Erro interno: " + error.message });
+    return res.status(500).json({ reply: "Erro de conexão: " + error.message });
   }
 }
