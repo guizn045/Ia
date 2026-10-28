@@ -8,13 +8,19 @@ export default async function handler(req, res) {
 
   try {
     const { messages } = req.body;
-    const colabUrl = process.env.COLAB_URL; 
 
-    if (!colabUrl) {
-      return res.status(200).json({ reply: "Erro: Falta configurar a variável COLAB_URL na Vercel." });
+    // Bucket ID já configurado automaticamente
+    const bucketId = "qwen-colab-chat-9831a2";
+    const urlRes = await fetch(`https://kvdb.io/${bucketId}/url`);
+    const colabUrl = (await urlRes.text()).trim();
+
+    if (!colabUrl || !colabUrl.startsWith("http")) {
+      return res.status(200).json({ 
+        reply: "Erro: O Google Colab está desligado ou ainda não atualizou o link." 
+      });
     }
 
-    // O fetch agora inclui o cabeçalho para ignorar a página de aviso do LocalTunnel
+    // Envia a mensagem para o teu Google Colab atual
     const response = await fetch(`${colabUrl}/chat`, {
       method: "POST",
       headers: { 
@@ -25,19 +31,17 @@ export default async function handler(req, res) {
     });
 
     const responseText = await response.text();
-    
-    // Tenta converter para JSON de forma segura
     let data;
     try {
       data = JSON.parse(responseText);
     } catch (e) {
       return res.status(200).json({ 
-        reply: "Erro: O Google Colab ou o túnel devolveram uma resposta inválida. Verifica se a aba do Colab continua aberta." 
+        reply: "Erro: O Google Colab devolveu uma resposta inválida. Verifica se a aba do Colab continua aberta." 
       });
     }
 
     return res.status(200).json({ reply: data.reply || "Resposta vazia do servidor." });
   } catch (error) {
-    return res.status(200).json({ reply: "Erro ao comunicar com o servidor Colab: " + error.message });
+    return res.status(200).json({ reply: "Erro ao comunicar com o servidor: " + error.message });
   }
 }
