@@ -14,16 +14,30 @@ export default async function handler(req, res) {
       return res.status(200).json({ reply: "Erro: Falta configurar a variável COLAB_URL na Vercel." });
     }
 
-    // Envia o histórico de mensagens para o teu servidor do Google Colab
+    // O fetch agora inclui o cabeçalho para ignorar a página de aviso do LocalTunnel
     const response = await fetch(`${colabUrl}/chat`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { 
+        "Content-Type": "application/json",
+        "bypass-tunnel-reminder": "true" 
+      },
       body: JSON.stringify({ messages })
     });
 
-    const data = await response.json();
+    const responseText = await response.text();
+    
+    // Tenta converter para JSON de forma segura
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch (e) {
+      return res.status(200).json({ 
+        reply: "Erro: O Google Colab ou o túnel devolveram uma resposta inválida. Verifica se a aba do Colab continua aberta." 
+      });
+    }
+
     return res.status(200).json({ reply: data.reply || "Resposta vazia do servidor." });
   } catch (error) {
-    return res.status(500).json({ reply: "Erro ao comunicar com o teu servidor Colab: " + error.message });
+    return res.status(200).json({ reply: "Erro ao comunicar com o servidor Colab: " + error.message });
   }
 }
