@@ -1,56 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Privado</title>
+    <style>
+        body { background: #121212; color: #fff; font-family: sans-serif; margin: 0; padding: 16px; display: flex; flex-direction: column; height: 100vh; box-sizing: border-box; }
+        #chat { flex: 1; overflow-y: auto; margin-bottom: 12px; display: flex; flex-direction: column; gap: 8px; }
+        .msg { padding: 10px 14px; border-radius: 8px; max-width: 85%; word-break: break-word; }
+        .user { background: #007bff; align-self: flex-end; }
+        .assistant { background: #2a2a2a; align-self: flex-start; }
+        .box { display: flex; gap: 8px; }
+        input { flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #2a2a2a; color: #fff; font-size: 16px; outline: none; }
+        button { background: #007bff; color: white; border: none; padding: 0 16px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div id="chat">
+        <div class="msg assistant">Olá! O chat está pronto. Podes enviar a tua mensagem.</div>
+    </div>
+
+    <div class="box">
+        <input type="text" id="txt" placeholder="Escreve uma mensagem..." onkeydown="if(event.key==='Enter') enviar()">
+        <button onclick="enviar()">Enviar</button>
+    </div>
+
     <script>
-    let mensagensHistorico = [];
+    let historico = [];
 
-    async function enviarMensagem() {
-        alert("Botão clicado com sucesso!"); // Teste rápido para ver se o telemóvel dispara o clique
-
-        const input = document.getElementById('user-input');
-        const textoUsuario = input.value.trim();
-        if (!textoUsuario) {
-            alert("A caixa de texto está vazia!");
-            return;
-        }
+    async function enviar() {
+        const input = document.getElementById('txt');
+        const texto = input.value.trim();
+        if (!texto) return;
 
         input.value = "";
-        adicionarMensagemNaTela("user", textoUsuario);
-        mensagensHistorico.push({ role: "user", content: textoUsuario });
+        adicionarMsg("user", texto);
+        historico.push({ role: "user", content: texto });
 
-        const idEspera = adicionarMensagemNaTela("assistant", "A pensar...");
+        const idEspera = adicionarMsg("assistant", "A pensar...");
 
         try {
-            const resposta = await fetch('/api/chat', {
+            const res = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ messages: mensagensHistorico })
+                body: JSON.stringify({ messages: historico })
             });
 
-            const dados = await resposta.json();
-            const respostaIA = dados.reply || "Sem resposta do servidor.";
+            const data = await res.json();
+            removerMsg(idEspera);
             
-            removerMensagem(idEspera);
-            adicionarMensagemNaTela("assistant", respostaIA);
-            mensagensHistorico.push({ role: "assistant", content: respostaIA });
-        } catch (erro) {
-            alert("Erro no fetch: " + erro.message);
-            removerMensagem(idEspera);
-            adicionarMensagemNaTela("assistant", "Erro de ligação com o servidor: " + erro.message);
+            const respostaIA = data.reply || "Sem resposta.";
+            adicionarMsg("assistant", respostaIA);
+            historico.push({ role: "assistant", content: respostaIA });
+        } catch (e) {
+            removerMsg(idEspera);
+            adicionarMsg("assistant", "Erro de ligação ao servidor.");
         }
     }
 
-    function adicionarMensagemNaTela(role, texto) {
-        const container = document.getElementById('chat-container');
+    function adicionarMsg(role, texto) {
+        const chat = document.getElementById('chat');
         const div = document.createElement('div');
-        div.className = `message ${role}`;
+        div.className = "msg " + role;
         div.textContent = texto;
-        div.id = 'msg-' + Math.random().toString(36).substring(2);
-        container.appendChild(div);
-        container.scrollTop = container.scrollHeight;
+        div.id = 'm-' + Math.random();
+        chat.appendChild(div);
+        chat.scrollTop = chat.scrollHeight;
         return div.id;
     }
 
-    function removerMensagem(id) {
+    function removerMsg(id) {
         const el = document.getElementById(id);
         if (el) el.remove();
     }
     </script>
-    
+</body>
+</html>
