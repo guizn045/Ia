@@ -10,41 +10,25 @@ export default async function handler(req, res) {
     const { messages } = req.body;
     const userMessage = messages[messages.length - 1].content;
 
-    // Ligação a um modelo independente e recente sem restrições morais ou filtros
-    const response = await fetch("https://router.huggingface.co/hf-inference/models/huihui-ai/Llama-3.1-8B-Instruct-Abliterated", {
+    // Endpoint alternativo de alta velocidade para modelos abertos
+    const response = await fetch("https://text.pollinations.ai/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        inputs: userMessage, 
-        parameters: { max_new_tokens: 1000, return_full_text: false } 
+      body: JSON.stringify({
+        messages: [{ role: "user", content: userMessage }],
+        model: "llama", // Modelo base rápido e sem filtros corporativos restritos
+        json: false
       })
     });
 
-    const rawText = await response.text();
-    let replyText = "";
+    const replyText = await response.text();
 
-    try {
-      const data = JSON.parse(rawText);
-      if (Array.isArray(data) && data[0]?.generated_text) {
-        replyText = data[0].generated_text;
-      } else if (data.generated_text) {
-        replyText = data.generated_text;
-      } else if (data.error) {
-        replyText = "Aviso do motor independente: " + data.error;
-      } else {
-        replyText = rawText;
-      }
-    } catch (e) {
-      // Se o servidor estiver a despertar, avisa de forma limpa sem quebrar o chat
-      if (rawText.includes("DOCTYPE") || rawText.includes("<html>")) {
-        replyText = "O modelo está a ligar no servidor descentralizado. Aguarde alguns segundos e envie novamente.";
-      } else {
-        replyText = rawText || "Servidor online.";
-      }
+    if (!replyText || replyText.includes("<html>")) {
+      return res.status(200).json({ reply: "A processar no motor livre. Envia novamente em instantes." });
     }
 
     return res.status(200).json({ reply: replyText });
   } catch (error) {
-    return res.status(500).json({ reply: "Erro interno: " + error.message });
+    return res.status(500).json({ reply: "Erro de conexão: " + error.message });
   }
 }
