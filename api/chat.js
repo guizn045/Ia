@@ -10,21 +10,31 @@ export default async function handler(req, res) {
     const { messages } = req.body;
     const userMessage = messages[messages.length - 1].content;
 
-    // Usando o modelo gratuito correto e suportado
-    const response = await fetch("https://text.pollinations.ai/", {
+    // Ligação a um modelo independente e recém-lançado, totalmente sem filtros corporativos
+    const response = await fetch("https://router.huggingface.co/hf-inference/models/cognitivecomputations/Dolphin3.0-R1-Mistral-24B", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: [{ role: "user", content: userMessage }],
-        model: "openai", 
-        json: false
+      body: JSON.stringify({ 
+        inputs: userMessage, 
+        parameters: { max_new_tokens: 1000, return_full_text: false } 
       })
     });
 
-    const replyText = await response.text();
+    const data = await response.json();
+    let replyText = "";
+
+    if (Array.isArray(data) && data[0]?.generated_text) {
+      replyText = data[0].generated_text;
+    } else if (data.generated_text) {
+      replyText = data.generated_text;
+    } else if (data.error) {
+      replyText = "Motor independente a despertar: " + data.error;
+    } else {
+      replyText = "O modelo está a carregar no servidor descentralizado. Tente enviar novamente.";
+    }
 
     return res.status(200).json({ reply: replyText });
   } catch (error) {
-    return res.status(500).json({ reply: "Erro de conexão: " + error.message });
+    return res.status(500).json({ reply: "Erro interno: " + error.message });
   }
 }
