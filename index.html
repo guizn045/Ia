@@ -1,23 +1,34 @@
-async function enviarMensagem(textoUsuario) {
-    // Adiciona a mensagem do utilizador ao array de histórico (messages)
-    mensagensHistorico.push({ role: "user", content: textoUsuario });
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <title>Meu Chat Privado</title>
+    <!-- Os teus estilos CSS aqui -->
+</head>
+<body>
 
-    try {
-        const resposta = await fetch('/api/chat', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ messages: mensagensHistorico })
-        });
+    <!-- O teu layout do chat aqui -->
 
-        const dados = await resposta.json();
-        
-        // Exibe a resposta da IA no teu chat
-        adicionarMensagemNaTela("assistant", dados.reply);
-        
-        // Guarda também no histórico
-        mensagensHistorico.push({ role: "assistant", content: dados.reply });
-    } catch (erro) {
-        console.error("Erro:", erro);
-        adicionarMensagemNaTela("assistant", "Erro de ligação com o servidor.");
+    <!-- COLA O TEU JAVASCRIPT AQUI DENTRO -->
+    <script>
+    async function enviarMensagem(textoUsuario) {
+        mensagensHistorico.push({ role: "user", content: textoUsuario });
+
+        try {
+            const resposta = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: mensagensHistorico })
+            });
+
+            const dados = await resposta.json();
+            adicionarMensagemNaTela("assistant", dados.reply);
+            mensagensHistorico.push({ role: "assistant", content: dados.reply });
+        } catch (erro) {
+            console.error("Erro:", erro);
+            adicionarMensagemNaTela("assistant", "Erro de ligação com o servidor.");
+        }
     }
-}
+    </script>
+</body>
+</html>
