@@ -44,8 +44,8 @@
 
     async function loadAI() {
       try {
-        // Usando um ID de modelo padrão e 100% compatível
-        const selectedModel = "Llama-3-8B-Instruct-q4f32_1";
+        // Modelo oficial leve e 100% suportado pelo WebLLM em telemóveis
+        const selectedModel = "Llama-3.2-1B-Instruct-q4f16_1";
         
         engine = await webllm.CreateMLCEngine(
           selectedModel,
