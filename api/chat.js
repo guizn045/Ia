@@ -8,43 +8,22 @@ export default async function handler(req, res) {
 
   try {
     const { messages } = req.body;
-    const userMessage = messages[messages.length - 1].content;
+    const colabUrl = process.env.COLAB_URL; 
 
-    // Rota direta para um modelo abliterated de livre acesso
-    const response = await fetch("https://router.huggingface.co/hf-inference/models/huihui-ai/Llama-3.1-8B-Instruct-Abliterated", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        inputs: userMessage, 
-        parameters: { max_new_tokens: 1000, return_full_text: false } 
-      })
-    });
-
-    const rawText = await response.text();
-    let replyText = "";
-
-    try {
-      const data = JSON.parse(rawText);
-      if (Array.isArray(data) && data[0]?.generated_text) {
-        replyText = data[0].generated_text;
-      } else if (data.generated_text) {
-        replyText = data.generated_text;
-      } else if (data.error) {
-        replyText = "Aviso do motor: " + data.error;
-      } else {
-        replyText = rawText;
-      }
-    } catch (e) {
-      // Tratamento caso o servidor esteja a fazer o aquecimento inicial (cold start)
-      if (rawText.includes("DOCTYPE") || rawText.includes("<html>")) {
-        replyText = "O motor está a ligar no servidor. Aguarda alguns segundos e envia novamente.";
-      } else {
-        replyText = rawText || "Servidor online.";
-      }
+    if (!colabUrl) {
+      return res.status(200).json({ reply: "Erro: Falta configurar a variável COLAB_URL na Vercel." });
     }
 
-    return res.status(200).json({ reply: replyText });
+    // Envia o histórico de mensagens para o teu servidor do Google Colab
+    const response = await fetch(`${colabUrl}/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ messages })
+    });
+
+    const data = await response.json();
+    return res.status(200).json({ reply: data.reply || "Resposta vazia do servidor." });
   } catch (error) {
-    return res.status(500).json({ reply: "Erro interno: " + error.message });
+    return res.status(500).json({ reply: "Erro ao comunicar com o teu servidor Colab: " + error.message });
   }
 }
