@@ -9,39 +9,30 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body;
 
-    // Bucket ID já configurado automaticamente
-    const bucketId = "qwen-colab-chat-9831a2";
-    const urlRes = await fetch(`https://kvdb.io/${bucketId}/url`);
-    const colabUrl = (await urlRes.text()).trim();
-
-    if (!colabUrl || !colabUrl.startsWith("http")) {
-      return res.status(200).json({ 
-        reply: "Erro: O Google Colab está desligado ou ainda não atualizou o link." 
-      });
-    }
-
-    // Envia a mensagem para o teu Google Colab atual
-    const response = await fetch(`${colabUrl}/chat`, {
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers: { 
-        "Content-Type": "application/json",
-        "bypass-tunnel-reminder": "true" 
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Content-Type": "application/json"
       },
-      body: JSON.stringify({ messages })
+      body: JSON.stringify({
+        model: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free", 
+        messages: messages
+      })
     });
 
-    const responseText = await response.text();
-    let data;
-    try {
-      data = JSON.parse(responseText);
-    } catch (e) {
-      return res.status(200).json({ 
-        reply: "Erro: O Google Colab devolveu uma resposta inválida. Verifica se a aba do Colab continua aberta." 
-      });
+    const data = await response.json();
+    
+    if (data.error) {
+      return res.status(200).json({ reply: "Erro da API: " + data.error.message });
     }
 
-    return res.status(200).json({ reply: data.reply || "Resposta vazia do servidor." });
+    const reply = data.choices && data.choices[0] && data.choices[0].message 
+      ? data.choices[0].message.content 
+      : "Resposta vazia.";
+
+    return res.status(200).json({ reply });
   } catch (error) {
-    return res.status(200).json({ reply: "Erro ao comunicar com o servidor: " + error.message });
+    return res.status(200).json({ reply: "Erro ao comunicar com a API: " + error.message });
   }
 }
