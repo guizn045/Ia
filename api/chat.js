@@ -9,27 +9,33 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body;
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+    // Transforma as mensagens do chat num formato de texto simples para o modelo
+    const prompt = messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n") + "\nAssistant:";
+
+    const response = await fetch("https://api-inference.huggingface.co/models/cognitivecomputations/dolphin-2.9.3-llama-3-8b-instruct", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${process.env.OPENROUTER_API_KEY}`,
+        "Authorization": `Bearer ${process.env.HF_API_KEY}`,
         "Content-Type": "application/json"
       },
       body: JSON.stringify({
-        model: "cognitivecomputations/dolphin-mistral-24b-venice-edition:free", 
-        messages: messages
+        inputs: prompt,
+        parameters: { max_new_tokens: 800, temperature: 0.7, return_full_text: false }
       })
     });
 
     const data = await response.json();
     
     if (data.error) {
-      return res.status(200).json({ reply: "Erro da API: " + data.error.message });
+      return res.status(200).json({ reply: "Erro da API: " + data.error });
     }
 
-    const reply = data.choices && data.choices[0] && data.choices[0].message 
-      ? data.choices[0].message.content 
-      : "Resposta vazia.";
+    let reply = "Resposta vazia.";
+    if (Array.isArray(data) && data[0] && data[0].generated_text) {
+      reply = data[0].generated_text.trim();
+    } else if (data.generated_text) {
+      reply = data.generated_text.trim();
+    }
 
     return res.status(200).json({ reply });
   } catch (error) {
