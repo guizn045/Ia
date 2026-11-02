@@ -9,10 +9,10 @@ export default async function handler(req, res) {
   try {
     const { messages } = req.body;
 
-    // Transforma as mensagens do chat num formato de texto simples para o modelo
     const prompt = messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n") + "\nAssistant:";
 
-    const response = await fetch("https://api-inference.huggingface.co/models/cognitivecomputations/dolphin-2.9.3-llama-3-8b-instruct", {
+    // Novo endpoint oficial do router da Hugging Face
+    const response = await fetch("https://router.huggingface.co/hf-inference/models/cognitivecomputations/dolphin-2.9.3-llama-3-8b-instruct", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.HF_API_KEY}`,
