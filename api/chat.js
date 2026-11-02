@@ -8,26 +8,23 @@ export default async function handler(req, res) {
 
   try {
     const { messages } = req.body;
-    
-    // Converte o histórico de chat num formato de prompt linear compatível com a rede
     const prompt = messages.map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`).join("\n") + "\nAssistant:";
 
-    // 1. Envia o pedido para a API pública da AI Horde
     const response = await fetch("https://stablehorde.net/api/v2/generate/text/async", {
       method: "POST",
       headers: {
-        "apikey": process.env.HORDE_API_KEY || "0000000000", // "0000000000" funciona anonimamente
+        "apikey": process.env.HORDE_API_KEY || "0000000000",
         "Content-Type": "application/json",
-        "Client-Agent": "VercelMobileChat:1.0:github.com/user/project"
+        "Client-Agent": "VercelMobileChat:1.0"
       },
       body: JSON.stringify({
         prompt: prompt,
         params: {
-          max_context_length: 1500,
-          max_length: 300,
+          max_context_length: 1000,
+          max_length: 250,
           temperature: 0.8
         },
-        models: ["llama_3_70b_instruct", "dolphin-2.9.3-llama-3-8b", "openchat_3.5"]
+        models: ["llama_3_70b_instruct", "dolphin-2.9.3-llama-3-8b"]
       })
     });
 
@@ -35,13 +32,13 @@ export default async function handler(req, res) {
     const requestId = data.id;
 
     if (!requestId) {
-      return res.status(200).json({ reply: "Erro: A Horde rejeitou o pedido inicial de entrada na fila." });
+      return res.status(200).json({ reply: "Erro: A Horde rejeitou o pedido." });
     }
 
-    // 2. Ciclo de verificação otimizado para respeitar os limites de tempo da Vercel
     let reply = "";
-    for (let i = 0; i < 6; i++) {
-      await new Promise(resolve => setTimeout(resolve, 1500)); // Intervalo de 1.5 segundos
+    // 8 tentativas com intervalos curtos para encaixar no limite da Vercel
+    for (let i = 0; i < 8; i++) {
+      await new Promise(resolve => setTimeout(resolve, 1100));
       
       const checkRes = await fetch(`https://stablehorde.net/api/v2/generate/text/status/${requestId}`);
       const checkData = await checkRes.json();
@@ -51,17 +48,17 @@ export default async function handler(req, res) {
         break;
       }
       if (checkData.faulted) {
-        reply = "Erro: O computador voluntário da rede falhou a geração.";
+        reply = "Erro no worker da rede.";
         break;
       }
     }
 
     if (!reply) {
-      reply = "A rede está muito concorrida neste momento à procura de um voluntário livre. Tenta enviar a mensagem novamente!";
+      reply = "A resposta demorou muito a chegar da rede descentralizada. Tenta enviar novamente!";
     }
 
     return res.status(200).json({ reply });
   } catch (error) {
-    return res.status(200).json({ reply: "Erro de comunicação com a Horde: " + error.message });
+    return res.status(200).json({ reply: "Erro de comunicação: " + error.message });
   }
 }
